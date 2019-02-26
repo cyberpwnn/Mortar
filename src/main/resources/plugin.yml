@@ -1,0 +1,3 @@
+name: ${project.name}
+main: mortar.bukkit.plugin.MortarAPIPlugin
+version: ${project.version}
