@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import mortar.lang.json.JSONArray;
 import mortar.lang.json.JSONObject;
+import mortar.util.text.C;
 
 /**
  * Raw Text holder
