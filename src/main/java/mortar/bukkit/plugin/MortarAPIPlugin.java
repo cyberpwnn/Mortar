@@ -1,13 +1,22 @@
 package mortar.bukkit.plugin;
 
+import org.bukkit.Bukkit;
+
+import mortar.api.sched.J;
 import mortar.bukkit.command.Command;
+import mortar.bukkit.command.Permission;
+import mortar.compute.math.M;
+import mortar.util.queue.PhantomQueue;
+import mortar.util.queue.Queue;
 import mortar.util.text.C;
-import mortar.util.text.TXT;
 
 public class MortarAPIPlugin extends MortarPlugin
 {
 	@Instance
 	public static MortarAPIPlugin p;
+
+	@Control
+	public static SomeController sc;
 
 	@Command
 	private CommandMortar mort;
@@ -15,10 +24,27 @@ public class MortarAPIPlugin extends MortarPlugin
 	@Command
 	private CommandClearConsole cls;
 
+	@Permission
+	public static PermissionMortar perm;
+	private static Queue<String> logQueue;
+
 	@Override
 	public void start()
 	{
+		logQueue = new PhantomQueue<String>();
+		M.initTicking();
+		J.a(() -> checkForUpdates());
+		J.ar(() -> flushLogBuffer(), 5);
+		J.ar(() -> M.uptickAsync(), 0);
+		J.sr(() -> M.uptick(), 0);
+	}
 
+	private void flushLogBuffer()
+	{
+		while(logQueue.hasNext())
+		{
+			Bukkit.getConsoleSender().sendMessage(logQueue.next());
+		}
 	}
 
 	@Override
@@ -28,8 +54,36 @@ public class MortarAPIPlugin extends MortarPlugin
 	}
 
 	@Override
-	public String getTag(String subTag)
+	public String getTag(String t)
 	{
-		return TXT.makeTag(C.BLUE, C.DARK_GRAY, C.GRAY, "Mortar");
+		if(t.trim().isEmpty())
+		{
+			return Mortar.tag(getName());
+		}
+
+		return Mortar.tag(getName() + " " + C.GRAY + " - " + C.WHITE + t);
+	}
+
+	private void checkForUpdates()
+	{
+		try
+		{
+
+		}
+
+		catch(Throwable e)
+		{
+
+		}
+	}
+
+	public static void log(String string)
+	{
+		if(logQueue == null)
+		{
+			logQueue = new PhantomQueue<>();
+		}
+
+		logQueue.queue(string);
 	}
 }

@@ -1,6 +1,7 @@
 package mortar.bukkit.plugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -13,34 +14,361 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import mortar.api.sched.J;
 import mortar.bukkit.command.ICommand;
 import mortar.bukkit.command.MortarCommand;
+import mortar.bukkit.command.MortarPermission;
+import mortar.bukkit.command.Permission;
 import mortar.bukkit.command.RouterCommand;
 import mortar.bukkit.command.VirtualCommand;
-import mortar.bukkit.nms.V;
+import mortar.compute.math.M;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
+import mortar.logic.io.VIO;
+import mortar.util.reflection.V;
+import mortar.util.text.D;
+import mortar.util.text.Logged;
 
-public abstract class MortarPlugin extends JavaPlugin
+public abstract class MortarPlugin extends JavaPlugin implements Logged, Listener
 {
 	private GMap<GList<String>, VirtualCommand> commands;
+	private GList<MortarCommand> commandCache;
+	private GList<MortarPermission> permissionCache;
+	private GMap<String, IController> controllers;
+	private GList<IController> cachedControllers;
+	private GMap<Class<? extends IController>, IController> cachedClassControllers;
+	private int controllerTick;
 
-	public abstract void start();
+	@Override
+	public void l(Object... l)
+	{
+		D.as(getName()).l(l);
+	}
 
-	public abstract void stop();
+	@Override
+	public void w(Object... l)
+	{
+		D.as(getName()).w(l);
+	}
 
-	public abstract String getTag(String subTag);
+	@Override
+	public void f(Object... l)
+	{
+		D.as(getName()).f(l);
+	}
 
 	@Override
 	public void onEnable()
 	{
 		registerInstance();
+		registerPermissions();
 		registerCommands();
+		registerControllers();
+		controllerTick = J.sr(() -> tickControllers(), 0);
+		J.a(() -> outputInfo());
+		registerListener(this);
 		start();
+	}
+
+	public void unregisterAll()
+	{
+		stopControllers();
+		unregisterListeners();
+		unregisterCommands();
+		unregisterPermissions();
+		unregisterInstance();
+	}
+
+	private void outputInfo()
+	{
+		try
+		{
+			VIO.delete(getDataFolder("info"));
+			getDataFolder("info").mkdirs();
+			outputPluginInfo();
+			outputCommandInfo();
+			outputPermissionInfo();
+		}
+
+		catch(Throwable e)
+		{
+
+		}
+	}
+
+	private void outputPermissionInfo() throws IOException
+	{
+		FileConfiguration fc = new YamlConfiguration();
+
+		for(MortarPermission i : permissionCache)
+		{
+			chain(i, fc);
+		}
+
+		fc.save(getDataFile("info", "permissions.yml"));
+	}
+
+	private void chain(MortarPermission i, FileConfiguration fc)
+	{
+		GList<String> ff = new GList<String>();
+
+		for(MortarPermission j : i.getChildren())
+		{
+			ff.add(j.getFullNode());
+		}
+
+		fc.set(i.getFullNode().replaceAll("\\Q.\\E", ",") + "." + "description", i.getDescription());
+		fc.set(i.getFullNode().replaceAll("\\Q.\\E", ",") + "." + "default", i.isDefault());
+		fc.set(i.getFullNode().replaceAll("\\Q.\\E", ",") + "." + "children", ff);
+
+		for(MortarPermission j : i.getChildren())
+		{
+			chain(j, fc);
+		}
+	}
+
+	private void outputCommandInfo() throws IOException
+	{
+		FileConfiguration fc = new YamlConfiguration();
+
+		for(MortarCommand i : commandCache)
+		{
+			chain(i, "/", fc);
+		}
+
+		fc.save(getDataFile("info", "commands.yml"));
+	}
+
+	private void chain(MortarCommand i, String c, FileConfiguration fc)
+	{
+		String n = c + (c.length() == 1 ? "" : " ") + i.getNode();
+		fc.set(n + "." + "description", i.getDescription());
+		fc.set(n + "." + "required-permissions", i.getRequiredPermissions());
+		fc.set(n + "." + "aliases", i.getAllNodes());
+
+		for(MortarCommand j : i.getChildren())
+		{
+			chain(j, n, fc);
+		}
+	}
+
+	private void outputPluginInfo() throws IOException
+	{
+		FileConfiguration fc = new YamlConfiguration();
+		fc.set("version", getDescription().getVersion());
+		fc.set("name", getDescription().getName());
+		fc.save(getDataFile("info", "plugin.yml"));
+	}
+
+	private void registerPermissions()
+	{
+		permissionCache = new GList<>();
+
+		for(Field i : getClass().getDeclaredFields())
+		{
+			if(i.isAnnotationPresent(Permission.class))
+			{
+				try
+				{
+					i.setAccessible(true);
+					MortarPermission pc = (MortarPermission) i.getType().getConstructor().newInstance();
+					i.set(Modifier.isStatic(i.getModifiers()) ? null : this, pc);
+					registerPermission(pc);
+					permissionCache.add(pc);
+				}
+
+				catch(IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException | SecurityException e)
+				{
+					w("Failed to register permission (field " + i.getName() + ")");
+					e.printStackTrace();
+				}
+			}
+		}
+
+		for(org.bukkit.permissions.Permission i : computePermissions())
+		{
+			try
+			{
+				Bukkit.getPluginManager().addPermission(i);
+			}
+
+			catch(Throwable e)
+			{
+
+			}
+		}
+	}
+
+	private GList<org.bukkit.permissions.Permission> computePermissions()
+	{
+		GList<org.bukkit.permissions.Permission> g = new GList<>();
+		for(Field i : getClass().getDeclaredFields())
+		{
+			if(i.isAnnotationPresent(Permission.class))
+			{
+				try
+				{
+					MortarPermission x = (MortarPermission) i.get(Modifier.isStatic(i.getModifiers()) ? null : this);
+					g.add(toPermission(x));
+					g.addAll(computePermissions(x));
+				}
+
+				catch(IllegalArgumentException | IllegalAccessException | SecurityException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return g.removeDuplicates();
+	}
+
+	private GList<org.bukkit.permissions.Permission> computePermissions(MortarPermission p)
+	{
+		GList<org.bukkit.permissions.Permission> g = new GList<>();
+
+		if(p == null)
+		{
+			return g;
+		}
+
+		for(MortarPermission i : p.getChildren())
+		{
+			if(i == null)
+			{
+				continue;
+			}
+
+			g.add(toPermission(i));
+			g.addAll(computePermissions(i));
+		}
+
+		return g;
+	}
+
+	private org.bukkit.permissions.Permission toPermission(MortarPermission p)
+	{
+		if(p == null)
+		{
+			return null;
+		}
+
+		org.bukkit.permissions.Permission perm = new org.bukkit.permissions.Permission(p.getFullNode() + (p.hasParent() ? "" : ".*"));
+		perm.setDescription(p.getDescription() == null ? "" : p.getDescription());
+		perm.setDefault(p.isDefault() ? PermissionDefault.TRUE : PermissionDefault.OP);
+
+		for(MortarPermission i : p.getChildren())
+		{
+			perm.getChildren().put(i.getFullNode(), true);
+		}
+
+		return perm;
+	}
+
+	private void registerPermission(MortarPermission pc)
+	{
+
+	}
+
+	@Override
+	public void onDisable()
+	{
+		stop();
+		J.csr(controllerTick);
+		unregisterListener(this);
+		unregisterAll();
+	}
+
+	private void tickControllers()
+	{
+		for(IController i : getControllers())
+		{
+			tickController(i);
+		}
+	}
+
+	private void tickController(IController i)
+	{
+		if(i.getTickInterval() < 0)
+		{
+			return;
+		}
+
+		if(M.interval(i.getTickInterval()))
+		{
+			try
+			{
+				i.tick();
+			}
+
+			catch(Throwable e)
+			{
+				w("Failed to tick controller " + i.getName());
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public GList<IController> getControllers()
+	{
+		return cachedControllers;
+	}
+
+	private void registerControllers()
+	{
+		controllers = new GMap<>();
+		cachedClassControllers = new GMap<>();
+
+		for(Field i : getClass().getDeclaredFields())
+		{
+			if(i.isAnnotationPresent(Control.class))
+			{
+				try
+				{
+					i.setAccessible(true);
+					IController pc = (IController) i.getType().getConstructor().newInstance();
+					registerController(pc);
+				}
+
+				catch(IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException | SecurityException e)
+				{
+					w("Failed to register controller (field " + i.getName() + ")");
+					e.printStackTrace();
+				}
+			}
+		}
+
+		cachedControllers = controllers.v();
+	}
+
+	public IController getController(Class<? extends IController> c)
+	{
+		return cachedClassControllers.get(c);
+	}
+
+	private void registerController(IController pc)
+	{
+		controllers.put(pc.getName(), pc);
+		cachedClassControllers.put(pc.getClass(), pc);
+		registerListener(pc);
+
+		try
+		{
+			pc.start();
+		}
+
+		catch(Throwable e)
+		{
+			w("Failed to start controller " + pc.getName());
+			e.printStackTrace();
+		}
 	}
 
 	private void registerInstance()
@@ -57,6 +385,7 @@ public abstract class MortarPlugin extends JavaPlugin
 
 				catch(IllegalArgumentException | IllegalAccessException | SecurityException e)
 				{
+					w("Failed to register instance (field " + i.getName() + ")");
 					e.printStackTrace();
 				}
 			}
@@ -77,6 +406,7 @@ public abstract class MortarPlugin extends JavaPlugin
 
 				catch(IllegalArgumentException | IllegalAccessException | SecurityException e)
 				{
+					w("Failed to unregister instance (field " + i.getName() + ")");
 					e.printStackTrace();
 				}
 			}
@@ -86,6 +416,7 @@ public abstract class MortarPlugin extends JavaPlugin
 	private void registerCommands()
 	{
 		commands = new GMap<>();
+		commandCache = new GList<>();
 
 		for(Field i : getClass().getDeclaredFields())
 		{
@@ -97,21 +428,16 @@ public abstract class MortarPlugin extends JavaPlugin
 					MortarCommand pc = (MortarCommand) i.getType().getConstructor().newInstance();
 					mortar.bukkit.command.Command c = i.getAnnotation(mortar.bukkit.command.Command.class);
 					registerCommand(pc, c.value());
+					commandCache.add(pc);
 				}
 
 				catch(IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException | SecurityException e)
 				{
+					w("Failed to register command (field " + i.getName() + ")");
 					e.printStackTrace();
 				}
 			}
 		}
-	}
-
-	@Override
-	public void onDisable()
-	{
-		stop();
-		unregisterAll();
 	}
 
 	@Override
@@ -208,7 +534,7 @@ public abstract class MortarPlugin extends JavaPlugin
 
 	public void unregisterListeners()
 	{
-		HandlerList.unregisterAll(this);
+		HandlerList.unregisterAll((Listener) this);
 	}
 
 	public void unregisterCommands()
@@ -219,11 +545,30 @@ public abstract class MortarPlugin extends JavaPlugin
 		}
 	}
 
-	public void unregisterAll()
+	private void unregisterPermissions()
 	{
-		unregisterListeners();
-		unregisterCommands();
-		unregisterInstance();
+		for(org.bukkit.permissions.Permission i : computePermissions())
+		{
+			Bukkit.getPluginManager().removePermission(i);
+		}
+	}
+
+	private void stopControllers()
+	{
+		for(IController i : controllers.v())
+		{
+			try
+			{
+				unregisterListener(i);
+				i.stop();
+			}
+
+			catch(Throwable e)
+			{
+				w("Failed to stop controller " + i.getName());
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public File getDataFile(String... strings)
@@ -245,4 +590,10 @@ public abstract class MortarPlugin extends JavaPlugin
 
 		return f;
 	}
+
+	public abstract void start();
+
+	public abstract void stop();
+
+	public abstract String getTag(String subTag);
 }

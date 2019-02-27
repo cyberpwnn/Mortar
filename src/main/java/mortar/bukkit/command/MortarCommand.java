@@ -18,6 +18,7 @@ public abstract class MortarCommand implements ICommand
 	private GList<String> requiredPermissions;
 	private String node;
 	private String category;
+	private String description;
 
 	/**
 	 * Override this with a super constructor as most commands shouldnt change these
@@ -35,6 +36,17 @@ public abstract class MortarCommand implements ICommand
 		this.nodes = new GList<String>(nodes);
 		requiredPermissions = new GList<>();
 		children = buildChildren();
+		description = "No Description";
+	}
+
+	public String getDescription()
+	{
+		return description;
+	}
+
+	protected void setDescription(String description)
+	{
+		this.description = description;
 	}
 
 	protected void requiresPermission(MortarPermission node)

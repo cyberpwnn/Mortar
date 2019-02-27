@@ -1,8 +1,11 @@
 package mortar.compute.math;
 
-
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import mortar.logic.format.F;
+import mortar.util.text.D;
 
 /**
  * Math
@@ -14,6 +17,57 @@ public class M
 	private static final int precision = 128;
 	private static final int modulus = 360 * precision;
 	private static final float[] sin = new float[modulus];
+	private static long TICK = 0;
+	private static long ATICK = 0;
+	private static long TIME = -1;
+
+	public static int iclip(double value, double min, double max)
+	{
+		return (int) clip(value, min, max);
+	}
+
+	public static void initTicking()
+	{
+		D d = new D(D.d, "Time");
+		TIME = new File("server.properties").lastModified();
+		TICK = ticksOnline();
+		d.l("Server Uptime: " + F.time(M.ms() - TIME, 0));
+	}
+
+	public static boolean interval(int m)
+	{
+		return tick() % Math.max(1, m) == 0;
+	}
+
+	public static boolean intervalAsync(int m)
+	{
+		return tickAsync() % Math.max(1, m) == 0;
+	}
+
+	public static long tick()
+	{
+		return TICK;
+	}
+
+	public static long tickAsync()
+	{
+		return ATICK;
+	}
+
+	public static long ticksOnline()
+	{
+		return timeOnline() / 50;
+	}
+
+	public static long timeStarted()
+	{
+		return TIME;
+	}
+
+	public static long timeOnline()
+	{
+		return ms() - TIME;
+	}
 
 	public static double clip(double value, double min, double max)
 	{
@@ -337,5 +391,25 @@ public class M
 	public static double absoluteZero(double d)
 	{
 		return d < 0 ? 0 : d;
+	}
+
+	public static void uptick()
+	{
+		TICK++;
+	}
+
+	public static void uptickAsync()
+	{
+		ATICK++;
+	}
+
+	public static long epochDays()
+	{
+		return epochDays(M.ms());
+	}
+
+	private static long epochDays(long ms)
+	{
+		return ms / 1000 / 60 / 60 / 24;
 	}
 }

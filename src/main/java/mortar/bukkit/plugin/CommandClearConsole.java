@@ -9,6 +9,8 @@ public class CommandClearConsole extends MortarCommand
 	public CommandClearConsole()
 	{
 		super("cls");
+		requiresPermission(MortarAPIPlugin.perm);
+		setDescription("Clears the console");
 	}
 
 	@Override

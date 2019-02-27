@@ -7,13 +7,14 @@ public class CommandMortar extends MortarCommand
 {
 	public CommandMortar()
 	{
-		super("mortar", "mort", "morty", "mortal");
+		super("mortar", "mort", "morty", "mortal", "mtr");
+		requiresPermission(MortarAPIPlugin.perm);
 	}
 
 	@Override
 	public boolean handle(MortarSender sender, String[] args)
 	{
-		sender.sendMessage("I turned myself into a plugin morty!");
+		sender.sendMessage("v" + MortarAPIPlugin.p.getDescription().getVersion());
 
 		return true;
 	}

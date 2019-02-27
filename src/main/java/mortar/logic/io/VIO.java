@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -200,6 +201,24 @@ public class VIO
 		f.delete();
 	}
 
+	public static void deleteOnExit(File f)
+	{
+		if(f == null || !f.exists())
+		{
+			return;
+		}
+
+		if(f.isDirectory())
+		{
+			for(File i : f.listFiles())
+			{
+				deleteOnExit(i);
+			}
+		}
+
+		f.deleteOnExit();
+	}
+
 	public static long size(File file)
 	{
 		long s = 0;
@@ -335,6 +354,34 @@ public class VIO
 		}
 
 		return e;
+	}
+
+	public static String downloadToString(String url)
+	{
+		try
+		{
+			URL uu = new URL(url);
+			String l = "";
+			String c = "";
+			InputStream in = uu.openStream();
+			BufferedReader r = new BufferedReader(new InputStreamReader(in));
+
+			while((c = r.readLine()) != null)
+			{
+				l += c + "\n";
+			}
+
+			in.close();
+
+			return l;
+		}
+
+		catch(Throwable e)
+		{
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	public static void writeAll(File f, Object c) throws IOException
