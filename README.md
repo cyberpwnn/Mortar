@@ -1,7 +1,7 @@
 # Mortar
 That crap between the bricks
 
-## I depend on Mortar cant auto-download Mortar without Mortar...
+## I depend on Mortar & cant auto-download Mortar without Mortar...
 Because plugins depend on MortarPlugin you may have some class loading issues when enabling. To work around this, simply add this anywhere in your main plugin class. 
 
 What this does
