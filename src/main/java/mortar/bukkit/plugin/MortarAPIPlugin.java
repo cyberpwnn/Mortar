@@ -15,9 +15,6 @@ public class MortarAPIPlugin extends MortarPlugin
 	@Instance
 	public static MortarAPIPlugin p;
 
-	@Control
-	public static SomeController sc;
-
 	@Command
 	private CommandMortar mort;
 
@@ -31,16 +28,20 @@ public class MortarAPIPlugin extends MortarPlugin
 	@Override
 	public void start()
 	{
-		logQueue = new PhantomQueue<String>();
 		M.initTicking();
 		J.a(() -> checkForUpdates());
-		J.ar(() -> flushLogBuffer(), 5);
+		J.sr(() -> flushLogBuffer(), 5);
 		J.ar(() -> M.uptickAsync(), 0);
 		J.sr(() -> M.uptick(), 0);
 	}
 
 	private void flushLogBuffer()
 	{
+		if(logQueue == null)
+		{
+			return;
+		}
+
 		while(logQueue.hasNext())
 		{
 			Bukkit.getConsoleSender().sendMessage(logQueue.next());

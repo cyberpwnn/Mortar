@@ -10,7 +10,7 @@ public class D implements Serializable, Logged
 {
 	private static final long serialVersionUID = 1L;
 	private String tag;
-	public static final D d = new D("Phantom");
+	public static final D d = new D("Mortar");
 	private static final GMap<String, D> dm = new GMap<>();
 
 	public D(D d, String e)
