@@ -34,9 +34,6 @@ public class FileWatcher
 			mod = true;
 		}
 
-		lastModified = m;
-		size = g;
-
 		return mod;
 	}
 }
