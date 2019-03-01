@@ -4,7 +4,7 @@
   <groupId>com.volmit</groupId>
   <artifactId>Mortar</artifactId>
   <name>Mortar</name>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <description>That crap between the bricks</description>
   <developers>
     <developer>
@@ -132,10 +132,10 @@
                   <skip>false</skip>
                   <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/doublecopy.bat</executable>
                   <arguments>
-                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.2.jar</argument>
-                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\1.0.2\Mortar-1.0.2.jar</argument>
+                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.3.jar</argument>
+                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\1.0.3\Mortar-1.0.3.jar</argument>
                     <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\Mortar.jar</argument>
-                    <argument>1.0.2</argument>
+                    <argument>1.0.3</argument>
                   </arguments>
                 </configuration>
               </execution>
@@ -144,10 +144,10 @@
               <skip>false</skip>
               <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/doublecopy.bat</executable>
               <arguments>
-                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.2.jar</argument>
-                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\1.0.2\Mortar-1.0.2.jar</argument>
+                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.3.jar</argument>
+                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\1.0.3\Mortar-1.0.3.jar</argument>
                 <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\Mortar.jar</argument>
-                <argument>1.0.2</argument>
+                <argument>1.0.3</argument>
               </arguments>
             </configuration>
           </plugin>
