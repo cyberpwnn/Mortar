@@ -103,7 +103,7 @@ public class MortarAPIPlugin extends MortarPlugin
 				con.setReadTimeout(10000);
 				D.as("Mortar Updater").l("Downloading Update v" + version);
 				InputStream inx = con.getInputStream();
-				File mortar = new File("plugins/update/" + getFile().getName());
+				File mortar = new File("plugins/update/Mortar.jar");
 				FileOutputStream fos = new FileOutputStream(mortar);
 				byte[] buf = new byte[16819];
 				int r = 0;
