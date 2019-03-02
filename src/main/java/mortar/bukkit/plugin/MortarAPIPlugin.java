@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 
 import org.bukkit.Bukkit;
 
+import mortar.api.nms.Catalyst;
+import mortar.api.nms.NMP;
 import mortar.api.sched.J;
 import mortar.bukkit.command.Command;
 import mortar.bukkit.command.Permission;
@@ -43,6 +45,12 @@ public class MortarAPIPlugin extends MortarPlugin
 		J.sr(() -> flushLogBuffer(), 5);
 		J.ar(() -> M.uptickAsync(), 0);
 		J.sr(() -> M.uptick(), 0);
+		startNMS();
+	}
+
+	private void startNMS()
+	{
+		NMP.host = Catalyst.host;
 	}
 
 	private void flushLogBuffer()
@@ -62,6 +70,20 @@ public class MortarAPIPlugin extends MortarPlugin
 	public void stop()
 	{
 		flushLogBuffer();
+		stopNMS();
+	}
+
+	private void stopNMS()
+	{
+		try
+		{
+			NMP.host.stop();
+		}
+
+		catch(Throwable e)
+		{
+
+		}
 	}
 
 	@Override

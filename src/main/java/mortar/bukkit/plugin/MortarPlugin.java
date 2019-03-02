@@ -335,6 +335,7 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 					i.setAccessible(true);
 					IController pc = (IController) i.getType().getConstructor().newInstance();
 					registerController(pc);
+					i.set(this, pc);
 				}
 
 				catch(IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException | SecurityException e)
