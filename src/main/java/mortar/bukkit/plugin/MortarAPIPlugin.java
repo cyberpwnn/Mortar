@@ -39,7 +39,7 @@ public class MortarAPIPlugin extends MortarPlugin
 	public void start()
 	{
 		M.initTicking();
-		J.a(() -> checkForUpdates());
+		J.a(() -> checkForUpdates(false));
 		J.sr(() -> flushLogBuffer(), 5);
 		J.ar(() -> M.uptickAsync(), 0);
 		J.sr(() -> M.uptick(), 0);
@@ -61,7 +61,7 @@ public class MortarAPIPlugin extends MortarPlugin
 	@Override
 	public void stop()
 	{
-
+		flushLogBuffer();
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class MortarAPIPlugin extends MortarPlugin
 		return Mortar.tag(getName() + " " + C.GRAY + " - " + C.WHITE + t);
 	}
 
-	private void checkForUpdates()
+	void checkForUpdates(boolean install)
 	{
 		try
 		{
@@ -103,7 +103,8 @@ public class MortarAPIPlugin extends MortarPlugin
 				con.setReadTimeout(10000);
 				D.as("Mortar Updater").l("Downloading Update v" + version);
 				InputStream inx = con.getInputStream();
-				File mortar = new File("plugins/update/Mortar.jar");
+				new File("plugins/update").mkdirs();
+				File mortar = new File("plugins/update/" + getFile().getName());
 				FileOutputStream fos = new FileOutputStream(mortar);
 				byte[] buf = new byte[16819];
 				int r = 0;
@@ -116,14 +117,15 @@ public class MortarAPIPlugin extends MortarPlugin
 				fos.close();
 				inx.close();
 				con.disconnect();
-				D.as("Mortar Updater").l("Update v" + version + " downloaded.");
-				D.as("Mortar Updater").l("Restart to apply this update.");
+				D.as("Mortar Updater").w("Update v" + version + " downloaded.");
+				D.as("Mortar Updater").w("Restart to apply");
 			}
 		}
 
 		catch(Throwable e)
 		{
 			D.as("Mortar Updater").f("Failed to check for updates.");
+			e.printStackTrace();
 		}
 	}
 
