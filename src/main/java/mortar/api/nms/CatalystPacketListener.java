@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import mortar.bukkit.plugin.MortarAPIPlugin;
 import mortar.lang.collection.GMap;
+import mortar.util.text.D;
 
 public abstract class CatalystPacketListener implements PacketListener
 {
@@ -16,6 +17,8 @@ public abstract class CatalystPacketListener implements PacketListener
 	protected GMap<String, String> teamCache;
 	private Map<Class<?>, List<PacketHandler<?>>> inHandlers = new HashMap<>();
 	private Map<Class<?>, List<PacketHandler<?>>> outHandlers = new HashMap<>();
+	private Map<String, List<PacketHandler<Object>>> inAbsHandlers = new HashMap<>();
+	private Map<String, List<PacketHandler<Object>>> outAbsHandlers = new HashMap<>();
 	private List<PacketHandler<?>> inGlobal = new ArrayList<>();
 	private List<PacketHandler<?>> outGlobal = new ArrayList<>();
 
@@ -50,6 +53,22 @@ public abstract class CatalystPacketListener implements PacketListener
 					}
 				}
 
+				for(String i : outAbsHandlers.keySet())
+				{
+					if(p.getClass().getSimpleName().equals(i))
+					{
+						for(PacketHandler<?> j : outAbsHandlers.get(i))
+						{
+							p = j.onPacket(reciever, p);
+
+							if(p == null)
+							{
+								break;
+							}
+						}
+					}
+				}
+
 				if(p != null && outHandlers.containsKey(packet.getClass()))
 				{
 					for(PacketHandler<?> i : outHandlers.get(packet.getClass()))
@@ -81,6 +100,22 @@ public abstract class CatalystPacketListener implements PacketListener
 					}
 				}
 
+				for(String i : inAbsHandlers.keySet())
+				{
+					if(p.getClass().getSimpleName().equals(i))
+					{
+						for(PacketHandler<?> j : inAbsHandlers.get(i))
+						{
+							p = j.onPacket(sender, p);
+
+							if(p == null)
+							{
+								break;
+							}
+						}
+					}
+				}
+
 				if(p != null && inHandlers.containsKey(packet.getClass()))
 				{
 					for(PacketHandler<?> i : inHandlers.get(packet.getClass()))
@@ -99,6 +134,7 @@ public abstract class CatalystPacketListener implements PacketListener
 		};
 
 		onOpened();
+		D.as("Mortar NMP").l("Packet Listener Opened");
 	}
 
 	@Override
@@ -121,9 +157,12 @@ public abstract class CatalystPacketListener implements PacketListener
 
 		inHandlers.clear();
 		outHandlers.clear();
+		inAbsHandlers.clear();
+		outAbsHandlers.clear();
 		inGlobal.clear();
 		outGlobal.clear();
 		protocol = null;
+		D.as("Mortar NMP").l("Packet Listener Closed");
 	}
 
 	@Override
@@ -155,6 +194,17 @@ public abstract class CatalystPacketListener implements PacketListener
 	}
 
 	@Override
+	public void addIncomingListener(String packetType, PacketHandler<Object> handler)
+	{
+		if(!inAbsHandlers.containsKey(packetType))
+		{
+			inAbsHandlers.put(packetType, new ArrayList<PacketHandler<Object>>());
+		}
+
+		inAbsHandlers.get(packetType).add(handler);
+	}
+
+	@Override
 	public void addGlobalIncomingListener(PacketHandler<?> handler)
 	{
 		inGlobal.add(handler);
@@ -167,6 +217,12 @@ public abstract class CatalystPacketListener implements PacketListener
 	}
 
 	@Override
+	public void removeOutgoingPacketListeners(String s)
+	{
+		outAbsHandlers.remove(s);
+	}
+
+	@Override
 	public void removeOutgoingPacketListeners()
 	{
 		outHandlers.clear();
@@ -176,6 +232,12 @@ public abstract class CatalystPacketListener implements PacketListener
 	public void removeIncomingPacketListeners(Class<?> c)
 	{
 		inHandlers.remove(c);
+	}
+
+	@Override
+	public void removeIncomingPacketListeners(String s)
+	{
+		inAbsHandlers.remove(s);
 	}
 
 	@Override

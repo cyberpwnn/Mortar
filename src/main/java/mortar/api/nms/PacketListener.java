@@ -92,4 +92,10 @@ public interface PacketListener
 	 * Remove all incoming packet listeners
 	 */
 	public void removeIncomingPacketListeners();
+
+	void removeIncomingPacketListeners(String s);
+
+	void removeOutgoingPacketListeners(String s);
+
+	void addIncomingListener(String packetType, PacketHandler<Object> handler);
 }
