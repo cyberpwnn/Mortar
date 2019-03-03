@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.bukkit.Bukkit;
 
+import mortar.api.config.Configurator;
 import mortar.api.nms.Catalyst;
 import mortar.api.nms.NMP;
 import mortar.api.sched.J;
@@ -36,21 +37,39 @@ public class MortarAPIPlugin extends MortarPlugin
 	@Permission
 	public static PermissionMortar perm;
 	private static Queue<String> logQueue;
+	private MortarConfig cfg;
 
 	@Override
 	public void start()
 	{
+		Configurator.JSON.load(cfg = new MortarConfig(), getDataFile("config.json"));
+		v("Configuration Loaded... Looks like we're in debug mode!");
 		M.initTicking();
+		v("Ticking Initiated");
 		J.a(() -> checkForUpdates(false));
-		J.sr(() -> flushLogBuffer(), 5);
+		J.sr(() -> flushLogBuffer(), 10);
 		J.ar(() -> M.uptickAsync(), 0);
 		J.sr(() -> M.uptick(), 0);
+		v("Updating & Log Flushing Initiated");
 		startNMS();
+	}
+
+	public MortarConfig getMortarConfig()
+	{
+		return cfg;
 	}
 
 	private void startNMS()
 	{
+		v("Selecting a suitable NMP Catalyst");
 		NMP.host = Catalyst.host;
+
+		if(NMP.host != null)
+		{
+			v("Starting " + NMP.host.getVersion() + " Catalyst");
+			NMP.host.start();
+			v("NMP Catalyst " + NMP.host.getVersion() + " Online");
+		}
 	}
 
 	private void flushLogBuffer()
@@ -69,20 +88,32 @@ public class MortarAPIPlugin extends MortarPlugin
 	@Override
 	public void stop()
 	{
-		flushLogBuffer();
 		stopNMS();
+		flushLogBuffer();
 	}
 
 	private void stopNMS()
 	{
-		try
+		v("Stopping Catalyst Host");
+
+		if(NMP.host == null)
 		{
-			NMP.host.stop();
+			v("Looks like there is no NMP host to shut down. Meh, whatever");
 		}
 
-		catch(Throwable e)
+		else
 		{
+			try
+			{
+				v("Stopping NMP host " + NMP.host.getVersion());
+				NMP.host.stop();
+				v("NMP host " + NMP.host.getVersion() + " Offline");
+			}
 
+			catch(Throwable e)
+			{
+				v("NMP host " + NMP.host.getVersion() + " is mostly Offline...");
+			}
 		}
 	}
 
@@ -147,7 +178,10 @@ public class MortarAPIPlugin extends MortarPlugin
 		catch(Throwable e)
 		{
 			D.as("Mortar Updater").f("Failed to check for updates.");
-			e.printStackTrace();
+			if(MortarConfig.DEBUG_LOGGING)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 

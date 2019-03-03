@@ -7,4 +7,6 @@ public interface Logged
 	public void w(Object... l);
 
 	public void f(Object... l);
+
+	public void v(Object... l);
 }

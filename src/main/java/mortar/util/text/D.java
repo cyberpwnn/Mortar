@@ -3,6 +3,7 @@ package mortar.util.text;
 import java.io.Serializable;
 
 import mortar.bukkit.plugin.MortarAPIPlugin;
+import mortar.bukkit.plugin.MortarConfig;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
 
@@ -46,7 +47,7 @@ public class D implements Serializable, Logged
 
 		if(f.equals("VERBOSE"))
 		{
-			c = C.AQUA.toString();
+			c = C.GRAY.toString();
 		}
 
 		MortarAPIPlugin.log(c + "|" + f.toUpperCase() + "| " + C.LIGHT_PURPLE + tag + C.WHITE + " " + c + msg + c);
@@ -73,8 +74,14 @@ public class D implements Serializable, Logged
 		log("INFO", s);
 	}
 
+	@Override
 	public void v(Object... s)
 	{
+		if(!MortarConfig.DEBUG_LOGGING)
+		{
+			return;
+		}
+
 		log("VERBOSE", s);
 	}
 

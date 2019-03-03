@@ -42,6 +42,12 @@ public abstract class Controller implements IController
 	}
 
 	@Override
+	public void v(Object... l)
+	{
+		D.as(getName()).v(l);
+	}
+
+	@Override
 	public String getName()
 	{
 		return name;

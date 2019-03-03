@@ -65,6 +65,12 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 	}
 
 	@Override
+	public void v(Object... l)
+	{
+		D.as(getName()).v(l);
+	}
+
+	@Override
 	public void onEnable()
 	{
 		registerInstance();
@@ -182,6 +188,7 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 					i.set(Modifier.isStatic(i.getModifiers()) ? null : this, pc);
 					registerPermission(pc);
 					permissionCache.add(pc);
+					v("Registered Permissions " + pc.getFullNode() + " (" + i.getName() + ")");
 				}
 
 				catch(IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException | SecurityException e)
@@ -336,6 +343,7 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 					IController pc = (IController) i.getType().getConstructor().newInstance();
 					registerController(pc);
 					i.set(this, pc);
+					v("Registered " + pc.getName() + " (" + i.getName() + ")");
 				}
 
 				catch(IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException | SecurityException e)
@@ -363,6 +371,7 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 		try
 		{
 			pc.start();
+			v("Started " + pc.getName());
 		}
 
 		catch(Throwable e)
@@ -382,6 +391,7 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 				{
 					i.setAccessible(true);
 					i.set(Modifier.isStatic(i.getModifiers()) ? null : this, this);
+					v("Registered Instance " + i.getName());
 				}
 
 				catch(IllegalArgumentException | IllegalAccessException | SecurityException e)
@@ -403,6 +413,7 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 				{
 					i.setAccessible(true);
 					i.set(Modifier.isStatic(i.getModifiers()) ? null : this, null);
+					v("Unregistered Instance " + i.getName());
 				}
 
 				catch(IllegalArgumentException | IllegalAccessException | SecurityException e)
@@ -430,6 +441,7 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 					mortar.bukkit.command.Command c = i.getAnnotation(mortar.bukkit.command.Command.class);
 					registerCommand(pc, c.value());
 					commandCache.add(pc);
+					v("Registered Commands /" + pc.getNode() + " (" + i.getName() + ")");
 				}
 
 				catch(IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException | SecurityException e)
@@ -507,6 +519,7 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 					if(c.unregister(m))
 					{
 						it.remove();
+						v("Unregistered Command /" + cmd.getNode());
 					}
 
 					else
@@ -551,6 +564,7 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 		for(org.bukkit.permissions.Permission i : computePermissions())
 		{
 			Bukkit.getPluginManager().removePermission(i);
+			v("Unregistered Permission " + i.getName());
 		}
 	}
 
@@ -562,6 +576,7 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 			{
 				unregisterListener(i);
 				i.stop();
+				v("Stopped " + i.getName());
 			}
 
 			catch(Throwable e)
