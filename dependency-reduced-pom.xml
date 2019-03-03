@@ -270,6 +270,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>ru.beykerykt</groupId>
+      <artifactId>LightAPI</artifactId>
+      <version>3.2.7</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>1.18.4</version>
