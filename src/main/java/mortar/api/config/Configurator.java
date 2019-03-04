@@ -175,7 +175,7 @@ public class Configurator
 
 				else
 				{
-					throw new IllegalArgumentException();
+
 				}
 			}
 		}

@@ -128,7 +128,7 @@ public class MortarAPIPlugin extends MortarPlugin
 		return Mortar.tag(getName() + " " + C.GRAY + " - " + C.WHITE + t);
 	}
 
-	void checkForUpdates(boolean install)
+	public void checkForUpdates(boolean install)
 	{
 		try
 		{
