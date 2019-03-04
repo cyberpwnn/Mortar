@@ -170,7 +170,15 @@ public class Configurator
 
 				else if(!stat)
 				{
-					i.set(object, fc.get(key));
+					try
+					{
+						i.set(object, fc.get(key));
+					}
+
+					catch(Throwable e)
+					{
+
+					}
 				}
 
 				else
