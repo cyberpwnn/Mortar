@@ -46,7 +46,12 @@ public class MortarAPIPlugin extends MortarPlugin
 		v("Configuration Loaded... Looks like we're in debug mode!");
 		M.initTicking();
 		v("Ticking Initiated");
-		J.a(() -> checkForUpdates(false));
+
+		if(MortarConfig.UPDATES)
+		{
+			J.a(() -> checkForUpdates(false));
+		}
+
 		J.sr(() -> flushLogBuffer(), 10);
 		J.ar(() -> M.uptickAsync(), 0);
 		J.sr(() -> M.uptick(), 0);
