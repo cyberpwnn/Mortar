@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
+import org.bukkit.command.CommandSender;
+
 import mortar.lang.collection.GList;
 
 public abstract class MortarPermission
@@ -89,5 +91,10 @@ public abstract class MortarPermission
 	public void setParent(MortarPermission parent)
 	{
 		this.parent = parent;
+	}
+
+	public boolean has(CommandSender sender)
+	{
+		return sender.hasPermission(getFullNode());
 	}
 }
