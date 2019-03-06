@@ -1,6 +1,5 @@
 package mortar.logic.format;
 
-
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -11,6 +10,8 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import mortar.compute.math.M;
 
 /**
  * Formatter
@@ -33,6 +34,17 @@ public class F
 		{
 			MAP.put(THOUSAND.pow(i + 1), NAMES[i]);
 		}
+	}
+
+	public static String scroll(String smx, int viewport, long time)
+	{
+		String src = F.repeat(" ", viewport) + smx + F.repeat(" ", viewport);
+		int len = src.length();
+		int walk = (int) (time % (len - viewport));
+		String base = src.substring(walk, M.min(walk + viewport, len - 1));
+		base = base.length() < viewport ? base + F.repeat(" ", viewport - base.length()) : base;
+
+		return base;
 	}
 
 	public static String capitalize(String s)
@@ -221,7 +233,7 @@ public class F
 
 		if(ms / 1000.0 / 60.0 / 60.0 / 24.0 < 7)
 		{
-			return F.f(ms / 1000.0 / 60.0/ 24.0, prec) + " days";
+			return F.f(ms / 1000.0 / 60.0 / 24.0, prec) + " days";
 		}
 
 		return F.f(ms, prec) + "ms";
