@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import mortar.compute.math.M;
 import mortar.lang.json.JSONArray;
 
 /**
@@ -799,5 +800,17 @@ public class GList<T> extends ArrayList<T>
 		}
 
 		return s;
+	}
+
+	public GList<T> sub(int f, int t)
+	{
+		GList<T> g = new GList<>();
+
+		for(int i = f; i < M.min(size(), t); i++)
+		{
+			g.add(get(i));
+		}
+
+		return g;
 	}
 }

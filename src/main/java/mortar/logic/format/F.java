@@ -42,7 +42,7 @@ public class F
 		int len = src.length();
 		int walk = (int) (time % (len - viewport));
 		String base = src.substring(walk, M.min(walk + viewport, len - 1));
-		base = base.length() < viewport ? base + F.repeat(" ", viewport - base.length()) : base;
+		base = base.length() < viewport ? base + F.repeat(" ", (viewport - base.length()) - 3) : base;
 
 		return base;
 	}
@@ -519,6 +519,11 @@ public class F
 	 */
 	public static String repeat(String s, int n)
 	{
+		if(n <= 0)
+		{
+			return "";
+		}
+
 		if(s == null)
 		{
 			return null;
