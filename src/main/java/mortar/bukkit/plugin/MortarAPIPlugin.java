@@ -18,6 +18,9 @@ import mortar.api.sched.J;
 import mortar.bukkit.command.Command;
 import mortar.bukkit.command.Permission;
 import mortar.compute.math.M;
+import mortar.lib.control.CacheController;
+import mortar.lib.control.MojangProfileController;
+import mortar.lib.control.RiftController;
 import mortar.util.queue.PhantomQueue;
 import mortar.util.queue.Queue;
 import mortar.util.text.C;
@@ -27,6 +30,15 @@ public class MortarAPIPlugin extends MortarPlugin
 {
 	@Instance
 	public static MortarAPIPlugin p;
+
+	@Control
+	private CacheController cacheController;
+
+	@Control
+	private MojangProfileController mojangProfileController;
+
+	@Control
+	private RiftController riftController;
 
 	@Command
 	private CommandMortar mort;

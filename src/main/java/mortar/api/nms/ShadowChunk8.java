@@ -36,6 +36,12 @@ public class ShadowChunk8 implements ShadowChunk
 	}
 
 	@Override
+	public void modifySection(int section)
+	{
+		modified[section] = true;
+	}
+
+	@Override
 	public boolean isFullModification()
 	{
 		return biomeModified;

@@ -36,6 +36,7 @@ import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.DataWatcher.WatchableObject;
 import net.minecraft.server.v1_8_R3.EntityHuman.EnumChatVisibility;
+import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.IScoreboardCriteria.EnumScoreboardHealthDisplay;
 import net.minecraft.server.v1_8_R3.NextTickListEntry;
@@ -66,11 +67,48 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutSetSlot;
 import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntity;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle.EnumTitleAction;
+import net.minecraft.server.v1_8_R3.PacketPlayOutUpdateTime;
 import net.minecraft.server.v1_8_R3.WorldServer;
 
 public class Catalyst8 extends CatalystPacketListener implements CatalystHost
 {
 	private Map<Player, PlayerSettings> playerSettings = new HashMap<>();
+
+	@Override
+	@SuppressWarnings("deprecation")
+	public void setBlock(Location l, MaterialBlock m)
+	{
+		int x = l.getBlockX();
+		int y = l.getBlockY();
+		int z = l.getBlockZ();
+		net.minecraft.server.v1_8_R3.World w = ((CraftWorld) l.getWorld()).getHandle();
+		net.minecraft.server.v1_8_R3.Chunk chunk = w.getChunkAt(x >> 4, z >> 4);
+		int combined = m.getMaterial().getId() + (m.getData() << 12);
+		IBlockData ibd = net.minecraft.server.v1_8_R3.Block.getByCombinedId(combined);
+
+		if(chunk.getSections()[y >> 4] == null)
+		{
+			chunk.getSections()[y >> 4] = new net.minecraft.server.v1_8_R3.ChunkSection(y >> 4 << 4, chunk.world.worldProvider.o());
+		}
+
+		net.minecraft.server.v1_8_R3.ChunkSection sec = chunk.getSections()[y >> 4];
+		sec.setType(x & 15, y & 15, z & 15, ibd);
+
+		if(l.getWorld().getEnvironment().equals(Environment.NORMAL))
+		{
+			sec.a(x & 15, y & 15, z & 15, 15);
+		}
+	}
+
+	@Override
+	public Object packetTime(long full, long day)
+	{
+		PacketPlayOutUpdateTime t = new PacketPlayOutUpdateTime();
+		new V(t).set("a", full);
+		new V(t).set("b", day);
+
+		return t;
+	}
 
 	@Override
 	public void sendAdvancement(Player p, FrameType type, ItemStack is, String text)
@@ -840,5 +878,13 @@ public class Catalyst8 extends CatalystPacketListener implements CatalystHost
 	public void sendItemStack(Player p, ItemStack is, int slot)
 	{
 		sendPacket(p, new PacketPlayOutSetSlot(((CraftPlayer) p).getHandle().activeContainer.windowId, slot, CraftItemStack.asNMSCopy(is)));
+	}
+
+	@Override
+	public void resendChunkSection(Player p, int x, int y, int z)
+	{
+		ShadowChunk sc = shadowCopy(p.getWorld().getChunkAt(x, z));
+		sc.modifySection(y);
+		new PacketBuffer().q(sc.flush()).flush(p);
 	}
 }

@@ -2,10 +2,12 @@ package mortar.api.nms;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import mortar.api.sched.S;
+import mortar.lang.collection.GList;
 
 public class NMP
 {
@@ -18,6 +20,11 @@ public class NMP
 	 */
 	public static class PLAYER
 	{
+		public static void time(Player p, long full, long day)
+		{
+			new PacketBuffer().q(host.packetTime(full, day));
+		}
+
 		public static boolean canSee(Player p, Chunk c)
 		{
 			return host.canSee(c, p);
@@ -221,6 +228,49 @@ public class NMP
 		public static ShadowChunk shadow(Chunk at)
 		{
 			return host.shadowCopy(at);
+		}
+
+		public static void resend(Player p, int x, int y, int z)
+		{
+			host.resendChunkSection(p, x, y, z);
+		}
+
+		public static void resend(Location c)
+		{
+			resend(c.getChunk(), c.getBlockY() >> 4);
+		}
+
+		public static void resend(Chunk c, int y)
+		{
+			resend(c.getWorld(), c.getX(), y, c.getZ());
+		}
+
+		public static void resend(World w, int x, int y, int z)
+		{
+			Chunk c = w.getChunkAt(x, z);
+			ShadowChunk s = shadow(c);
+			s.modifySection(y);
+			PacketBuffer pb = new PacketBuffer().q(s.flush());
+
+			for(Player i : nearbyPlayers(c))
+			{
+				pb.flush(i);
+			}
+		}
+
+		public static GList<Player> nearbyPlayers(Chunk i)
+		{
+			GList<Player> px = new GList<>();
+
+			for(Player x : i.getWorld().getPlayers())
+			{
+				if(NMP.host.canSee(i, x))
+				{
+					px.add(x);
+				}
+			}
+
+			return px;
 		}
 	}
 }

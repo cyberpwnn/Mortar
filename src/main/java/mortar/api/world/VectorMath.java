@@ -1,4 +1,5 @@
 package mortar.api.world;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -125,6 +126,11 @@ public class VectorMath
 	public static Vector direction(Location from, Location to)
 	{
 		return to.subtract(from).toVector().normalize();
+	}
+
+	public static Vector directionNoNormal(Location from, Location to)
+	{
+		return to.subtract(from).toVector();
 	}
 
 	/**
@@ -346,8 +352,7 @@ public class VectorMath
 
 	/**
 	 * (clone) Force normalize the vector into three points, 1, 0, or -1. If the
-	 * value
-	 * is > 0.333 (1) if the value is less than -0.333 (-1) else 0
+	 * value is > 0.333 (1) if the value is less than -0.333 (-1) else 0
 	 *
 	 * @param direction
 	 *            the direction

@@ -32,7 +32,7 @@ import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
 import mortar.lang.json.JSONException;
 import mortar.lang.json.JSONObject;
-import mortar.lib.control.RiftSVC;
+import mortar.lib.control.RiftController;
 import mortar.logic.io.VIO;
 import mortar.util.text.D;
 
@@ -392,7 +392,7 @@ public class PhantomRift implements Rift, Listener
 	@Override
 	public Rift send(Player p)
 	{
-		if(!Mortar.getController(RiftSVC.class).isInRift(p.getWorld()))
+		if(!Mortar.getController(RiftController.class).isInRift(p.getWorld()))
 		{
 			p.teleport(getSpawn());
 		}
@@ -446,7 +446,7 @@ public class PhantomRift implements Rift, Listener
 			unload();
 		}
 
-		Mortar.getController(RiftSVC.class).deleteRift(getName());
+		Mortar.getController(RiftController.class).deleteRift(getName());
 		return this;
 	}
 

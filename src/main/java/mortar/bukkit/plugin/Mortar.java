@@ -10,6 +10,11 @@ import mortar.util.text.TXT;
 
 public class Mortar
 {
+	public static boolean isMainThread()
+	{
+		return Bukkit.isPrimaryThread();
+	}
+
 	public static String tag(String s)
 	{
 		return TXT.makeTag(C.BLUE, C.DARK_GRAY, C.GRAY, s);

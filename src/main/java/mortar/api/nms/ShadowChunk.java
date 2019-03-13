@@ -18,6 +18,14 @@ import org.bukkit.block.Biome;
 public interface ShadowChunk
 {
 	/**
+	 * Mark the section as modified
+	 *
+	 * @param section
+	 *            the section
+	 */
+	public void modifySection(int section);
+
+	/**
 	 * Check if the next flush is a full chunk section or not
 	 *
 	 * @return true if the next chunk packet will be a full send

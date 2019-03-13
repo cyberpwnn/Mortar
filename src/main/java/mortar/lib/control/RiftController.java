@@ -19,7 +19,7 @@ import mortar.lang.json.JSONObject;
 import mortar.logic.io.VIO;
 import mortar.util.text.D;
 
-public class RiftSVC extends Controller
+public class RiftController extends Controller
 {
 	private static final GList<Rift> rifts = new GList<>();
 	private static final GList<String> usedNames = new GList<>();

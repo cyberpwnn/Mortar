@@ -19,6 +19,10 @@ import mortar.util.text.C;
 
 public interface CatalystHost extends PacketListener, Listener
 {
+	public void setBlock(Location l, MaterialBlock m);
+
+	public void resendChunkSection(Player p, int x, int y, int z);
+
 	public void sendItemStack(Player p, ItemStack is, int slot);
 
 	public void sendEntityMetadata(Player p, int eid, Object... objects);
@@ -483,4 +487,6 @@ public interface CatalystHost extends PacketListener, Listener
 	public Block getBlock(World world, Object tickListEntry);
 
 	public Object packetTabHeaderFooter(String h, String f);
+
+	public Object packetTime(long full, long day);
 }

@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.craftbukkit.v1_9_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
@@ -39,6 +40,7 @@ import net.minecraft.server.v1_9_R2.DataWatcherObject;
 import net.minecraft.server.v1_9_R2.DataWatcherRegistry;
 import net.minecraft.server.v1_9_R2.EntityHuman.EnumChatVisibility;
 import net.minecraft.server.v1_9_R2.EnumMainHand;
+import net.minecraft.server.v1_9_R2.IBlockData;
 import net.minecraft.server.v1_9_R2.IChatBaseComponent;
 import net.minecraft.server.v1_9_R2.IScoreboardCriteria.EnumScoreboardHealthDisplay;
 import net.minecraft.server.v1_9_R2.NextTickListEntry;
@@ -71,11 +73,38 @@ import net.minecraft.server.v1_9_R2.PacketPlayOutSpawnEntity;
 import net.minecraft.server.v1_9_R2.PacketPlayOutTitle;
 import net.minecraft.server.v1_9_R2.PacketPlayOutTitle.EnumTitleAction;
 import net.minecraft.server.v1_9_R2.PacketPlayOutUnloadChunk;
+import net.minecraft.server.v1_9_R2.PacketPlayOutUpdateTime;
 import net.minecraft.server.v1_9_R2.WorldServer;
 
 public class Catalyst94 extends CatalystPacketListener implements CatalystHost
 {
 	private Map<Player, PlayerSettings> playerSettings = new HashMap<>();
+
+	@Override
+	@SuppressWarnings("deprecation")
+	public void setBlock(Location l, MaterialBlock m)
+	{
+		int x = l.getBlockX();
+		int y = l.getBlockY();
+		int z = l.getBlockZ();
+		net.minecraft.server.v1_9_R2.World w = ((CraftWorld) l.getWorld()).getHandle();
+		net.minecraft.server.v1_9_R2.Chunk chunk = w.getChunkAt(x >> 4, z >> 4);
+		int combined = m.getMaterial().getId() + (m.getData() << 12);
+		IBlockData ibd = net.minecraft.server.v1_9_R2.Block.getByCombinedId(combined);
+
+		if(chunk.getSections()[y >> 4] == null)
+		{
+			chunk.getSections()[y >> 4] = new net.minecraft.server.v1_9_R2.ChunkSection(y >> 4 << 4, chunk.world.worldProvider.m());
+		}
+
+		net.minecraft.server.v1_9_R2.ChunkSection sec = chunk.getSections()[y >> 4];
+		sec.setType(x & 15, y & 15, z & 15, ibd);
+
+		if(l.getWorld().getEnvironment().equals(Environment.NORMAL))
+		{
+			sec.a(x & 15, y & 15, z & 15, 15);
+		}
+	}
 
 	@Override
 	public void sendAdvancement(Player p, FrameType type, ItemStack is, String text)
@@ -92,6 +121,16 @@ public class Catalyst94 extends CatalystPacketListener implements CatalystHost
 		a.loadAdvancement();
 		a.sendPlayer(p);
 		J.s(() -> a.delete(p), 5);
+	}
+
+	@Override
+	public Object packetTime(long full, long day)
+	{
+		PacketPlayOutUpdateTime t = new PacketPlayOutUpdateTime();
+		new V(t).set("a", full);
+		new V(t).set("b", day);
+
+		return t;
 	}
 
 	// START PACKETS
@@ -856,5 +895,13 @@ public class Catalyst94 extends CatalystPacketListener implements CatalystHost
 	public void sendItemStack(Player p, ItemStack is, int slot)
 	{
 		sendPacket(p, new PacketPlayOutSetSlot(((CraftPlayer) p).getHandle().activeContainer.windowId, slot, CraftItemStack.asNMSCopy(is)));
+	}
+
+	@Override
+	public void resendChunkSection(Player p, int x, int y, int z)
+	{
+		ShadowChunk sc = shadowCopy(p.getWorld().getChunkAt(x, z));
+		sc.modifySection(y);
+		new PacketBuffer().q(sc.flush()).flush(p);
 	}
 }
