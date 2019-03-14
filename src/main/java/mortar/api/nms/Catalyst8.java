@@ -39,6 +39,7 @@ import net.minecraft.server.v1_8_R3.EntityHuman.EnumChatVisibility;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.IScoreboardCriteria.EnumScoreboardHealthDisplay;
+import net.minecraft.server.v1_8_R3.MathHelper;
 import net.minecraft.server.v1_8_R3.NextTickListEntry;
 import net.minecraft.server.v1_8_R3.Packet;
 import net.minecraft.server.v1_8_R3.PacketPlayInEntityAction;
@@ -514,9 +515,9 @@ public class Catalyst8 extends CatalystPacketListener implements CatalystHost
 			g.setAccessible(true);
 			h.setAccessible(true);
 			a.set(r, eid);
-			b.set(r, (int) (x * 4096));
-			c.set(r, (int) (y * 4096));
-			d.set(r, (int) (z * 4096));
+			b.set(r, (byte) ((int) (x * 32D)));
+			c.set(r, (byte) ((int) (y * 32D)));
+			d.set(r, (byte) ((int) (z * 32D)));
 			e.set(r, (byte) 0);
 			f.set(r, (byte) 0);
 			g.set(r, onGround);
@@ -550,9 +551,9 @@ public class Catalyst8 extends CatalystPacketListener implements CatalystHost
 	{
 		PacketPlayOutEntityTeleport t = new PacketPlayOutEntityTeleport();
 		new V(t).set("a", eid);
-		new V(t).set("b", l.getX());
-		new V(t).set("c", l.getY());
-		new V(t).set("d", l.getZ());
+		new V(t).set("b", (int) MathHelper.floor(l.getX() * 32D));
+		new V(t).set("c", (int) MathHelper.floor(l.getY() * 32D));
+		new V(t).set("d", (int) MathHelper.floor(l.getZ() * 32D));
 		new V(t).set("e", (byte) 0);
 		new V(t).set("f", (byte) 0);
 		new V(t).set("g", onGround);
@@ -564,17 +565,11 @@ public class Catalyst8 extends CatalystPacketListener implements CatalystHost
 	{
 		PacketPlayOutSpawnEntity m = new PacketPlayOutSpawnEntity();
 		new V(m).set("a", eid);
-		new V(m).set("b", id);
-		new V(m).set("c", l.getX());
-		new V(m).set("d", l.getY());
-		new V(m).set("e", l.getZ());
-		new V(m).set("f", 0);
-		new V(m).set("g", 0);
-		new V(m).set("h", 0);
-		new V(m).set("i", 0);
-		new V(m).set("j", 0);
-		new V(m).set("k", 78);
-		new V(m).set("l", 0);
+		new V(m).set("b", MathHelper.floor(l.getX() * 32D));
+		new V(m).set("c", MathHelper.floor(l.getY() * 32D));
+		new V(m).set("d", MathHelper.floor(l.getZ() * 32D));
+		new V(m).set("j", 78);
+
 		sendPacket(player, m);
 	}
 
@@ -801,6 +796,11 @@ public class Catalyst8 extends CatalystPacketListener implements CatalystHost
 
 		for(Object i : objects)
 		{
+			if(i == null)
+			{
+				continue;
+			}
+
 			items.add((WatchableObject) i);
 		}
 
@@ -852,14 +852,14 @@ public class Catalyst8 extends CatalystPacketListener implements CatalystHost
 	public Object getMetaEntitySilenced(boolean silenced)
 	{
 		// Byte (Boolean), Index 4
-		return new WatchableObject(4, 0, (byte) (silenced ? 1 : 0));
+		return new WatchableObject(0, 4, (byte) (silenced ? 1 : 0));
 	}
 
 	@Override
 	public Object getMetaEntityCustomNameVisible(boolean visible)
 	{
 		// Byte (Boolean), Index 3
-		return new WatchableObject(3, 0, (byte) (visible ? 1 : 0));
+		return new WatchableObject(0, 3, (byte) (visible ? 1 : 0));
 	}
 
 	@Override
@@ -871,7 +871,7 @@ public class Catalyst8 extends CatalystPacketListener implements CatalystHost
 		bits += noBasePlate ? 8 : 0;
 		bits += marker ? 10 : 0;
 
-		return new WatchableObject(0, 11, bits);
+		return new WatchableObject(0, 10, bits);
 	}
 
 	@Override
