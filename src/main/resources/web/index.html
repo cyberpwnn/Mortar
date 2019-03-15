@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Fulcrum</title>
+</head>
+<style>
+@import url("https://fonts.googleapis.com/css?family=Homenaje");
+.p-canvas-webgl {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+}
+
+.p-summary {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  color: #fff;
+  font-family: 'Homenaje', sans-serif;
+  text-align: center;
+}
+.p-summary h1 {
+  margin: 0 0 0.1em;
+  font-size: 18vh;
+  font-weight: 400;
+}
+.p-summary p {
+  margin: 0;
+  font-size: 3vh;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.p-summary a {
+  color: #fff;
+}
+#logo {
+  padding: 0 20px 20px 0;
+  width: 100px;
+  height: 100px;
+  left: 1%;
+  bottom: 0%;
+  position: absolute;
+}
+</style>>
+<body>
+
+  
+<div class="p-summary">
+  <div class="p-summary__wrap">
+    <h1>Fulcrum ${project.version}</h1>
+    <p>This webserver locally delivers resource packs built with your plugin to players on your server.</p>
+    <img src="https://raw.githubusercontent.com/VolmitSoftware/Fulcrum/master/images/smalllogo.png" id="logo">
+  </div>
+</div>
+
+<canvas class="p-canvas-webgl" id="canvas-webgl"></canvas>
+<script src="canvas.js"></script>
+<script src="index.js"></script>
+
+
+
+
+</body>
+
+</html>

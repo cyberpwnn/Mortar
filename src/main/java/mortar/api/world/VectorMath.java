@@ -8,6 +8,7 @@ import org.bukkit.util.Vector;
 import mortar.compute.math.CDou;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GListAdapter;
+import mortar.logic.format.F;
 
 /**
  * Vector utilities
@@ -406,6 +407,231 @@ public class VectorMath
 		else
 		{
 			v.setZ(0);
+		}
+
+		return v;
+	}
+
+	public static Vector scaleStatic(Axis x, Vector v, double amt)
+	{
+		switch(x)
+		{
+			case X:
+				return scaleX(v, amt);
+			case Y:
+				return scaleY(v, amt);
+			case Z:
+				return scaleZ(v, amt);
+		}
+
+		return null;
+	}
+
+	public static Vector scaleX(Vector v, double amt)
+	{
+		double x = v.getX();
+		double y = v.getY();
+		double z = v.getZ();
+		double rx = x == 0 ? 1 : amt / x;
+
+		return new Vector(x * rx, y * rx, z * rx);
+	}
+
+	public static Vector scaleY(Vector v, double amt)
+	{
+		double x = v.getX();
+		double y = v.getY();
+		double z = v.getZ();
+		double rx = y == 0 ? 1 : amt / y;
+
+		return new Vector(x * rx, y * rx, z * rx);
+	}
+
+	public static Vector scaleZ(Vector v, double amt)
+	{
+		double x = v.getX();
+		double y = v.getY();
+		double z = v.getZ();
+		double rx = z == 0 ? 1 : amt / z;
+
+		return new Vector(x * rx, y * rx, z * rx);
+	}
+
+	public static Vector reverseXZ(Vector v)
+	{
+		v.setX(-v.getX());
+		v.setZ(-v.getZ());
+		return v;
+	}
+
+	public static boolean isLookingNear(Location a, Location b, double maxOff)
+	{
+		Vector perfect = VectorMath.direction(a, b);
+		Vector actual = a.getDirection();
+
+		return perfect.distance(actual) <= maxOff;
+	}
+
+	public static Vector rotate(Direction current, Direction to, Vector v)
+	{
+		if(current.equals(to))
+		{
+			return v;
+		}
+
+		else if(current.equals(to.reverse()))
+		{
+			if(current.isVertical())
+			{
+				return new Vector(v.getX(), -v.getY(), v.getZ());
+			}
+
+			else
+			{
+				return new Vector(-v.getX(), v.getY(), -v.getZ());
+			}
+		}
+
+		else
+		{
+			Vector c = current.toVector().clone().add(to.toVector());
+
+			if(c.getX() == 0)
+			{
+				if(c.getY() != c.getZ())
+				{
+					return rotate90CX(v);
+				}
+
+				return rotate90CCX(v);
+			}
+
+			else if(c.getY() == 0)
+			{
+				if(c.getX() != c.getZ())
+				{
+					return rotate90CY(v);
+				}
+
+				return rotate90CCY(v);
+			}
+
+			else if(c.getZ() == 0)
+			{
+				if(c.getX() != c.getY())
+				{
+					return rotate90CZ(v);
+				}
+
+				return rotate90CCZ(v);
+			}
+		}
+
+		return v;
+	}
+
+	public static Vector rotate90CX(Vector v)
+	{
+		return new Vector(v.getX(), -v.getZ(), v.getY());
+	}
+
+	public static Vector rotate90CCX(Vector v)
+	{
+		return new Vector(v.getX(), v.getZ(), -v.getY());
+	}
+
+	public static Vector rotate90CY(Vector v)
+	{
+		return new Vector(-v.getZ(), v.getY(), v.getX());
+	}
+
+	public static Vector rotate90CCY(Vector v)
+	{
+		return new Vector(v.getZ(), v.getY(), -v.getX());
+	}
+
+	public static Vector rotate90CZ(Vector v)
+	{
+		return new Vector(v.getY(), -v.getX(), v.getZ());
+	}
+
+	public static Vector rotate90CCZ(Vector v)
+	{
+		return new Vector(-v.getY(), v.getX(), v.getZ());
+	}
+
+	public static Vector getAxis(Direction current, Direction to)
+	{
+		if(current.equals(Direction.U) || current.equals(Direction.D))
+		{
+			if(to.equals(Direction.U) || to.equals(Direction.D))
+			{
+				return new Vector(1, 0, 0);
+			}
+
+			else
+			{
+				if(current.equals(Direction.N) || current.equals(Direction.S))
+				{
+					return Direction.E.toVector();
+				}
+
+				else
+				{
+					return Direction.S.toVector();
+				}
+			}
+		}
+
+		return new Vector(0, 1, 0);
+	}
+
+	private static double round(double value, int precision)
+	{
+		return Double.valueOf(F.f(value, precision));
+	}
+
+	public static Vector clip(Vector v, int decimals)
+	{
+		v.setX(round(v.getX(), decimals));
+		v.setY(round(v.getY(), decimals));
+		v.setZ(round(v.getZ(), decimals));
+		return v;
+	}
+
+	public static Vector rotateVectorCC(Vector vec, Vector axis, double deg)
+	{
+		double theta = Math.toRadians(deg);
+		double x, y, z;
+		double u, v, w;
+		x = vec.getX();
+		y = vec.getY();
+		z = vec.getZ();
+		u = axis.getX();
+		v = axis.getY();
+		w = axis.getZ();
+		double xPrime = u * (u * x + v * y + w * z) * (1d - Math.cos(theta)) + x * Math.cos(theta) + (-w * y + v * z) * Math.sin(theta);
+		double yPrime = v * (u * x + v * y + w * z) * (1d - Math.cos(theta)) + y * Math.cos(theta) + (w * x - u * z) * Math.sin(theta);
+		double zPrime = w * (u * x + v * y + w * z) * (1d - Math.cos(theta)) + z * Math.cos(theta) + (-v * x + u * y) * Math.sin(theta);
+
+		return clip(new Vector(xPrime, yPrime, zPrime), 4);
+	}
+
+	public static Vector flip(Vector v, Axis axis)
+	{
+		if(axis.equals(Axis.X))
+		{
+			return new Vector(-v.getX(), v.getY(), v.getZ());
+		}
+
+		if(axis.equals(Axis.Y))
+		{
+			return new Vector(v.getX(), -v.getY(), v.getZ());
+		}
+
+		if(axis.equals(Axis.Z))
+		{
+			return new Vector(v.getX(), v.getY(), -v.getZ());
 		}
 
 		return v;

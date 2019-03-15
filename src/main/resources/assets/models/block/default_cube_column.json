@@ -1,0 +1,7 @@
+{
+    "parent": "block/fulcrum_cube_column",
+    "textures": {
+        "side": "blocks/$id_side",
+        "end": "blocks/$id_end"
+    }
+}

@@ -1,0 +1,6 @@
+{
+    "parent": "block/fulcrum_cube_all",
+    "textures": {
+        "all": "blocks/$id"
+    }
+}

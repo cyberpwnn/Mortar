@@ -1,142 +1,347 @@
 package mortar.api.sound;
 
 import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
-import mortar.compute.math.Average;
+import mortar.api.sched.S;
 import mortar.lang.collection.GList;
 
-/**
- * A collection of audibles which may contain more sub-audibles or actual sound
- * objects. This allows you to create sounds with mixtures of multiple sounds
- * and volumes
- *
- * @author cyberpwn
- */
 public class Audio implements Audible
 {
-	private GList<Audible> audibles;
+	private float v;
+	private float p;
+	private SoundCategory c;
+	private Sound s;
+	private GList<Audible> a;
+	private int delay;
+	private String sound;
 
-	/**
-	 * Create an audible object
-	 */
 	public Audio()
 	{
-		audibles = new GList<Audible>();
+		sound = null;
+		a = new GList<Audible>();
+		c(SoundCategory.AMBIENT).v(1f).p(1f).s(Sound.UI_BUTTON_CLICK);
+		delay = 0;
 	}
 
-	/**
-	 * Create an audible entity with multiple sub-audibles
-	 *
-	 * @param audibles
-	 *            the audibles
-	 */
-	public Audio(GList<Audible> audibles)
+	public Audio(Audible ax)
 	{
-		this.audibles = audibles;
-	}
+		v = ax.getVolume();
+		p = ax.getPitch();
+		c = ax.getCategory();
+		s = ax.getSound();
+		a = ax.getChildren().copy();
+		delay = ax.getDelay();
+		sound = ax.getSoundString();
 
-	@Override
-	public Audible clone()
-	{
-		return new Audio(audibles);
-	}
-
-	/**
-	 * Add an audible object to the sound entity
-	 *
-	 * @param audible
-	 *            to be played with the others
-	 */
-	public void add(Audible audible)
-	{
-		audibles.add(audible);
-	}
-
-	public Audio qadd(Audible audible)
-	{
-		audibles.add(audible);
-		return this;
 	}
 
 	@Override
-	public void play(Player p, Location l)
+	public void play(Location l, float v, float p)
 	{
-		for(Audible i : audibles)
+		setVolume(v);
+		setPitch(p);
+		play(l);
+
+		for(Audible i : getChildren())
 		{
-			i.play(p, l);
+			i.play(l, v, p);
 		}
 	}
 
 	@Override
-	public void play(Player p)
+	public void play(Player l, float v, float p)
 	{
-		for(Audible i : audibles)
+		setVolume(v);
+		setPitch(p);
+		play(l);
+
+		for(Audible i : getChildren())
 		{
-			i.play(p);
+			i.play(l, v, p);
 		}
 	}
 
 	@Override
 	public void play(Location l)
 	{
-		for(Audible i : audibles)
+		if(hasDelay())
 		{
-			i.play(l);
+			new S(getDelay())
+			{
+				@Override
+				public void run()
+				{
+					if(sound != null)
+					{
+						l.getWorld().playSound(l, getSoundString(), getVolume(), getPitch());
+					}
+
+					else
+					{
+						l.getWorld().playSound(l, getSound(), getVolume(), getPitch());
+					}
+
+					for(Audible i : getChildren())
+					{
+						i.play(l);
+					}
+				}
+			};
+		}
+
+		else
+		{
+			if(sound != null)
+			{
+				l.getWorld().playSound(l, getSoundString(), getVolume(), getPitch());
+			}
+
+			else
+			{
+				l.getWorld().playSound(l, getSound(), getVolume(), getPitch());
+			}
+
+			for(Audible i : getChildren())
+			{
+				i.play(l);
+			}
 		}
 	}
 
 	@Override
-	public void play(Player p, Vector v)
+	public void play(Player l, Location pos)
 	{
-		for(Audible i : audibles)
+		if(hasDelay())
 		{
-			i.play(p, v);
+			new S(getDelay())
+			{
+				@Override
+				public void run()
+				{
+					if(sound != null)
+					{
+						l.playSound(pos, getSoundString(), getVolume(), getPitch());
+					}
+
+					else
+					{
+						l.playSound(pos, getSound(), getVolume(), getPitch());
+					}
+
+					for(Audible i : getChildren())
+					{
+						i.play(l, pos);
+					}
+				}
+			};
+		}
+
+		else
+		{
+			if(sound != null)
+			{
+				l.playSound(pos, getSoundString(), getVolume(), getPitch());
+			}
+
+			else
+			{
+				l.playSound(pos, getSound(), getVolume(), getPitch());
+			}
+
+			for(Audible i : getChildren())
+			{
+				i.play(l, pos);
+			}
 		}
 	}
 
 	@Override
-	public Float getVolume()
+	public void play(Player l)
 	{
-		Average a = new Average(-1);
-
-		for(Audible i : audibles)
-		{
-			a.put(i.getVolume());
-		}
-
-		return (float) a.getAverage();
+		play(l, l.getLocation());
 	}
 
 	@Override
-	public void setVolume(Float volume)
+	public Audible setVolume(float v)
 	{
-		for(Audible i : audibles)
+		this.v = v;
+		return this;
+	}
+
+	@Override
+	public Audible setPitch(float p)
+	{
+		this.p = p;
+		return this;
+	}
+
+	@Override
+	public float getVolume()
+	{
+		return v;
+	}
+
+	@Override
+	public float getPitch()
+	{
+		return p;
+	}
+
+	@Override
+	public GList<Audible> getChildren()
+	{
+		return a;
+	}
+
+	@Override
+	public Audible addChild(Audible a)
+	{
+		this.a.add(a);
+		return this;
+	}
+
+	@Override
+	public SoundCategory getCategory()
+	{
+		return c;
+	}
+
+	@Override
+	public Audible setCategory(SoundCategory c)
+	{
+		this.c = c;
+		return this;
+	}
+
+	@Override
+	public Sound getSound()
+	{
+		return s;
+	}
+
+	@Override
+	public Audible setSound(Sound s)
+	{
+		this.s = s;
+		return this;
+	}
+
+	@Override
+	public Audible v(float v)
+	{
+		return setVolume(v);
+	}
+
+	@Override
+	public Audible p(float p)
+	{
+		return setPitch(p);
+	}
+
+	@Override
+	public Audible c(SoundCategory c)
+	{
+		return setCategory(c);
+	}
+
+	@Override
+	public Audible s(Sound s)
+	{
+		return setSound(s);
+	}
+
+	@Override
+	public Audible vp(float v, float p)
+	{
+		return v(v).p(p);
+	}
+
+	@Override
+	public void scalePitch(float p)
+	{
+		setPitch((getPitch() + p) / 2f);
+
+		for(Audible i : getChildren())
 		{
-			i.setVolume(volume);
+			i.scalePitch(p);
 		}
 	}
 
 	@Override
-	public Float getPitch()
+	public void scaleVolume(float p)
 	{
-		Average a = new Average(-1);
+		setVolume((getVolume() + p) / 2f);
 
-		for(Audible i : audibles)
+		for(Audible i : getChildren())
 		{
-			a.put(i.getPitch());
+			i.scaleVolume(p);
 		}
-
-		return (float) a.getAverage();
 	}
 
 	@Override
-	public void setPitch(Float pitch)
+	public Audio clone()
 	{
-		for(Audible i : audibles)
-		{
-			i.setPitch(pitch);
-		}
+		return (Audio) new Audio().d(this.delay).v(this.v).p(this.p).s(this.s).c(this.c).addChildren(this.getChildren());
+	}
+
+	@Override
+	public Audible addChildren(GList<Audible> a)
+	{
+		getChildren().addAll(a);
+		return this;
+	}
+
+	@Override
+	public Audible setDelay(int ticks)
+	{
+		this.delay = ticks;
+		return this;
+	}
+
+	@Override
+	public int getDelay()
+	{
+		return delay;
+	}
+
+	@Override
+	public Audible d(int ticks)
+	{
+		return setDelay(ticks);
+	}
+
+	@Override
+	public boolean hasDelay()
+	{
+		return getDelay() > 0;
+	}
+
+	@Override
+	public Audible s(String s)
+	{
+		sound = s;
+		return this;
+	}
+
+	@Override
+	public String getSoundString()
+	{
+		return sound;
+	}
+
+	@Override
+	public Audible setSound(String s)
+	{
+		sound = s;
+		return this;
+	}
+
+	@Override
+	public Audible osc(double d)
+	{
+		return new Audio(this).p((float) (Math.sin(Math.random()) * d));
 	}
 }

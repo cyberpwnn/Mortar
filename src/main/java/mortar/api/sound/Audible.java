@@ -1,89 +1,76 @@
 package mortar.api.sound;
 
 import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
-/**
- * Allows you to wrap either objects or more folders of wrappers into one
- * audible object allowing multiple sounds at different pitches and volumes be
- * played with one object
- * 
- * @author cyberpwn
- *
- */
-public interface Audible
+import mortar.lang.collection.GList;
+
+public interface Audible extends Cloneable
 {
-	/**
-	 * Play the sound to just the player
-	 * 
-	 * @param p
-	 *            the player
-	 * @param l
-	 *            the location
-	 */
-	public void play(Player p, Location l);
-	
-	/**
-	 * Play the sound to just the player
-	 * 
-	 * @param p
-	 *            the player
-	 */
-	public void play(Player p);
-	
-	/**
-	 * Play the sound globally
-	 * 
-	 * @param l
-	 *            the location
-	 */
+	public Audible setDelay(int ticks);
+
+	public int getDelay();
+
+	public Audible d(int ticks);
+
+	public void play(Location l, float v, float p);
+
+	public void play(Player l, float v, float p);
+
 	public void play(Location l);
-	
-	/**
-	 * Play the sound to the player
-	 * 
-	 * @param p
-	 *            the player
-	 * @param v
-	 *            relative to the players location
-	 */
-	public void play(Player p, Vector v);
-	
-	/**
-	 * Get volume
-	 * 
-	 * @return the volume
-	 */
-	public Float getVolume();
-	
-	/**
-	 * Sets the volume
-	 * 
-	 * @param volume
-	 *            the volume
-	 */
-	public void setVolume(Float volume);
-	
-	/**
-	 * get the pitch
-	 * 
-	 * @return the pitch
-	 */
-	public Float getPitch();
-	
-	/**
-	 * Set the pitch
-	 * 
-	 * @param pitch
-	 *            the pitch
-	 */
-	public void setPitch(Float pitch);
-	
-	/**
-	 * Clone the audio
-	 * 
-	 * @return the audio
-	 */
+
+	public void play(Player l);
+
+	public void scalePitch(float p);
+
+	public void scaleVolume(float p);
+
+	public void play(Player l, Location pos);
+
+	public Audible setVolume(float v);
+
+	public Audible setPitch(float p);
+
+	public Audible v(float v);
+
+	public Audible p(float p);
+
+	public Audible c(SoundCategory c);
+
+	public Audible s(Sound s);
+
+	public Audible s(String s);
+
+	public Audible vp(float v, float p);
+
+	public float getVolume();
+
+	public float getPitch();
+
+	public GList<Audible> getChildren();
+
+	public Audible addChild(Audible a);
+
+	public SoundCategory getCategory();
+
+	public Audible setCategory(SoundCategory c);
+
+	public Sound getSound();
+
+	public String getSoundString();
+
+	public Audible setSound(Sound s);
+
+	public Audible setSound(String s);
+
+	public Audible addChildren(GList<Audible> a);
+
+	public boolean hasDelay();
+
+	public Audible osc(double d);
+
 	public Audible clone();
+
 }

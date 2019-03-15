@@ -3,6 +3,7 @@ package mortar.bukkit.plugin;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 
 import mortar.util.text.C;
@@ -50,5 +51,10 @@ public class Mortar
 		}
 
 		return Bukkit.getWorlds().get(0);
+	}
+
+	public static void callEvent(Event e)
+	{
+		Bukkit.getServer().getPluginManager().callEvent(e);
 	}
 }

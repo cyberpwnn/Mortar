@@ -1,0 +1,7 @@
+{
+    "parent": "block/fulcrum_cube_framed",
+    "textures": {
+        "inside": "blocks/$id_inside",
+        "outside": "blocks/$id_outside"
+    }
+}

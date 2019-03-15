@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.volmit</groupId>
 	<artifactId>Mortar</artifactId>
-	<version>1.0.21</version>
+	<version>1.0.24</version>
 	<name>Mortar</name>
 	<description>That crap between the bricks</description>
 	<developers>
@@ -30,6 +30,39 @@
 					<include>**/*.yml</include>
 					<include>**/*.json</include>
 					<include>**/*.txt</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.yml</include>
+					<include>**/*.json</include>
+					<include>**/*.html</include>
+					<include>**/*.css</include>
+					<include>**/*.js</include>
+					<include>**/*.txt</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>**/*.ogg</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>**/*.png</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/java</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.java</include>
 				</includes>
 			</resource>
 		</resources>
@@ -296,6 +329,11 @@
 			<groupId>org.zeroturnaround</groupId>
 			<artifactId>zt-zip</artifactId>
 			<version>1.13</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.depsypher</groupId>
+			<artifactId>pngtastic</artifactId>
+			<version>1.5</version>
 		</dependency>
 	</dependencies>
 	<distributionManagement>

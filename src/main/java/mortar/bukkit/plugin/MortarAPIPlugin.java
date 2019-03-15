@@ -21,6 +21,8 @@ import mortar.compute.math.M;
 import mortar.lib.control.CacheController;
 import mortar.lib.control.MojangProfileController;
 import mortar.lib.control.RiftController;
+import mortar.scm.CommandSCM;
+import mortar.scm.SCMController;
 import mortar.util.queue.PhantomQueue;
 import mortar.util.queue.Queue;
 import mortar.util.text.C;
@@ -31,6 +33,18 @@ public class MortarAPIPlugin extends MortarPlugin
 	@Instance
 	public static MortarAPIPlugin p;
 
+	@Permission
+	public static PermissionMortar perm;
+
+	@Command
+	private CommandMortar mort;
+
+	@Command
+	private CommandClearConsole cls;
+
+	@Command
+	private CommandSCM scm;
+
 	@Control
 	private CacheController cacheController;
 
@@ -40,14 +54,12 @@ public class MortarAPIPlugin extends MortarPlugin
 	@Control
 	private RiftController riftController;
 
-	@Command
-	private CommandMortar mort;
+	@Control
+	private GhostWorldController ghostWorldControlller;
 
-	@Command
-	private CommandClearConsole cls;
+	@Control
+	private SCMController scmController;
 
-	@Permission
-	public static PermissionMortar perm;
 	private static Queue<String> logQueue;
 	private MortarConfig cfg;
 

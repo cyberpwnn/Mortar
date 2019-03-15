@@ -1,0 +1,11 @@
+{
+    "parent": "block/fulcrum_cube",
+    "textures": {
+        "up": "blocks/$id_up",
+        "down": "blocks/$id_down",
+        "north": "blocks/$id_north",
+        "south": "blocks/$id_south",
+        "east": "blocks/$id_east",
+        "west": "blocks/$id_west"
+    }
+}

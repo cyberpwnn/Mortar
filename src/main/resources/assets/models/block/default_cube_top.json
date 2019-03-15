@@ -1,0 +1,7 @@
+{
+    "parent": "block/fulcrum_cube_top",
+    "textures": {
+        "side": "blocks/$id_side",
+        "top": "blocks/$id_top"
+    }
+}

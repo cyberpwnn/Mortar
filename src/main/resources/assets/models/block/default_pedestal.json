@@ -1,0 +1,8 @@
+{
+    "parent": "block/fulcrum_pedestal",
+    "textures": {
+        "top": "blocks/$id_top",
+        "bottom": "blocks/$id_bottom",
+        "pillar": "blocks/$id_pillar"
+    }
+}

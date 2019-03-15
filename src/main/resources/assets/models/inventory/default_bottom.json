@@ -1,0 +1,6 @@
+{
+    "parent": "inventory/fulcrum_bottom",
+    "textures": {
+        "texture": "inventories/$id_bottom"
+    }
+}
