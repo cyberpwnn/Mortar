@@ -6,7 +6,9 @@ import org.bukkit.entity.Player;
 
 public enum Instrument
 {
-	ENCHANT_HIGH(new MFADistortion(6, 0.11f).distort(new Audio().s(Sound.BLOCK_ENCHANTMENT_TABLE_USE).vp(1f, 1.5f))),
+	ENCHANT_HIGH(new MFADistortion(4, 1.9f).distort(new Audio().s(Sound.BLOCK_ENCHANTMENT_TABLE_USE).vp(1f, 1.5f))),
+	ENCHANT_MID(new MFADistortion(4, 1.1f).distort(new Audio().s(Sound.BLOCK_ENCHANTMENT_TABLE_USE).vp(1f, 1.5f))),
+	ENCHANT_LOW(new MFADistortion(4, 0.11f).distort(new Audio().s(Sound.BLOCK_ENCHANTMENT_TABLE_USE).vp(1f, 1.5f))),
 	CLICK(new MFADistortion(6, 0.1f).distort(new Audio().s(Sound.BLOCK_LEVER_CLICK).vp(1f, 1.7f))),
 	KINDLE_HIGH(new MFADistortion(6, 1.9f).distort(new Audio().s(Sound.BLOCK_FURNACE_FIRE_CRACKLE).vp(1f, 1f))),
 	KINDLE_MID(new MFADistortion(6, 1.5f).distort(new Audio().s(Sound.BLOCK_FURNACE_FIRE_CRACKLE).vp(1f, 0.6f))),

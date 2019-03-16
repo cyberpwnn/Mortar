@@ -9,6 +9,9 @@ public class CommandMortar extends MortarCommand
 	@Command
 	private CommandMortarUpdate update;
 
+	@Command
+	private CommandSound sound;
+
 	public CommandMortar()
 	{
 		super("mortar", "mort", "morty", "mortal", "mtr");

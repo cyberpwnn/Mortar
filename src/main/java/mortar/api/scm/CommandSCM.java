@@ -180,7 +180,7 @@ public class CommandSCM extends MortarCommand
 							}, (pct) ->
 							{
 								sender.sendMessage("SCM RAW -> " + args[1] + " (" + F.pc(pct, 0) + ")");
-								Instrument.GRAVEL_WIDE.play(sender.player());
+								Instrument.CRAWL_LOW.play(sender.player());
 							});
 						}
 
@@ -248,7 +248,7 @@ public class CommandSCM extends MortarCommand
 						}, (pct) ->
 						{
 							sender.sendMessage("SCM RAW -> " + args[1] + " (" + F.pc(pct, 0) + ")");
-							Instrument.GRAVEL_WIDE.play(sender.player());
+							Instrument.CRAWL_LOW.play(sender.player());
 						});
 					}
 

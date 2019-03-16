@@ -22,7 +22,7 @@ public class Audio implements Audible
 	{
 		sound = null;
 		a = new GList<Audible>();
-		c(SoundCategory.AMBIENT).v(1f).p(1f).s(Sound.UI_BUTTON_CLICK);
+		c(SoundCategory.AMBIENT).v(1f).p(1f);
 		delay = 0;
 	}
 
