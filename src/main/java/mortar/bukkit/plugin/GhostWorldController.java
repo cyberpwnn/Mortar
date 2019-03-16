@@ -8,8 +8,8 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+import mortar.api.scm.GhostWorld;
 import mortar.api.world.BlockType;
-import mortar.scm.GhostWorld;
 
 public class GhostWorldController extends Controller
 {

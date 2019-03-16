@@ -2,8 +2,8 @@ package mortar.event;
 
 import org.bukkit.event.Event;
 
-import mortar.scm.IMappedVolume;
-import mortar.scm.IVolume;
+import mortar.api.scm.IMappedVolume;
+import mortar.api.scm.IVolume;
 
 public class VolumeConstructEvent extends MortarEvent
 {

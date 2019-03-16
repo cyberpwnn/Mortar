@@ -28,6 +28,11 @@ public class ChunkSendQueue
 		running = false;
 	}
 
+	public boolean hasStuff()
+	{
+		return c.size() > 0 || sections.size() > 0;
+	}
+
 	public void start()
 	{
 		s = new SR(interval)

@@ -1,8 +1,8 @@
 package mortar.bukkit.plugin;
 
+import mortar.api.scm.PermissionSCM;
 import mortar.bukkit.command.MortarPermission;
 import mortar.bukkit.command.Permission;
-import mortar.scm.PermissionSCM;
 
 public class PermissionMortar extends MortarPermission
 {
