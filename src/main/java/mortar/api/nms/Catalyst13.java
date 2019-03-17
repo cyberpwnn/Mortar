@@ -99,6 +99,11 @@ public class Catalyst13 extends CatalystPacketListener implements CatalystHost
 		J.s(() -> a.delete(p), 5);
 	}
 
+	public void relight(Chunk c)
+	{
+		((CraftChunk) c).getHandle().initLighting();
+	}
+
 	@Override
 	public Object packetTime(long full, long day)
 	{

@@ -105,6 +105,11 @@ public class Catalyst92 extends CatalystPacketListener implements CatalystHost
 		}
 	}
 
+	public void relight(Chunk c)
+	{
+		((CraftChunk) c).getHandle().initLighting();
+	}
+
 	@Override
 	public Object packetTime(long full, long day)
 	{

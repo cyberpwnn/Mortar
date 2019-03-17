@@ -51,7 +51,7 @@ public class GhostWorld
 	{
 		if(!snap.containsKey(c))
 		{
-			snap.put(c, c.getChunkSnapshot(false, false, false));
+			snap.put(c, c.getChunkSnapshot(true, true, true));
 			aquired.put(c, M.ms());
 		}
 

@@ -13,6 +13,7 @@ import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -44,8 +45,13 @@ public class SCMIO
 		return scm;
 	}
 
-	@SuppressWarnings("deprecation")
 	public static void read(File f, Location at, Callback<Boolean> done, Callback<Double> percent)
+	{
+		read(f, at, done, percent, true, 500);
+	}
+
+	@SuppressWarnings("deprecation")
+	public static void read(File f, Location at, Callback<Boolean> done, Callback<Double> percent, boolean loadChunks, long intervalLog)
 	{
 		J.s(() ->
 		{
@@ -58,7 +64,7 @@ public class SCMIO
 				Location min = at.getBlock().getLocation().subtract(scm.getOrigin());
 				Location max = min.clone().add(scm.getSize()).subtract(1, 1, 1);
 				Cuboid c = new Cuboid(min, max);
-				ChronoLatch latch = new ChronoLatch(500, false);
+				ChronoLatch latch = new ChronoLatch(intervalLog, false);
 				PhantomQueue<Chunk> cq = new PhantomQueue<Chunk>().responsiveMode();
 				cq.queue(new GList<>(c.getChunks()));
 				int vx = cq.size() / 16;
@@ -80,11 +86,24 @@ public class SCMIO
 						{
 							for(int k = min.getBlockZ(); k <= max.getBlockZ(); k++)
 							{
+								try
+								{
+									int ii = i;
+									int kk = k;
+									Biome b = Biome.values()[(int) din.readByte()];
+									J.s(() -> c.getWorld().setBiome(ii, kk, b));
+								}
+
+								catch(IOException e)
+								{
+									e.printStackTrace();
+								}
+
 								for(int j = min.getBlockY(); j <= max.getBlockY(); j++)
 								{
 									try
 									{
-										int id = (int) din.readByte();
+										int id = (int) din.readInt();
 										byte dat = din.readByte();
 										NMP.host.setBlock(new Location(c.getWorld(), i, j, k), new MaterialBlock(Material.getMaterial(id), dat));
 									}
@@ -148,25 +167,28 @@ public class SCMIO
 									}
 
 									J.s(() -> done.run(true));
-									J.s(() ->
+									if(loadChunks)
 									{
-										int v = 0;
-
-										for(Chunk i : c.getChunks())
+										J.s(() ->
 										{
-											v++;
-											J.s(() ->
+											int v = 0;
+
+											for(Chunk i : c.getChunks())
 											{
-												for(Player j : c.getWorld().getPlayers())
+												v++;
+												J.s(() ->
 												{
-													if(NMP.PLAYER.canSee(j, i))
+													for(Player j : c.getWorld().getPlayers())
 													{
-														NMP.CHUNK.refresh(j, i);
+														if(NMP.PLAYER.canSee(j, i))
+														{
+															NMP.CHUNK.refresh(j, i);
+														}
 													}
-												}
-											}, M.rand(0, v / 10));
-										}
-									});
+												}, M.rand(0, v / 10));
+											}
+										});
+									}
 								});
 							}
 
@@ -187,7 +209,7 @@ public class SCMIO
 		});
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({"deprecation", "resource"})
 	public static void write(File f, Location at, Cuboid c, Callback<Boolean> done, Callback<Double> percent)
 	{
 		GhostWorld gw = new GhostWorld();
@@ -198,10 +220,10 @@ public class SCMIO
 		GMap<Vector, ChunkSnapshot> chunkCache = new GMap<>();
 		PhantomQueue<Chunk> cq = new PhantomQueue<Chunk>().responsiveMode();
 		cq.queue(new GList<>(c.outset(CuboidDirection.Horizontal, 1).getChunks()));
-		int v = cq.size() / 16;
+		int v = cq.size() / 2;
 		J.sr(() ->
 		{
-			for(Chunk i : cq.next(16))
+			for(Chunk i : cq.next(3))
 			{
 				chunkCache.put(new Vector(i.getX(), i.getZ(), 0), gw.snap(i));
 				i.load();
@@ -237,7 +259,7 @@ public class SCMIO
 							int kk = k;
 							J.s(() ->
 							{
-								snap[0] = c.getWorld().getChunkAt(ii >> 4, kk >> 4).getChunkSnapshot();
+								snap[0] = c.getWorld().getChunkAt(ii >> 4, kk >> 4).getChunkSnapshot(true, true, true);
 								chunkCache.put(new Vector(ii >> 4, kk >> 4, 0), snap[0]);
 							});
 
@@ -246,10 +268,12 @@ public class SCMIO
 								Thread.sleep(1);
 							}
 
+							dos.writeByte(snap[0].getBiome(i & 15, k & 15).ordinal());
+
 							for(int j = min.getBlockY(); j <= max.getBlockY(); j++)
 							{
 								Material m = snap[0].getBlockType(i & 15, j, k & 15);
-								dos.writeByte(m.getId());
+								dos.writeInt(m.getId());
 								dos.writeByte(snap[0].getBlockData(i & 15, j, k & 15));
 
 								if(m.equals(Material.SIGN_POST) || m.equals(Material.WALL_SIGN))
@@ -284,7 +308,6 @@ public class SCMIO
 
 								for(String j : s.getLines())
 								{
-
 									dos.writeUTF(j != null ? j : "");
 								}
 							}
