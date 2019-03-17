@@ -1,4 +1,4 @@
-package com.volmit.fulcrum.resourcepack;
+package mortar.api.resourcepack;
 
 import java.io.File;
 import java.io.FileInputStream;

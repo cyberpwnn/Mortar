@@ -265,7 +265,7 @@ public class SCMIO
 
 							while(snap[0] == null)
 							{
-								Thread.sleep(1);
+								Thread.sleep(150);
 							}
 
 							dos.writeByte(snap[0].getBiome(i & 15, k & 15).ordinal());

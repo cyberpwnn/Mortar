@@ -1,4 +1,4 @@
-package com.volmit.fulcrum.resourcepack;
+package mortar.api.resourcepack;
 
 public enum LootTableType
 {

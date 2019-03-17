@@ -16,8 +16,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import mortar.api.nms.NMSVersion;
 import mortar.api.particle.ParticleEffect.ParticleData;
 import mortar.api.particle.ReflectionUtils.PackageType;
+import net.minecraft.server.v1_12_R1.PacketPlayOutWorldParticles;
+import net.minecraft.server.v1_13_R2.ParticleParam;
+import net.minecraft.server.v1_13_R2.ParticleParamRedstone;
+import net.minecraft.server.v1_13_R2.Particles;
 
 /**
  * <b>ParticleEffect Library</b>
@@ -1838,6 +1843,12 @@ public enum ParticleEffect
 				}
 
 				Class<?> packetClass = PackageType.MINECRAFT_SERVER.getClass(version < 7 ? "Packet63WorldParticles" : "PacketPlayOutWorldParticles");
+
+				if(NMSVersion.current().equals(NMSVersion.R1_13))
+				{
+					packetClass = PackageType.MINECRAFT_SERVER.getClass("PacketPlayOutWorldParticles");
+				}
+
 				packetConstructor = ReflectionUtils.getConstructor(packetClass);
 				getHandle = ReflectionUtils.getMethod("CraftPlayer", PackageType.CRAFTBUKKIT_ENTITY, "getHandle");
 				playerConnection = ReflectionUtils.getField("EntityPlayer", PackageType.MINECRAFT_SERVER, false, "playerConnection");
@@ -1846,7 +1857,8 @@ public enum ParticleEffect
 
 			catch(Exception exception)
 			{
-
+				PacketPlayOutWorldParticles m;
+				net.minecraft.server.v1_13_R2.PacketPlayOutWorldParticles g;
 			}
 
 			initialized = true;
@@ -1900,37 +1912,198 @@ public enum ParticleEffect
 			try
 			{
 				packet = packetConstructor.newInstance();
-				if(version < 8)
+
+				if(!NMSVersion.current().equals(NMSVersion.R1_13))
 				{
-					String name = effect.getName();
-					if(data != null)
+					if(version < 8)
 					{
-						name += data.getPacketDataString();
+						String name = effect.getName();
+						if(data != null)
+						{
+							name += data.getPacketDataString();
+						}
+						ReflectionUtils.setValue(packet, true, "a", name);
 					}
-					ReflectionUtils.setValue(packet, true, "a", name);
+					else
+					{
+						ReflectionUtils.setValue(packet, true, "a", enumParticle.getEnumConstants()[effect.getId()]);
+						ReflectionUtils.setValue(packet, true, "j", longDistance);
+						if(data != null)
+						{
+							int[] packetData = data.getPacketData();
+							ReflectionUtils.setValue(packet, true, "k", effect == ParticleEffect.ITEM_CRACK ? packetData : new int[] {packetData[0] | (packetData[1] << 12)});
+						}
+					}
+					ReflectionUtils.setValue(packet, true, "b", (float) center.getX());
+					ReflectionUtils.setValue(packet, true, "c", (float) center.getY());
+					ReflectionUtils.setValue(packet, true, "d", (float) center.getZ());
+					ReflectionUtils.setValue(packet, true, "e", offsetX);
+					ReflectionUtils.setValue(packet, true, "f", offsetY);
+					ReflectionUtils.setValue(packet, true, "g", offsetZ);
+					ReflectionUtils.setValue(packet, true, "h", speed);
+					ReflectionUtils.setValue(packet, true, "i", amount);
 				}
+
 				else
 				{
+
 					ReflectionUtils.setValue(packet, true, "a", enumParticle.getEnumConstants()[effect.getId()]);
-					ReflectionUtils.setValue(packet, true, "j", longDistance);
+
 					if(data != null)
 					{
 						int[] packetData = data.getPacketData();
 						ReflectionUtils.setValue(packet, true, "k", effect == ParticleEffect.ITEM_CRACK ? packetData : new int[] {packetData[0] | (packetData[1] << 12)});
 					}
+
+					ParticleParam param = Particles.g;
+
+					switch(effect)
+					{
+						case BARRIER:
+							param = Particles.c;
+							break;
+						case CLOUD:
+							param = Particles.g;
+							break;
+						case CRIT:
+							param = Particles.h;
+							break;
+						case CRIT_MAGIC:
+							param = Particles.p;
+							break;
+						case DAMAGE_INDICATOR:
+							param = Particles.i;
+							break;
+						case DRAGON_BREATH:
+							param = Particles.j;
+							break;
+						case DRIP_LAVA:
+							param = Particles.k;
+							break;
+						case DRIP_WATER:
+							param = Particles.l;
+							break;
+						case ENCHANTMENT_TABLE:
+							param = Particles.q;
+							break;
+						case END_ROD:
+							param = Particles.r;
+							break;
+						case EXPLOSION_HUGE:
+							param = Particles.t;
+							break;
+						case EXPLOSION_LARGE:
+							param = Particles.u;
+							break;
+						case EXPLOSION_NORMAL:
+							param = Particles.u;
+							break;
+						case FIREWORKS_SPARK:
+							param = Particles.w;
+							break;
+						case FLAME:
+							param = Particles.y;
+							break;
+						case FOOTSTEP:
+							param = Particles.J;
+							break;
+						case HEART:
+							param = Particles.A;
+							break;
+						case LAVA:
+							param = Particles.G;
+							break;
+						case MOB_APPEARANCE:
+							param = Particles.o;
+							break;
+						case NOTE:
+							param = Particles.I;
+							break;
+						case PORTAL:
+							param = Particles.K;
+							break;
+						case REDSTONE:
+							param = new ParticleParamRedstone(offsetX, offsetY, offsetZ, speed);
+							break;
+						case SLIME:
+							param = Particles.D;
+							break;
+						case SMOKE_LARGE:
+							param = Particles.F;
+							break;
+						case SMOKE_NORMAL:
+							param = Particles.M;
+							break;
+						case SNOWBALL:
+							param = Particles.E;
+							break;
+						case SNOW_SHOVEL:
+							param = Particles.E;
+							break;
+						case SPELL:
+							param = Particles.n;
+							break;
+						case SPELL_INSTANT:
+							param = Particles.B;
+							break;
+						case SPELL_MOB:
+							param = Particles.s;
+							break;
+						case SPELL_MOB_AMBIENT:
+							param = Particles.a;
+							break;
+						case SPELL_WITCH:
+							param = Particles.S;
+							break;
+						case SUSPENDED:
+							param = Particles.H;
+							break;
+						case SUSPENDED_DEPTH:
+							param = Particles.H;
+							break;
+						case SWEEP_ATTACK:
+							param = Particles.O;
+							break;
+						case TOWN_AURA:
+							param = Particles.H;
+							break;
+						case VILLAGER_ANGRY:
+							param = Particles.b;
+							break;
+						case VILLAGER_HAPPY:
+							param = Particles.z;
+							break;
+						case WATER_BUBBLE:
+							param = Particles.e;
+							break;
+						case WATER_DROP:
+							param = Particles.L;
+							break;
+						case WATER_SPLASH:
+							param = Particles.R;
+							break;
+						case WATER_WAKE:
+							param = Particles.Q;
+							break;
+						default:
+							break;
+					}
+
+					ReflectionUtils.setValue(packet, true, "a", (float) center.getX());
+					ReflectionUtils.setValue(packet, true, "b", (float) center.getY());
+					ReflectionUtils.setValue(packet, true, "c", (float) center.getZ());
+					ReflectionUtils.setValue(packet, true, "d", offsetX);
+					ReflectionUtils.setValue(packet, true, "e", offsetY);
+					ReflectionUtils.setValue(packet, true, "f", offsetZ);
+					ReflectionUtils.setValue(packet, true, "g", speed);
+					ReflectionUtils.setValue(packet, true, "h", amount);
+					ReflectionUtils.setValue(packet, true, "i", longDistance);
 				}
-				ReflectionUtils.setValue(packet, true, "b", (float) center.getX());
-				ReflectionUtils.setValue(packet, true, "c", (float) center.getY());
-				ReflectionUtils.setValue(packet, true, "d", (float) center.getZ());
-				ReflectionUtils.setValue(packet, true, "e", offsetX);
-				ReflectionUtils.setValue(packet, true, "f", offsetY);
-				ReflectionUtils.setValue(packet, true, "g", offsetZ);
-				ReflectionUtils.setValue(packet, true, "h", speed);
-				ReflectionUtils.setValue(packet, true, "i", amount);
 			}
+
 			catch(Exception exception)
 			{
-				throw new PacketInstantiationException("Packet instantiation failed", exception);
+
 			}
 		}
 
@@ -1954,9 +2127,9 @@ public enum ParticleEffect
 			{
 				sendPacket.invoke(playerConnection.get(getHandle.invoke(player)), packet);
 			}
+
 			catch(Exception exception)
 			{
-				throw new PacketSendingException("Failed to send the packet to player '" + player.getName() + "'", exception);
 			}
 		}
 
