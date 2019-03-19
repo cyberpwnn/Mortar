@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.craftbukkit.v1_11_R1.CraftChunk;
@@ -28,13 +29,16 @@ import org.bukkit.util.Vector;
 
 import mortar.api.sched.J;
 import mortar.api.world.MaterialBlock;
+import mortar.bukkit.plugin.Mortar;
 import mortar.bukkit.plugin.MortarAPIPlugin;
+import mortar.lang.collection.FinalBoolean;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GSet;
 import mortar.util.reflection.V;
 import mortar.util.text.C;
 import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.BlockPosition;
+import net.minecraft.server.v1_11_R1.ChunkSection;
 import net.minecraft.server.v1_11_R1.DataWatcher.Item;
 import net.minecraft.server.v1_11_R1.DataWatcherObject;
 import net.minecraft.server.v1_11_R1.DataWatcherRegistry;
@@ -96,9 +100,63 @@ public class Catalyst11 extends CatalystPacketListener implements CatalystHost
 		J.s(() -> a.delete(p), 5);
 	}
 
+	@Override
 	public void relight(Chunk c)
 	{
 		((CraftChunk) c).getHandle().initLighting();
+	}
+
+	@Override
+	public MaterialBlock getBlock(Location l)
+	{
+		return getBlock(l.getWorld(), l.getBlockX(), l.getBlockY(), l.getBlockZ());
+	}
+
+	@Override
+	public MaterialBlock getBlock(World world, int xx, int yy, int zz)
+	{
+		int x = xx >> 4;
+		int y = yy >> 4;
+		int z = zz >> 4;
+		FinalBoolean lx = new FinalBoolean(false);
+		if(!world.isChunkLoaded(x, z))
+		{
+			if(Mortar.isMainThread())
+			{
+				world.loadChunk(x, z);
+			}
+
+			else
+			{
+				int m = J.sr(() -> world.loadChunk(x, z), 20);
+
+				while(!lx.get())
+				{
+					try
+					{
+						Thread.sleep(1);
+					}
+
+					catch(InterruptedException e)
+					{
+						e.printStackTrace();
+					}
+				}
+
+				J.csr(m);
+			}
+		}
+
+		net.minecraft.server.v1_11_R1.Chunk c = ((CraftChunk) world.getChunkAt(x, z)).getHandle();
+		ChunkSection s = c.getSections()[y];
+
+		if(s == null)
+		{
+			return new MaterialBlock(Material.AIR);
+		}
+
+		IBlockData data = s.getType(xx & 15, yy & 15, zz & 15);
+		return new MaterialBlock(Block.getId(data.getBlock()), (byte) data.getBlock().toLegacyData(data) << 12);
 	}
 
 	// START PACKETS

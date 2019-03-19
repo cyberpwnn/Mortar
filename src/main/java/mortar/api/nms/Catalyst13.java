@@ -99,6 +99,19 @@ public class Catalyst13 extends CatalystPacketListener implements CatalystHost
 		J.s(() -> a.delete(p), 5);
 	}
 
+	@Override
+	public MaterialBlock getBlock(Location l)
+	{
+		return null;
+	}
+
+	@Override
+	public MaterialBlock getBlock(World w, int x, int y, int z)
+	{
+		return null;
+	}
+
+	@Override
 	public void relight(Chunk c)
 	{
 		((CraftChunk) c).getHandle().initLighting();

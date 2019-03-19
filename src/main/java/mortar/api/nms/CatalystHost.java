@@ -19,6 +19,10 @@ import mortar.util.text.C;
 
 public interface CatalystHost extends PacketListener, Listener
 {
+	public MaterialBlock getBlock(Location l);
+
+	public MaterialBlock getBlock(World world, int x, int y, int z);
+
 	public void setBlock(Location l, MaterialBlock m);
 
 	public void resendChunkSection(Player p, int x, int y, int z);

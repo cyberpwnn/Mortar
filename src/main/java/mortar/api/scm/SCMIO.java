@@ -10,7 +10,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -22,13 +21,11 @@ import org.bukkit.util.Vector;
 import mortar.api.nms.NMP;
 import mortar.api.sched.J;
 import mortar.api.world.Cuboid;
-import mortar.api.world.Cuboid.CuboidDirection;
 import mortar.api.world.MaterialBlock;
 import mortar.api.world.VectorMath;
 import mortar.compute.math.M;
 import mortar.lang.collection.Callback;
 import mortar.lang.collection.GList;
-import mortar.lang.collection.GMap;
 import mortar.logic.queue.ChronoLatch;
 import mortar.util.queue.PhantomQueue;
 
@@ -143,6 +140,7 @@ public class SCMIO
 											s.setLine(j, din.readUTF());
 										}
 
+										s.setRawData(din.readByte());
 										s.update();
 									}
 
@@ -212,135 +210,108 @@ public class SCMIO
 	@SuppressWarnings({"deprecation", "resource"})
 	public static void write(File f, Location at, Cuboid c, Callback<Boolean> done, Callback<Double> percent)
 	{
-		GhostWorld gw = new GhostWorld();
 		Location min = c.getLowerNE();
 		Location max = c.getUpperSW();
 		Vector origin = VectorMath.directionNoNormal(min, at);
 		GList<Location> signs = new GList<>();
-		GMap<Vector, ChunkSnapshot> chunkCache = new GMap<>();
-		PhantomQueue<Chunk> cq = new PhantomQueue<Chunk>().responsiveMode();
-		cq.queue(new GList<>(c.outset(CuboidDirection.Horizontal, 1).getChunks()));
-		int v = cq.size() / 2;
-		J.sr(() ->
-		{
-			for(Chunk i : cq.next(3))
-			{
-				chunkCache.put(new Vector(i.getX(), i.getZ(), 0), gw.snap(i));
-				i.load();
-			}
-		}, 0, v);
 
-		J.s(() ->
+		J.a(() ->
 		{
-			J.a(() ->
+			try
 			{
-				try
+				FileOutputStream fos = new FileOutputStream(f);
+				GZIPOutputStream gzo = new GZIPOutputStream(fos);
+				DataOutputStream dos = new DataOutputStream(gzo);
+				ChronoLatch latch = new ChronoLatch(500, false);
+				dos.writeInt(c.getSizeX());
+				dos.writeInt(c.getSizeY());
+				dos.writeInt(c.getSizeZ());
+				dos.writeInt(origin.getBlockX());
+				dos.writeInt(origin.getBlockY());
+				dos.writeInt(origin.getBlockZ());
+
+				int of = c.volume();
+				int did = 0;
+
+				for(int i = min.getBlockX(); i <= max.getBlockX(); i++)
 				{
-					FileOutputStream fos = new FileOutputStream(f);
-					GZIPOutputStream gzo = new GZIPOutputStream(fos);
-					DataOutputStream dos = new DataOutputStream(gzo);
-					ChronoLatch latch = new ChronoLatch(500, false);
-					dos.writeInt(c.getSizeX());
-					dos.writeInt(c.getSizeY());
-					dos.writeInt(c.getSizeZ());
-					dos.writeInt(origin.getBlockX());
-					dos.writeInt(origin.getBlockY());
-					dos.writeInt(origin.getBlockZ());
-
-					int of = c.volume();
-					int did = 0;
-
-					for(int i = min.getBlockX(); i <= max.getBlockX(); i++)
+					for(int k = min.getBlockZ(); k <= max.getBlockZ(); k++)
 					{
-						for(int k = min.getBlockZ(); k <= max.getBlockZ(); k++)
+						dos.writeByte(c.getWorld().getBiome(i, k).ordinal());
+
+						for(int j = min.getBlockY(); j <= max.getBlockY(); j++)
 						{
-							ChunkSnapshot[] snap = {chunkCache.get(new Vector(i >> 4, k >> 4, 0))};
-							int ii = i;
-							int kk = k;
-							J.s(() ->
-							{
-								snap[0] = c.getWorld().getChunkAt(ii >> 4, kk >> 4).getChunkSnapshot(true, true, true);
-								chunkCache.put(new Vector(ii >> 4, kk >> 4, 0), snap[0]);
-							});
+							MaterialBlock mb = NMP.host.getBlock(c.getWorld(), i, j, k);
+							Material m = mb.getMaterial();
+							dos.writeInt(m.getId());
+							dos.writeByte(mb.getData());
 
-							while(snap[0] == null)
+							if(m.equals(Material.SIGN_POST) || m.equals(Material.WALL_SIGN))
 							{
-								Thread.sleep(150);
+								signs.add(new Location(c.getWorld(), i, j, k));
 							}
 
-							dos.writeByte(snap[0].getBiome(i & 15, k & 15).ordinal());
+							did++;
+						}
 
-							for(int j = min.getBlockY(); j <= max.getBlockY(); j++)
+						if(latch.flip())
+						{
+							percent.run((double) did / (double) of);
+						}
+					}
+				}
+
+				dos.writeInt(signs.size());
+
+				J.s(() ->
+				{
+					for(Location i : signs)
+					{
+						Sign s = (Sign) i.getBlock().getState();
+
+						try
+						{
+							Vector offset = VectorMath.directionNoNormal(min, i);
+							dos.writeInt(offset.getBlockX());
+							dos.writeInt(offset.getBlockY());
+							dos.writeInt(offset.getBlockZ());
+
+							for(String j : s.getLines())
 							{
-								Material m = snap[0].getBlockType(i & 15, j, k & 15);
-								dos.writeInt(m.getId());
-								dos.writeByte(snap[0].getBlockData(i & 15, j, k & 15));
-
-								if(m.equals(Material.SIGN_POST) || m.equals(Material.WALL_SIGN))
-								{
-									signs.add(new Location(c.getWorld(), i, j, k));
-								}
-
-								did++;
+								dos.writeUTF(j != null ? j : "");
 							}
 
-							if(latch.flip())
-							{
-								percent.run((double) did / (double) of);
-							}
+							dos.writeByte(s.getRawData());
+						}
+
+						catch(IOException e)
+						{
+							e.printStackTrace();
+
 						}
 					}
 
-					dos.writeInt(signs.size());
-
-					J.s(() ->
+					J.a(() ->
 					{
-						for(Location i : signs)
+						try
 						{
-							Sign s = (Sign) i.getBlock().getState();
-
-							try
-							{
-								Vector offset = VectorMath.directionNoNormal(min, i);
-								dos.writeInt(offset.getBlockX());
-								dos.writeInt(offset.getBlockY());
-								dos.writeInt(offset.getBlockZ());
-
-								for(String j : s.getLines())
-								{
-									dos.writeUTF(j != null ? j : "");
-								}
-							}
-
-							catch(IOException e)
-							{
-								e.printStackTrace();
-
-							}
+							dos.close();
 						}
 
-						J.a(() ->
+						catch(IOException e)
 						{
-							try
-							{
-								dos.close();
-							}
-
-							catch(IOException e)
-							{
-								e.printStackTrace();
-							}
-							done.run(true);
-						});
+							e.printStackTrace();
+						}
+						done.run(true);
 					});
-				}
+				});
+			}
 
-				catch(Throwable e)
-				{
-					done.run(false);
-					e.printStackTrace();
-				}
-			});
-		}, v + 1);
+			catch(Throwable e)
+			{
+				done.run(false);
+				e.printStackTrace();
+			}
+		});
 	}
 }

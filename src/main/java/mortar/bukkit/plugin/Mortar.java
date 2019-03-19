@@ -6,11 +6,14 @@ import org.bukkit.World.Environment;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 
+import mortar.logic.io.VIO;
 import mortar.util.text.C;
 import mortar.util.text.TXT;
 
 public class Mortar
 {
+	public static final int API_VERSION = readAPIVersion();
+
 	public static boolean isMainThread()
 	{
 		return Bukkit.isPrimaryThread();
@@ -56,5 +59,20 @@ public class Mortar
 	public static void callEvent(Event e)
 	{
 		Bukkit.getServer().getPluginManager().callEvent(e);
+	}
+
+	private static int readAPIVersion()
+	{
+		try
+		{
+			Integer.valueOf(VIO.readAll(Mortar.class.getResourceAsStream("/apiversion.info")).replaceAll("\\Q\n\\E", "").replaceAll("\\Q\"\\E", "").trim());
+		}
+
+		catch(Throwable e)
+		{
+			e.printStackTrace();
+		}
+
+		return -1;
 	}
 }

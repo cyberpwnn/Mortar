@@ -30,6 +30,17 @@ public class MaterialBlock
 		this.data = data;
 	}
 
+	public MaterialBlock(int material, byte data)
+	{
+		this.material = Material.getMaterial(material);
+		this.data = data;
+	}
+
+	public MaterialBlock(int material, int data)
+	{
+		this(material, (byte) data);
+	}
+
 	public MaterialBlock(Material material)
 	{
 		this.material = material;
