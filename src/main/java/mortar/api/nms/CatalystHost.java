@@ -1,5 +1,6 @@
 package mortar.api.nms;
 
+import java.awt.Color;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -19,6 +20,10 @@ import mortar.util.text.C;
 
 public interface CatalystHost extends PacketListener, Listener
 {
+	public void redstoneParticle(Player p, Color c, Location l, float size);
+
+	public void redstoneParticle(double range, Color c, Location l, float size);
+
 	public MaterialBlock getBlock(Location l);
 
 	public MaterialBlock getBlock(World world, int x, int y, int z);

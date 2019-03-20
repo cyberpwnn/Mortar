@@ -1,5 +1,6 @@
 package mortar.api.nms;
 
+import java.awt.Color;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +27,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import mortar.api.particle.ParticleEffect;
+import mortar.api.particle.ParticleEffect.ParticleColor;
 import mortar.api.sched.J;
 import mortar.api.world.MaterialBlock;
 import mortar.bukkit.plugin.Mortar;
@@ -963,5 +966,19 @@ public class Catalyst12 extends CatalystPacketListener implements CatalystHost
 
 		IBlockData data = s.getType(xx & 15, yy & 15, zz & 15);
 		return new MaterialBlock(Block.getId(data.getBlock()), (byte) data.getBlock().toLegacyData(data) << 12);
+	}
+
+	@Override
+	public void redstoneParticle(Player p, Color c, Location l, float size)
+	{
+		ParticleColor cx = new ParticleEffect.OrdinaryColor(c.getRed(), c.getGreen(), c.getBlue());
+		ParticleEffect.REDSTONE.display(cx, l, p);
+	}
+
+	@Override
+	public void redstoneParticle(double range, Color c, Location l, float size)
+	{
+		ParticleColor cx = new ParticleEffect.OrdinaryColor(c.getRed(), c.getGreen(), c.getBlue());
+		ParticleEffect.REDSTONE.display(cx, l, range);
 	}
 }

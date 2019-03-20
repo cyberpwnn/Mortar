@@ -1,5 +1,6 @@
 package mortar.api.nms;
 
+import java.awt.Color;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import mortar.api.sched.J;
+import mortar.api.world.Area;
 import mortar.api.world.MaterialBlock;
 import mortar.bukkit.plugin.MortarAPIPlugin;
 import mortar.lang.collection.GList;
@@ -74,6 +76,9 @@ import net.minecraft.server.v1_13_R2.PacketPlayOutTitle;
 import net.minecraft.server.v1_13_R2.PacketPlayOutTitle.EnumTitleAction;
 import net.minecraft.server.v1_13_R2.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_13_R2.PacketPlayOutUpdateTime;
+import net.minecraft.server.v1_13_R2.PacketPlayOutWorldParticles;
+import net.minecraft.server.v1_13_R2.ParticleParam;
+import net.minecraft.server.v1_13_R2.ParticleParamRedstone;
 import net.minecraft.server.v1_13_R2.ScoreboardServer;
 import net.minecraft.server.v1_13_R2.TickListServer;
 import net.minecraft.server.v1_13_R2.WorldServer;
@@ -946,5 +951,49 @@ public class Catalyst13 extends CatalystPacketListener implements CatalystHost
 		ShadowChunk sc = shadowCopy(p.getWorld().getChunkAt(x, z));
 		sc.modifySection(y);
 		new PacketBuffer().q(sc.flush()).flush(p);
+	}
+
+	@Override
+	public void redstoneParticle(Player p, Color c, Location l, float size)
+	{
+		ParticleParam pp = new ParticleParamRedstone(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, size);
+		PacketPlayOutWorldParticles px = new PacketPlayOutWorldParticles();
+		PacketBuffer b = new PacketBuffer();
+		new V(px).set("a", (float) l.getX());
+		new V(px).set("b", (float) l.getY());
+		new V(px).set("c", (float) l.getZ());
+		new V(px).set("d", 0f);
+		new V(px).set("e", 0f);
+		new V(px).set("f", 0f);
+		new V(px).set("g", 0f);
+		new V(px).set("h", 1);
+		new V(px).set("i", p.getLocation().distanceSquared(l) > 64 * 64);
+		new V(px).set("j", pp);
+		b.q(px).flush(p);
+	}
+
+	@Override
+	public void redstoneParticle(double range, Color c, Location l, float size)
+	{
+		ParticleParam pp = new ParticleParamRedstone(c.getRed(), c.getGreen(), c.getBlue(), size);
+		PacketPlayOutWorldParticles px = new PacketPlayOutWorldParticles();
+		PacketBuffer b = new PacketBuffer();
+		new V(px).set("a", (float) l.getX());
+		new V(px).set("b", (float) l.getY());
+		new V(px).set("c", (float) l.getZ());
+		new V(px).set("d", 0f);
+		new V(px).set("e", 0f);
+		new V(px).set("f", 0f);
+		new V(px).set("g", 0f);
+		new V(px).set("h", 1);
+		new V(px).set("i", range > 64);
+		new V(px).set("j", pp);
+		Area a = new Area(l, range);
+		b.q(px);
+
+		for(Player i : a.getNearbyPlayers())
+		{
+			b.flush(i);
+		}
 	}
 }

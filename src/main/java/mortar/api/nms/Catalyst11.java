@@ -1,5 +1,6 @@
 package mortar.api.nms;
 
+import java.awt.Color;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +28,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import mortar.api.particle.ParticleEffect;
+import mortar.api.particle.ParticleEffect.ParticleColor;
 import mortar.api.sched.J;
 import mortar.api.world.MaterialBlock;
 import mortar.bukkit.plugin.Mortar;
@@ -965,5 +968,19 @@ public class Catalyst11 extends CatalystPacketListener implements CatalystHost
 		ShadowChunk sc = shadowCopy(p.getWorld().getChunkAt(x, z));
 		sc.modifySection(y);
 		new PacketBuffer().q(sc.flush()).flush(p);
+	}
+
+	@Override
+	public void redstoneParticle(Player p, Color c, Location l, float size)
+	{
+		ParticleColor cx = new ParticleEffect.OrdinaryColor(c.getRed(), c.getGreen(), c.getBlue());
+		ParticleEffect.REDSTONE.display(cx, l, p);
+	}
+
+	@Override
+	public void redstoneParticle(double range, Color c, Location l, float size)
+	{
+		ParticleColor cx = new ParticleEffect.OrdinaryColor(c.getRed(), c.getGreen(), c.getBlue());
+		ParticleEffect.REDSTONE.display(cx, l, range);
 	}
 }
