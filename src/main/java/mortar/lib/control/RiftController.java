@@ -34,65 +34,73 @@ public class RiftController extends Controller
 
 	private void searchForRifts(File folder)
 	{
-		File scfg = new File(folder, "rift.json");
-
-		if(scfg.exists())
+		try
 		{
-			try
-			{
-				JSONObject j = new JSONObject(VIO.readAll(scfg));
+			File scfg = new File(folder, "rift.json");
 
-				if(j.has("temporary") && j.getBoolean("temporary"))
+			if(scfg.exists())
+			{
+				try
 				{
-					D.as("Rift Service").w("Found temporary rift " + folder.getName() + " deleting.");
+					JSONObject j = new JSONObject(VIO.readAll(scfg));
+
+					if(j.has("temporary") && j.getBoolean("temporary"))
+					{
+						D.as("Rift Service").w("Found temporary rift " + folder.getName() + " deleting.");
+						VIO.delete(folder);
+
+						if(folder.exists())
+						{
+							VIO.deleteOnExit(folder);
+							usedNames.add(j.getString("name"));
+						}
+					}
+
+					else
+					{
+						try
+						{
+							Rift r = new PhantomRift(j.getString("name"));
+							rifts.add(r);
+							D.as("Rift Service").l("Identified Rift " + folder.getName() + ".");
+						}
+
+						catch(Throwable e)
+						{
+							e.printStackTrace();
+						}
+					}
+				}
+
+				catch(JSONException | IOException e)
+				{
+					D.as("Rift Service").f("Failed to identify rift " + folder.getName() + " deleting.");
 					VIO.delete(folder);
 
 					if(folder.exists())
 					{
 						VIO.deleteOnExit(folder);
-						usedNames.add(j.getString("name"));
-					}
-				}
-
-				else
-				{
-					try
-					{
-						Rift r = new PhantomRift(j.getString("name"));
-						rifts.add(r);
-						D.as("Rift Service").l("Identified Rift " + folder.getName() + ".");
 					}
 
-					catch(Throwable e)
-					{
-						e.printStackTrace();
-					}
+					e.printStackTrace();
 				}
 			}
 
-			catch(JSONException | IOException e)
+			else
 			{
-				D.as("Rift Service").f("Failed to identify rift " + folder.getName() + " deleting.");
-				VIO.delete(folder);
-
-				if(folder.exists())
+				for(File i : folder.listFiles())
 				{
-					VIO.deleteOnExit(folder);
+					if(i.isDirectory())
+					{
+						searchForRifts(i);
+					}
 				}
-
-				e.printStackTrace();
 			}
 		}
 
-		else
+		catch(Throwable e)
 		{
-			for(File i : folder.listFiles())
-			{
-				if(i.isDirectory())
-				{
-					searchForRifts(i);
-				}
-			}
+
 		}
 	}
 

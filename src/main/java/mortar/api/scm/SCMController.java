@@ -21,6 +21,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 import mortar.api.fx.ParticleRedstone;
+import mortar.api.nms.NMSVersion;
 import mortar.api.particle.ParticleEffect;
 import mortar.api.sched.A;
 import mortar.api.sched.S;
@@ -49,6 +50,11 @@ public class SCMController extends Controller
 	@Override
 	public void start()
 	{
+		if(NMSVersion.current().equals(NMSVersion.R1_8))
+		{
+			return;
+		}
+
 		volumes = new GMap<String, IVolume>();
 
 		File gf = getSCMFolder();
@@ -192,6 +198,7 @@ public class SCMController extends Controller
 		return s;
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void on(PlayerInteractEvent e)
 	{
@@ -218,7 +225,7 @@ public class SCMController extends Controller
 				lx.set(0, C.AQUA + "A: " + ll.getWorld().getName() + "@" + ll.getBlockX() + "." + ll.getBlockY() + "." + ll.getBlockZ());
 				im.setLore(lx);
 				is.setItemMeta(im);
-				e.getPlayer().getInventory().setItemInMainHand(is);
+				e.getPlayer().getInventory().setItemInHand(is);
 			}
 
 			else if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK))
@@ -234,7 +241,7 @@ public class SCMController extends Controller
 				lx.set(1, C.AQUA + "B: " + ll.getWorld().getName() + "@" + ll.getBlockX() + "." + ll.getBlockY() + "." + ll.getBlockZ());
 				im.setLore(lx);
 				is.setItemMeta(im);
-				e.getPlayer().getInventory().setItemInMainHand(is);
+				e.getPlayer().getInventory().setItemInHand(is);
 			}
 		}
 	}
@@ -242,7 +249,8 @@ public class SCMController extends Controller
 	public Location[] getSelection(Player p)
 	{
 		Location[] l = new Location[2];
-		ItemStack is = p.getInventory().getItemInMainHand();
+		@SuppressWarnings("deprecation")
+		ItemStack is = p.getInventory().getItemInHand();
 		if(is == null)
 		{
 			return null;
@@ -265,12 +273,13 @@ public class SCMController extends Controller
 		return null;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void tick()
 	{
 		for(Player i : P.onlinePlayers())
 		{
-			if(i.getInventory().getItemInMainHand().getType().equals(Material.IRON_AXE))
+			if(i.getInventory().getItemInHand().getType().equals(Material.IRON_AXE))
 			{
 				Location[] d = getSelection(i);
 
