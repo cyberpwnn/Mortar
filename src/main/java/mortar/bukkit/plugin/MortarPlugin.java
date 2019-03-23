@@ -504,6 +504,12 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 	public void unregisterCommand(ICommand cmd)
 	{
 		SimpleCommandMap m = new V(Bukkit.getServer()).get("commandMap");
+
+		for(Field i : m.getClass().getDeclaredFields())
+		{
+			System.out.println(i.getName());
+		}
+
 		Map<String, Command> k = new V(m).get("knownCommands");
 
 		for(Iterator<Map.Entry<String, Command>> it = k.entrySet().iterator(); it.hasNext();)
@@ -555,7 +561,15 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 	{
 		for(VirtualCommand i : commands.v())
 		{
-			unregisterCommand(i.getCommand());
+			try
+			{
+				unregisterCommand(i.getCommand());
+			}
+
+			catch(Throwable e)
+			{
+
+			}
 		}
 	}
 

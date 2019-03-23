@@ -165,7 +165,15 @@ public class Configurator
 
 				if(Modifier.isStatic(i.getModifiers()))
 				{
-					i.set(null, fc.get(key));
+					try
+					{
+						i.set(null, fc.get(key));
+					}
+
+					catch(Throwable e)
+					{
+
+					}
 				}
 
 				else if(!stat)
