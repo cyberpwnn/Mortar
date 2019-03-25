@@ -4,7 +4,7 @@
   <groupId>com.volmit</groupId>
   <artifactId>Mortar</artifactId>
   <name>Mortar</name>
-  <version>1.0.42</version>
+  <version>1.0.44</version>
   <description>That crap between the bricks</description>
   <developers>
     <developer>
@@ -164,10 +164,10 @@
                   <skip>false</skip>
                   <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/doublecopy.bat</executable>
                   <arguments>
-                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.42.jar</argument>
-                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\1.0.42\Mortar-1.0.42.jar</argument>
+                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.44.jar</argument>
+                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\1.0.44\Mortar-1.0.44.jar</argument>
                     <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\Mortar.jar</argument>
-                    <argument>1.0.42</argument>
+                    <argument>1.0.44</argument>
                   </arguments>
                 </configuration>
               </execution>
@@ -176,10 +176,10 @@
               <skip>false</skip>
               <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/doublecopy.bat</executable>
               <arguments>
-                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.42.jar</argument>
-                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\1.0.42\Mortar-1.0.42.jar</argument>
+                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.44.jar</argument>
+                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\1.0.44\Mortar-1.0.44.jar</argument>
                 <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\Mortar.jar</argument>
-                <argument>1.0.42</argument>
+                <argument>1.0.44</argument>
               </arguments>
             </configuration>
           </plugin>
@@ -236,6 +236,34 @@
       <artifactId>craftbukkit12</artifactId>
       <version>1.12.2</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.md-5</groupId>
+      <artifactId>bungeecord-api</artifactId>
+      <version>1.12-SNAPSHOT</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>bungeecord-chat</artifactId>
+          <groupId>net.md-5</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>bungeecord-config</artifactId>
+          <groupId>net.md-5</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>bungeecord-event</artifactId>
+          <groupId>net.md-5</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>bungeecord-protocol</artifactId>
+          <groupId>net.md-5</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>guava</artifactId>
+          <groupId>com.google.guava</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.bukkit</groupId>

@@ -18,6 +18,7 @@ import mortar.api.sched.J;
 import mortar.api.scm.CommandSCM;
 import mortar.api.scm.SCMController;
 import mortar.bukkit.command.Command;
+import mortar.bukkit.command.MortarSender;
 import mortar.bukkit.command.Permission;
 import mortar.compute.math.M;
 import mortar.lib.control.CacheController;
@@ -73,7 +74,7 @@ public class MortarAPIPlugin extends MortarPlugin
 
 		if(MortarConfig.UPDATES)
 		{
-			J.a(() -> checkForUpdates(false));
+			J.s(() -> Mortar.checkForUpdates(new MortarSender(Bukkit.getConsoleSender())), 160);
 		}
 
 		J.sr(() -> flushLogBuffer(), 10);

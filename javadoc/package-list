@@ -22,6 +22,7 @@ mortar.lib.control
 mortar.logic.format
 mortar.logic.io
 mortar.logic.queue
+mortar.proxy
 mortar.util.queue
 mortar.util.reflection
 mortar.util.text

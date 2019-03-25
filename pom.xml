@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.volmit</groupId>
 	<artifactId>Mortar</artifactId>
-	<version>1.0.42</version>
+	<version>1.0.44</version>
 	<name>Mortar</name>
 	<description>That crap between the bricks</description>
 	<developers>
@@ -232,6 +232,12 @@
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit12</artifactId>
 			<version>1.12.2</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.md-5</groupId>
+			<artifactId>bungeecord-api</artifactId>
+			<version>1.12-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

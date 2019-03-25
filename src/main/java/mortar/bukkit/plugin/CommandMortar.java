@@ -22,7 +22,7 @@ public class CommandMortar extends MortarCommand
 	public boolean handle(MortarSender sender, String[] args)
 	{
 		sender.sendMessage("v" + MortarAPIPlugin.p.getDescription().getVersion());
-
+		Mortar.checkForUpdates(sender);
 		return true;
 	}
 }
