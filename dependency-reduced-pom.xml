@@ -4,7 +4,7 @@
   <groupId>com.volmit</groupId>
   <artifactId>Mortar</artifactId>
   <name>Mortar</name>
-  <version>1.0.43</version>
+  <version>1.0.45</version>
   <description>That crap between the bricks</description>
   <developers>
     <developer>
@@ -93,7 +93,7 @@
                   <skip>false</skip>
                   <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/copy.bat</executable>
                   <arguments>
-                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.43.jar</argument>
+                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.45.jar</argument>
                     <argument>C:\Users\cyberpwn\Documents\development\servers\dynamic\plugins\Mortar.jar</argument>
                   </arguments>
                 </configuration>
@@ -103,7 +103,7 @@
               <skip>false</skip>
               <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/copy.bat</executable>
               <arguments>
-                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.43.jar</argument>
+                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.45.jar</argument>
                 <argument>C:\Users\cyberpwn\Documents\development\servers\dynamic\plugins\Mortar.jar</argument>
               </arguments>
             </configuration>

@@ -277,86 +277,89 @@ public class SCMController extends Controller
 	@Override
 	public void tick()
 	{
-		for(Player i : P.onlinePlayers())
+		try
 		{
-			if(i.getInventory().getItemInHand().getType().equals(Material.IRON_AXE))
+			for(Player i : P.onlinePlayers())
 			{
-				Location[] d = getSelection(i);
-
-				if(d != null)
+				if(i.getInventory().getItemInHand().getType().equals(Material.IRON_AXE))
 				{
-					if(M.interval(3))
+					Location[] d = getSelection(i);
+
+					if(d != null)
 					{
-						ParticleEffect.CRIT_MAGIC.display(0.1f, 1, d[0].clone().add(0.5, 0.5, 0.5).clone().add(Vector.getRandom().subtract(Vector.getRandom()).normalize().clone().multiply(0.65)), i);
-						ParticleEffect.CRIT.display(0.1f, 1, d[1].clone().add(0.5, 0.5, 0.5).clone().add(Vector.getRandom().subtract(Vector.getRandom()).normalize().clone().multiply(0.65)), i);
-
-						if(!d[0].getWorld().equals(d[1].getWorld()))
+						if(M.interval(3))
 						{
-							return;
-						}
+							ParticleEffect.CRIT_MAGIC.display(0.1f, 1, d[0].clone().add(0.5, 0.5, 0.5).clone().add(Vector.getRandom().subtract(Vector.getRandom()).normalize().clone().multiply(0.65)), i);
+							ParticleEffect.CRIT.display(0.1f, 1, d[1].clone().add(0.5, 0.5, 0.5).clone().add(Vector.getRandom().subtract(Vector.getRandom()).normalize().clone().multiply(0.65)), i);
 
-						if(d[0].distanceSquared(d[1]) > 64 * 64)
-						{
-							return;
-						}
-
-						int minx = Math.min(d[0].getBlockX(), d[1].getBlockX());
-						int miny = Math.min(d[0].getBlockY(), d[1].getBlockY());
-						int minz = Math.min(d[0].getBlockZ(), d[1].getBlockZ());
-						int maxx = Math.max(d[0].getBlockX(), d[1].getBlockX());
-						int maxy = Math.max(d[0].getBlockY(), d[1].getBlockY());
-						int maxz = Math.max(d[0].getBlockZ(), d[1].getBlockZ());
-
-						for(double j = minx - 1; j < maxx + 1; j += 0.25)
-						{
-							for(double k = miny - 1; k < maxy + 1; k += 0.25)
+							if(!d[0].getWorld().equals(d[1].getWorld()))
 							{
-								for(double l = minz - 1; l < maxz + 1; l += 0.25)
+								return;
+							}
+
+							if(d[0].distanceSquared(d[1]) > 64 * 64)
+							{
+								return;
+							}
+
+							int minx = Math.min(d[0].getBlockX(), d[1].getBlockX());
+							int miny = Math.min(d[0].getBlockY(), d[1].getBlockY());
+							int minz = Math.min(d[0].getBlockZ(), d[1].getBlockZ());
+							int maxx = Math.max(d[0].getBlockX(), d[1].getBlockX());
+							int maxy = Math.max(d[0].getBlockY(), d[1].getBlockY());
+							int maxz = Math.max(d[0].getBlockZ(), d[1].getBlockZ());
+
+							for(double j = minx - 1; j < maxx + 1; j += 0.25)
+							{
+								for(double k = miny - 1; k < maxy + 1; k += 0.25)
 								{
-									boolean jj = j == minx || j == maxx;
-									boolean kk = k == miny || k == maxy;
-									boolean ll = l == minz || l == maxz;
-									double aa = j;
-									double bb = k;
-									double cc = l;
-
-									if((jj && kk) || (jj && ll) || (ll && kk))
+									for(double l = minz - 1; l < maxz + 1; l += 0.25)
 									{
-										Vector push = new Vector(0, 0, 0);
+										boolean jj = j == minx || j == maxx;
+										boolean kk = k == miny || k == maxy;
+										boolean ll = l == minz || l == maxz;
+										double aa = j;
+										double bb = k;
+										double cc = l;
 
-										if(j == minx)
+										if((jj && kk) || (jj && ll) || (ll && kk))
 										{
-											push.add(new Vector(-0.55, 0, 0));
-										}
+											Vector push = new Vector(0, 0, 0);
 
-										if(k == miny)
-										{
-											push.add(new Vector(0, -0.55, 0));
-										}
+											if(j == minx)
+											{
+												push.add(new Vector(-0.55, 0, 0));
+											}
 
-										if(l == minz)
-										{
-											push.add(new Vector(0, 0, -0.55));
-										}
+											if(k == miny)
+											{
+												push.add(new Vector(0, -0.55, 0));
+											}
 
-										if(j == maxx)
-										{
-											push.add(new Vector(0.55, 0, 0));
-										}
+											if(l == minz)
+											{
+												push.add(new Vector(0, 0, -0.55));
+											}
 
-										if(k == maxy)
-										{
-											push.add(new Vector(0, 0.55, 0));
-										}
+											if(j == maxx)
+											{
+												push.add(new Vector(0.55, 0, 0));
+											}
 
-										if(l == maxz)
-										{
-											push.add(new Vector(0, 0, 0.55));
-										}
+											if(k == maxy)
+											{
+												push.add(new Vector(0, 0.55, 0));
+											}
 
-										Location lv = new Location(d[0].getWorld(), aa, bb, cc).clone().add(0.5, 0.5, 0.5).clone().add(push);
-										int color = Color.getHSBColor((float) (0.5f + (Math.sin((aa + bb + cc + (M.ticksOnline() / 2)) / 20f) / 2)), 1, 1).getRGB();
-										new ParticleRedstone().setColor(new Color(color)).play(lv, i);
+											if(l == maxz)
+											{
+												push.add(new Vector(0, 0, 0.55));
+											}
+
+											Location lv = new Location(d[0].getWorld(), aa, bb, cc).clone().add(0.5, 0.5, 0.5).clone().add(push);
+											int color = Color.getHSBColor((float) (0.5f + (Math.sin((aa + bb + cc + (M.ticksOnline() / 2)) / 20f) / 2)), 1, 1).getRGB();
+											new ParticleRedstone().setColor(new Color(color)).play(lv, i);
+										}
 									}
 								}
 							}
@@ -364,6 +367,11 @@ public class SCMController extends Controller
 					}
 				}
 			}
+		}
+
+		catch(Throwable e)
+		{
+
 		}
 	}
 
