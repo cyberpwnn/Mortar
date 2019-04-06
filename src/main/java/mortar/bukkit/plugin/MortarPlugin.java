@@ -503,37 +503,45 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 
 	public void unregisterCommand(ICommand cmd)
 	{
-		SimpleCommandMap m = new V(Bukkit.getServer()).get("commandMap");
-
-		for(Field i : m.getClass().getDeclaredFields())
+		try
 		{
-			System.out.println(i.getName());
-		}
+			SimpleCommandMap m = new V(Bukkit.getServer()).get("commandMap");
 
-		Map<String, Command> k = new V(m).get("knownCommands");
-
-		for(Iterator<Map.Entry<String, Command>> it = k.entrySet().iterator(); it.hasNext();)
-		{
-			Map.Entry<String, Command> entry = it.next();
-			if(entry.getValue() instanceof Command)
+			for(Field i : m.getClass().getDeclaredFields())
 			{
-				org.bukkit.command.Command c = (org.bukkit.command.Command) entry.getValue();
-				String u = c.getUsage();
+				System.out.println(i.getName());
+			}
 
-				if(u != null && u.equals(getName() + ":" + getClass().toString() + ":" + cmd.getNode()))
+			Map<String, Command> k = new V(m).get("knownCommands");
+
+			for(Iterator<Map.Entry<String, Command>> it = k.entrySet().iterator(); it.hasNext();)
+			{
+				Map.Entry<String, Command> entry = it.next();
+				if(entry.getValue() instanceof Command)
 				{
-					if(c.unregister(m))
-					{
-						it.remove();
-						v("Unregistered Command /" + cmd.getNode());
-					}
+					org.bukkit.command.Command c = (org.bukkit.command.Command) entry.getValue();
+					String u = c.getUsage();
 
-					else
+					if(u != null && u.equals(getName() + ":" + getClass().toString() + ":" + cmd.getNode()))
 					{
-						Bukkit.getConsoleSender().sendMessage(getTag() + "Failed to unregister command " + c.getName());
+						if(c.unregister(m))
+						{
+							it.remove();
+							v("Unregistered Command /" + cmd.getNode());
+						}
+
+						else
+						{
+							Bukkit.getConsoleSender().sendMessage(getTag() + "Failed to unregister command " + c.getName());
+						}
 					}
 				}
 			}
+		}
+
+		catch(Throwable e)
+		{
+
 		}
 	}
 
