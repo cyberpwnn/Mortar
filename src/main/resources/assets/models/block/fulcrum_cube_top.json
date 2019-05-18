@@ -2,9 +2,8 @@
     "parent": "block/cube_top",
     "display": {
         "head": {
-            "rotation": [ -30, 0, 0 ],
-            "translation": [ 0, -30.75, -7.25 ],
-            "scale": [ 3.0125, 3.0125, 3.0125 ]
+            "translation": [ 0, -14.664, 0 ],
+            "scale": [ 2.288, 2.288, 2.288 ]
 	    }
     }
 }

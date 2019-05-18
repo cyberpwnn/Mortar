@@ -49,6 +49,16 @@ public class TableCache<K, V>
 		}
 	}
 
+	public GList<K> getKeys()
+	{
+		return map.k().copy();
+	}
+
+	public GList<V> getValues()
+	{
+		return map.v().copy();
+	}
+
 	public V get(K k)
 	{
 		order.remove(k);

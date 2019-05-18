@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import org.bukkit.Bukkit;
 
 import mortar.api.config.Configurator;
+import mortar.api.fulcrum.FulcrumController;
 import mortar.api.nms.Catalyst;
 import mortar.api.nms.NMP;
 import mortar.api.sched.J;
@@ -21,6 +22,7 @@ import mortar.bukkit.command.Command;
 import mortar.bukkit.command.MortarSender;
 import mortar.bukkit.command.Permission;
 import mortar.compute.math.M;
+import mortar.fulcrum.CommandFulcrum;
 import mortar.lib.control.CacheController;
 import mortar.lib.control.MojangProfileController;
 import mortar.lib.control.RiftController;
@@ -41,6 +43,9 @@ public class MortarAPIPlugin extends MortarPlugin
 	private CommandMortar mort;
 
 	@Command
+	private CommandFulcrum fulcrum;
+
+	@Command
 	private CommandClearConsole cls;
 
 	@Command
@@ -57,6 +62,9 @@ public class MortarAPIPlugin extends MortarPlugin
 
 	@Control
 	private GhostWorldController ghostWorldControlller;
+
+	@Control
+	private FulcrumController fulcrumController;
 
 	@Control
 	private SCMController scmController;

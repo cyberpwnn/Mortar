@@ -20,11 +20,24 @@ public class SQLKit
 {
 	private Connection sql;
 	private long lastTest;
+	private boolean logging;
 	private GSet<String> existingTables;
 	private String sqlAddress = "localhost";
 	private String sqlDatabase = "ordis";
 	private String sqlUsername = "ordis";
 	private String sqlPassword = "12345";
+
+	public SQLKit(Connection sql, boolean log)
+	{
+		lastTest = M.ms();
+		existingTables = new GSet<String>();
+		this.sqlAddress = "none";
+		this.sqlDatabase = sqlAddress;
+		this.sqlUsername = sqlAddress;
+		this.sqlPassword = sqlAddress;
+		this.sql = sql;
+		logging = log;
+	}
 
 	public SQLKit(String sqlAddress, String sqlDatabase, String sqlUsername, String sqlPassword)
 	{
@@ -254,7 +267,7 @@ public class SQLKit
 		return false;
 	}
 
-	private boolean validate(Object object) throws SQLException
+	public boolean validate(Object object) throws SQLException
 	{
 		String table = object.getClass().getDeclaredAnnotation(Table.class).value();
 		if(existingTables.contains(table))
@@ -353,7 +366,10 @@ public class SQLKit
 
 	private void l(String string)
 	{
-		System.out.println(string);
+		if(logging)
+		{
+			System.out.println(string);
+		}
 	}
 
 	public PreparedStatement prepareFindGive(Class<?> clazz, String find, String give, String equalsFind) throws IllegalArgumentException, IllegalAccessException, SQLException
@@ -723,6 +739,75 @@ public class SQLKit
 	{
 		validate(s.get());
 		String ss = "SELECT * FROM `" + clazz.getAnnotation(Table.class).value() + "` WHERE `" + inColumn + "` = '" + find + "'";
+		l("-> " + ss);
+		PreparedStatement ps = getConnection().prepareStatement(ss);
+		ResultSet r = ps.executeQuery();
+
+		while(r.next())
+		{
+			T t = s.get();
+
+			try
+			{
+				for(Field i : clazz.getDeclaredFields())
+				{
+					i.setAccessible(true);
+					if(i.isAnnotationPresent(Column.class))
+					{
+						Column c = i.getAnnotation(Column.class);
+						if(i.getType().equals(UUID.class))
+						{
+							i.set(t, UUID.fromString(r.getString(c.name())));
+						}
+
+						else if(i.getType().equals(String.class))
+						{
+							i.set(t, r.getString(c.name()));
+						}
+
+						else if(i.getType().equals(Integer.class) || i.getType().equals(int.class))
+						{
+							i.set(t, r.getInt(c.name()));
+						}
+
+						else if(i.getType().equals(Double.class) || i.getType().equals(double.class))
+						{
+							i.set(t, r.getDouble(c.name()));
+						}
+
+						else if(i.getType().equals(Long.class) || i.getType().equals(long.class))
+						{
+							i.set(t, r.getLong(c.name()));
+						}
+
+						else if(i.getType().equals(Date.class))
+						{
+							i.set(t, r.getDate(c.name()));
+						}
+
+						else
+						{
+							w("Cannot handle type injection from table: " + i.getType().toString());
+						}
+					}
+				}
+
+				f.add(t);
+			}
+
+			catch(Throwable e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		return f;
+	}
+
+	public <T> GList<T> getAllFor(Class<T> clazz, GList<T> f, Supplier<T> s) throws SQLException
+	{
+		validate(s.get());
+		String ss = "SELECT * FROM `" + clazz.getAnnotation(Table.class).value() + "`";
 		l("-> " + ss);
 		PreparedStatement ps = getConnection().prepareStatement(ss);
 		ResultSet r = ps.executeQuery();

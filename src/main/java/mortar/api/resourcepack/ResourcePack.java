@@ -19,11 +19,11 @@ import com.googlecode.pngtastic.core.PngImage;
 import com.googlecode.pngtastic.core.PngOptimizer;
 
 import mortar.api.sched.S;
-import mortar.bukkit.plugin.MortarAPIPlugin;
 import mortar.compute.math.M;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
 import mortar.logic.format.F;
+import mortar.logic.io.VIO;
 import mortar.util.text.C;
 import mortar.util.text.TXT;
 
@@ -92,6 +92,13 @@ public class ResourcePack
 		return copyResources.size() + writeResources.size() + 3;
 	}
 
+	public void removeResource(String path)
+	{
+		oc.remove(path);
+		copyResources.remove(path);
+		writeResources.remove(path);
+	}
+
 	public void setResource(String path, URL url)
 	{
 		if(path == null && url == null)
@@ -140,7 +147,12 @@ public class ResourcePack
 
 	public byte[] writeToArchive(File f) throws IOException, NoSuchAlgorithmException
 	{
-		File fx = new File(MortarAPIPlugin.p.getDataFolder(), "temp");
+		File fx = new File(f.getParentFile(), f.getName() + "-gen");
+		if(fx.exists())
+		{
+			VIO.delete(fx);
+		}
+
 		fx.mkdirs();
 		writeToFolder(fx);
 		f.createNewFile();
@@ -155,23 +167,9 @@ public class ResourcePack
 		}
 
 		zos.close();
-		delete(fx);
 		f.setLastModified(M.ms());
 
 		return d.digest();
-	}
-
-	private void delete(File fx)
-	{
-		if(fx.isDirectory())
-		{
-			for(File i : fx.listFiles())
-			{
-				delete(i);
-			}
-		}
-
-		fx.delete();
 	}
 
 	private void addToZip(MessageDigest d, File file, File root, ZipOutputStream s) throws IOException
@@ -209,6 +207,7 @@ public class ResourcePack
 
 	public void writeToFolder(File f) throws IOException
 	{
+		f.mkdirs();
 		totalSaved = 0;
 		writePackContent(new File(f, "pack.mcmeta"), getMeta().toString());
 		writeResourceToFile(getMeta().getPackIcon(), new File(f, "pack.png"));

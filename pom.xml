@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.volmit</groupId>
 	<artifactId>Mortar</artifactId>
-	<version>1.0.46</version>
+	<version>1.0.48</version>
 	<name>Mortar</name>
 	<description>That crap between the bricks</description>
 	<developers>
@@ -51,13 +51,8 @@
 				<filtering>false</filtering>
 				<includes>
 					<include>**/*.ogg</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>false</filtering>
-				<includes>
 					<include>**/*.png</include>
+					<include>**/*.lang</include>
 				</includes>
 			</resource>
 			<resource>
@@ -342,6 +337,21 @@
 			<groupId>com.github.depsypher</groupId>
 			<artifactId>pngtastic</artifactId>
 			<version>1.5</version>
+		</dependency>
+				<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>9.4.8.v20171121</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>9.4.8.v20171121</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-util</artifactId>
+			<version>9.4.8.v20171121</version>
 		</dependency>
 	</dependencies>
 	<distributionManagement>

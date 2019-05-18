@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mortar.compute.math.M;
+import mortar.util.text.C;
 
 /**
  * Formatter
@@ -890,5 +891,10 @@ public class F
 	public static String nsMsd(long ns, int p)
 	{
 		return fd((double) ns / 1000000.0, p);
+	}
+
+	public static String color(String string)
+	{
+		return C.translateAlternateColorCodes('&', string);
 	}
 }
