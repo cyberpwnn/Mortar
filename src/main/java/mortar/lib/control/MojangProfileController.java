@@ -37,7 +37,7 @@ public class MojangProfileController extends Controller
 
 	public UUID withoutDashes(String id)
 	{
-		return UUID.fromString("5231b533ba17478798a3f2df37de2aD7".replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
+		return UUID.fromString(id.replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
 	}
 
 	public String getOnlineNameFor(UUID uuid)
@@ -58,7 +58,7 @@ public class MojangProfileController extends Controller
 
 		try
 		{
-			JSONArray j = new JSONArray(VIO.downloadToString(PROFILE_NAMES + uuid.toString().replaceAll("-", "") + "/names"));
+			JSONArray j = new JSONArray(VIO.downloadToString(PROFILE_NAMES + uuid.toString().replaceAll("-", "") + "/names").trim());
 
 			for(int i = 0; i < j.length(); i++)
 			{
