@@ -3,14 +3,6 @@ package mortar.api.fulcrum;
 import java.io.File;
 import java.io.IOException;
 
-import org.bukkit.event.EventHandler;
-
-import mortar.api.atests.BlockExampleCased;
-import mortar.api.atests.BlockExampleCauldron;
-import mortar.api.atests.BlockExampleCompanion;
-import mortar.api.atests.BlockExampleCube;
-import mortar.api.atests.BlockExampleFramed;
-import mortar.api.atests.BlockExamplePedestal;
 import mortar.api.sched.J;
 import mortar.bukkit.plugin.Controller;
 import mortar.lang.json.JSONException;
@@ -57,19 +49,5 @@ public class FulcrumController extends Controller
 	public void tick()
 	{
 
-	}
-
-	@EventHandler
-	public void on(FulcrumRegistryEvent e)
-	{
-		if(Fulcrum.registerExamples)
-		{
-			e.getRegistry().item().register(new BlockExampleCube());
-			e.getRegistry().item().register(new BlockExampleFramed());
-			e.getRegistry().item().register(new BlockExampleCased());
-			e.getRegistry().item().register(new BlockExampleCompanion());
-			e.getRegistry().item().register(new BlockExampleCauldron());
-			e.getRegistry().item().register(new BlockExamplePedestal());
-		}
 	}
 }

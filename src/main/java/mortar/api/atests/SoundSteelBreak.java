@@ -15,6 +15,6 @@ public class SoundSteelBreak extends CustomSound
 		setDefaultVolume(1f);
 		setStream(false);
 		setSubtitle("Steel Broken");
-		addSounds("steelbreak$", getClass(), "/assets/sounds/material/metal/metalbar_walk$.ogg", 1, 7);
+		addSounds("steelbreak$", "/assets/sounds/material/metal/metalbar_walk$.ogg", 1, 7);
 	}
 }

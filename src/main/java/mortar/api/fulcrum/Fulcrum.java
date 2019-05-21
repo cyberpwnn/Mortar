@@ -1,5 +1,7 @@
 package mortar.api.fulcrum;
 
+import org.bukkit.Material;
+
 import mortar.api.fulcrum.util.AllocationStrategy;
 import mortar.bukkit.plugin.Mortar;
 
@@ -31,6 +33,9 @@ public class Fulcrum
 
 	@FulcrumParameter
 	public static AllocationStrategy allocationStrategy = AllocationStrategy.SEQUENTIAL;
+
+	public static final Material SOLID_IDLE = Material.BARRIER;
+	public static final Material SOLID_DIGGING = Material.GLASS;
 
 	public FulcrumController getFulcrum()
 	{

@@ -30,6 +30,12 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import mortar.api.atests.BlockExampleCased;
+import mortar.api.atests.BlockExampleCauldron;
+import mortar.api.atests.BlockExampleCompanion;
+import mortar.api.atests.BlockExampleCube;
+import mortar.api.atests.BlockExampleFramed;
+import mortar.api.atests.BlockExamplePedestal;
 import mortar.api.fulcrum.object.CustomBlock;
 import mortar.api.fulcrum.object.CustomItem;
 import mortar.api.fulcrum.resourcepack.ResourcePack;
@@ -328,7 +334,7 @@ public class FulcrumInstance implements Listener
 		{
 			Block b = e.getPlayer().getLocation().add(0, -0.1, 0).getBlock();
 
-			if(b.getType().equals(Material.BARRIER))
+			if(b.getType().equals(Fulcrum.SOLID_IDLE))
 			{
 				CustomBlock cb = ContentAssist.getBlock(b);
 
@@ -346,7 +352,10 @@ public class FulcrumInstance implements Listener
 	private void doRegistry() throws Exception
 	{
 		EntityNMS12.registerEntity("block_stand", Type.ARMOR_STAND, BlockStand12.class);
-		getRegistry().begin().complete();
+		getRegistry().begin();
+		registerExamples();
+		registerBreakBlocks();
+		getRegistry().complete();
 		getPack().getMeta().setPackFormat(3);
 		getPack().getMeta().setPackDescription("Some pack description");
 		getPack().setOptimizePngs(Fulcrum.optimizeImages);
@@ -360,6 +369,27 @@ public class FulcrumInstance implements Listener
 		MortarAPIPlugin.p.registerListener(this);
 		web = new ShittyWebserver(Fulcrum.webServerPort, getResources().fileFor("web"));
 		web.start();
+	}
+
+	private void registerBreakBlocks()
+	{
+		for(int i = 0; i < 10; i++)
+		{
+			getRegistry().item().register(new BlockOverlayBreak(i));
+		}
+	}
+
+	private void registerExamples()
+	{
+		if(Fulcrum.registerExamples)
+		{
+			getRegistry().item().register(new BlockExampleCube());
+			getRegistry().item().register(new BlockExampleFramed());
+			getRegistry().item().register(new BlockExampleCased());
+			getRegistry().item().register(new BlockExampleCompanion());
+			getRegistry().item().register(new BlockExampleCauldron());
+			getRegistry().item().register(new BlockExamplePedestal());
+		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

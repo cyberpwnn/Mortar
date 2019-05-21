@@ -15,6 +15,6 @@ public class SoundSteelStep extends CustomSound
 		setDefaultVolume(0.3f);
 		setStream(false);
 		setSubtitle("Walking on Steel");
-		addSounds("steel$", getClass(), "/assets/sounds/material/metal/metalbar_break$.ogg", 1, 11);
+		addSounds("steel$", "/assets/sounds/material/metal/metalbar_break$.ogg", 1, 11);
 	}
 }

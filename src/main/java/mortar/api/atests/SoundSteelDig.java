@@ -15,6 +15,6 @@ public class SoundSteelDig extends CustomSound
 		setDefaultVolume(0.4f);
 		setStream(false);
 		setSubtitle("Digging steel");
-		addSounds("steel$", getClass(), "/assets/sounds/material/metal/metalbar_break$.ogg", 1, 11);
+		addSounds("steel$", "/assets/sounds/material/metal/metalbar_break$.ogg", 1, 11);
 	}
 }

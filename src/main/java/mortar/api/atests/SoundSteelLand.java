@@ -15,6 +15,6 @@ public class SoundSteelLand extends CustomSound
 		setDefaultVolume(0.8f);
 		setStream(false);
 		setSubtitle("Lands on Steel");
-		addSounds("steel$", getClass(), "/assets/sounds/material/metal/metalbar_break$.ogg", 1, 11);
+		addSounds("steel$", "/assets/sounds/material/metal/metalbar_break$.ogg", 1, 11);
 	}
 }

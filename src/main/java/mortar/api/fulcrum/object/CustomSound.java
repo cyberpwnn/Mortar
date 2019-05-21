@@ -2,15 +2,15 @@ package mortar.api.fulcrum.object;
 
 import org.bukkit.SoundCategory;
 
+import mortar.api.fulcrum.FulcrumInstance;
 import mortar.api.fulcrum.FulcrumRegistry;
 import mortar.api.fulcrum.registry.FCURegisteredObject;
-import mortar.api.fulcrum.util.IResource;
-import mortar.api.fulcrum.util.JarResorce;
 import mortar.api.sound.Audible;
 import mortar.api.sound.Audio;
 import mortar.lang.collection.GList;
 import mortar.lang.json.JSONArray;
 import mortar.lang.json.JSONObject;
+import mortar.util.text.D;
 
 public class CustomSound extends FCURegisteredObject
 {
@@ -31,17 +31,25 @@ public class CustomSound extends FCURegisteredObject
 		setStream(false);
 	}
 
-	public void addSounds(String id, Class<?> anchor, String path, int from, int to)
+	public void addSounds(String id, String path, int from, int to)
 	{
 		for(int i = from; i <= to; i++)
 		{
-			addSound(id.replaceAll("\\Q$\\E", i + ""), new JarResorce(anchor, path));
+			try
+			{
+				addSound(id.replaceAll("\\Q$\\E", i + ""), path.replaceAll("\\Q$\\E", i + ""));
+			}
+
+			catch(Throwable e)
+			{
+				D.as(this).w("Cannot find resource " + path.replaceAll("\\Q$\\E", i + ""));
+			}
 		}
 	}
 
-	public void addSound(String id, IResource resource)
+	public void addSound(String id, String resource)
 	{
-		sounds.add(new CustomVorbis(id, resource));
+		sounds.add(new CustomVorbis(id, FulcrumInstance.instance.getResource(resource)));
 	}
 
 	public float getDefaultVolume()

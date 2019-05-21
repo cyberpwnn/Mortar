@@ -2,12 +2,12 @@ package mortar.api.fulcrum.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 
 import mortar.api.fulcrum.ContentAssist;
+import mortar.api.fulcrum.Fulcrum;
 import mortar.api.nms.Catalyst;
 import mortar.api.sched.J;
 import mortar.api.world.PE;
@@ -67,9 +67,9 @@ public class DigTracker
 
 			if(progress.containsKey(i))
 			{
-				if(!i.getType().equals(Material.GLASS) && !i.isEmpty())
+				if(!i.getType().equals(Fulcrum.SOLID_DIGGING) && !i.isEmpty())
 				{
-					i.setType(Material.GLASS);
+					i.setType(Fulcrum.SOLID_DIGGING);
 				}
 
 				Catalyst.host.sendViewDistancedPacket(i.getChunk(), new PacketPlayOutBlockBreakAnimation(getBlockPos(i), new BlockPosition(i.getX(), i.getY(), i.getZ()), (int) (progress.get(i) * 9.0)));
@@ -77,9 +77,9 @@ public class DigTracker
 
 			else
 			{
-				if(i.getType().equals(Material.GLASS))
+				if(i.getType().equals(Fulcrum.SOLID_DIGGING))
 				{
-					i.setType(Material.BARRIER);
+					i.setType(Fulcrum.SOLID_IDLE);
 				}
 
 				Catalyst.host.sendViewDistancedPacket(i.getChunk(), new PacketPlayOutBlockBreakAnimation(getBlockPos(i), new BlockPosition(i.getX(), i.getY(), i.getZ()), (int) (-1)));
@@ -125,9 +125,9 @@ public class DigTracker
 				speed.remove(b);
 			}
 
-			if(b.getType().equals(Material.GLASS))
+			if(b.getType().equals(Fulcrum.SOLID_DIGGING))
 			{
-				b.setType(Material.BARRIER);
+				b.setType(Fulcrum.SOLID_IDLE);
 			}
 
 			Catalyst.host.sendViewDistancedPacket(b.getChunk(), new PacketPlayOutBlockBreakAnimation(getBlockPos(b), new BlockPosition(b.getX(), b.getY(), b.getZ()), (int) (-1)));
