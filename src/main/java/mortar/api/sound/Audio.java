@@ -96,7 +96,7 @@ public class Audio implements Audible
 		{
 			if(sound != null)
 			{
-				l.getWorld().playSound(l, getSoundString(), getVolume(), getPitch());
+				l.getWorld().playSound(l, getSoundString(), getCategory(), getVolume(), getPitch());
 			}
 
 			else

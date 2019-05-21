@@ -11,4 +11,19 @@ public class FCUVorbis extends FCUResource
 	{
 		super(id, anchor, resource);
 	}
+
+	public String toPackPath()
+	{
+		return "sounds/" + getID() + ".ogg";
+	}
+
+	public String toSoundsPath()
+	{
+		return toSoundsPathJ() + ".ogg";
+	}
+
+	public String toSoundsPathJ()
+	{
+		return getID();
+	}
 }

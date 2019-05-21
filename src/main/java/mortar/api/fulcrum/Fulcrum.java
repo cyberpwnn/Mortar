@@ -15,13 +15,16 @@ public class Fulcrum
 	public static boolean generateModelNormals = true;
 
 	@FulcrumParameter
-	public static boolean optimizeImages = true;
+	public static boolean optimizeImages = false;
+
+	@FulcrumParameter
+	public static boolean obfuscate = false;
 
 	@FulcrumParameter
 	public static boolean verbose = true;
 
 	@FulcrumParameter
-	public static AllocationStrategy allocationStrategy = AllocationStrategy.CYCLIC;
+	public static AllocationStrategy allocationStrategy = AllocationStrategy.SEQUENTIAL;
 
 	public FulcrumController getFulcrum()
 	{

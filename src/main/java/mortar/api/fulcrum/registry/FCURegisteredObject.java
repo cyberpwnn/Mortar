@@ -2,7 +2,7 @@ package mortar.api.fulcrum.registry;
 
 public class FCURegisteredObject implements Registered
 {
-	private final String id;
+	protected final String id;
 
 	public FCURegisteredObject(String id)
 	{

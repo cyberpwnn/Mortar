@@ -22,6 +22,7 @@ import mortar.api.sched.S;
 import mortar.compute.math.M;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
+import mortar.lang.json.JSONObject;
 import mortar.logic.format.F;
 import mortar.logic.io.VIO;
 import mortar.util.text.C;
@@ -36,7 +37,9 @@ public class ResourcePack
 	GList<String> oc = new GList<String>();
 	GList<String> ow = new GList<String>();
 	private boolean optimizePngs;
+	private boolean minifyJSON = false;
 	private boolean overbose = false;
+	private boolean obfuscate = false;
 
 	public void o(String s)
 	{
@@ -211,12 +214,21 @@ public class ResourcePack
 		totalSaved = 0;
 		writePackContent(new File(f, "pack.mcmeta"), getMeta().toString());
 		writeResourceToFile(getMeta().getPackIcon(), new File(f, "pack.png"));
+		GList<File> jsonFiles = new GList<>();
+		GList<File> allFiles = new GList<>();
 
 		for(String i : oc.copy())
 		{
 			File destination = new File(f, "assets" + File.separator + "minecraft" + File.separator + i.replaceAll("/", Matcher.quoteReplacement(File.separator)));
 			destination.getParentFile().mkdirs();
 			writeResourceToFile(copyResources.get(i), destination);
+
+			if(destination.getName().endsWith(".json"))
+			{
+				jsonFiles.add(destination);
+			}
+
+			allFiles.add(destination);
 		}
 
 		for(String i : ow.copy())
@@ -224,6 +236,27 @@ public class ResourcePack
 			File destination = new File(f, "assets" + File.separator + "minecraft" + File.separator + i.replaceAll("/", Matcher.quoteReplacement(File.separator)));
 			destination.getParentFile().mkdirs();
 			writePackContent(destination, writeResources.get(i));
+
+			if(destination.getName().endsWith(".json"))
+			{
+				jsonFiles.add(destination);
+			}
+
+			allFiles.add(destination);
+		}
+
+		for(File i : jsonFiles)
+		{
+			try
+			{
+				JSONObject o = new JSONObject(VIO.readAll(i));
+				VIO.writeAll(i, o.toString(minifyJSON ? 0 : 4));
+			}
+
+			catch(Throwable e)
+			{
+
+			}
 		}
 
 		if(isOptimizedPngs())
@@ -301,5 +334,15 @@ public class ResourcePack
 	public void setOverbose(boolean hasFlag)
 	{
 		overbose = hasFlag;
+	}
+
+	public void setMinifyJSON(boolean minifyJSON)
+	{
+		this.minifyJSON = minifyJSON;
+	}
+
+	public void setObfuscate(boolean obfuscate)
+	{
+		this.obfuscate = obfuscate;
 	}
 }

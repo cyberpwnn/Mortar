@@ -5,6 +5,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import mortar.api.fulcrum.FulcrumRegistry;
+import mortar.api.fulcrum.util.DefaultItemModel;
+import mortar.api.fulcrum.util.ToolLevel;
+import mortar.api.fulcrum.util.ToolType;
 import mortar.api.resourcepack.ModelType;
 import mortar.api.resourcepack.TextureType;
 import mortar.lang.collection.GMap;
@@ -16,16 +19,40 @@ public class FCUItem extends FCUCollective
 	protected FCUModel model;
 	private String name;
 	private int maxStackSize;
+	private String itemToolType;
+	private int itemToolLevel;
 
 	public FCUItem(String id)
 	{
 		super(id);
 		textures = new GMap<>();
 		setTexture(id, "assets/textures/items/unknown.png");
-		setModel(id, "assets/models/item/default_item.json");
-		model.rewrite("$texture", id);
+		setModel(DefaultItemModel.ITEM);
+		model.rewrite("$id", id);
 		setName(getFancyNameFromID());
 		setMaxStackSize(64);
+		setItemToolType(ToolType.HAND);
+		setItemToolLevel(ToolLevel.HAND);
+	}
+
+	public int getItemToolLevel()
+	{
+		return itemToolLevel;
+	}
+
+	public void setItemToolLevel(int itemToolLevel)
+	{
+		this.itemToolLevel = itemToolLevel;
+	}
+
+	public String getItemToolType()
+	{
+		return itemToolType;
+	}
+
+	public void setItemToolType(String itemToolType)
+	{
+		this.itemToolType = itemToolType;
 	}
 
 	public ItemStack toItemStack(int amt)
@@ -76,7 +103,7 @@ public class FCUItem extends FCUCollective
 
 	public String getLocalizedName()
 	{
-		return "fcu." + getID() + ".name";
+		return ("fcu." + getID() + ".name");
 	}
 
 	public GMap<String, FCUTexture> getTextures()
@@ -141,5 +168,15 @@ public class FCUItem extends FCUCollective
 	public int getMaxStackSize()
 	{
 		return maxStackSize;
+	}
+
+	public void setModel(DefaultItemModel model)
+	{
+		setModel(model.getPath());
+	}
+
+	public void setModel(String modelResource)
+	{
+		setModel(new FCUModel(getID(), getClass(), modelResource, ModelType.ITEM));
 	}
 }

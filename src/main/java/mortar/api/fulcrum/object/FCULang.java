@@ -12,6 +12,6 @@ public class FCULang extends FCUTextResource
 
 	public String toLine()
 	{
-		return getID().toLowerCase().replaceAll("\\Q_\\E", ".").trim() + "=" + cachedText;
+		return getID().toLowerCase().trim() + "=" + cachedText;
 	}
 }

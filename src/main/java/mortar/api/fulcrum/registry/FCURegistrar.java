@@ -35,7 +35,7 @@ public abstract class FCURegistrar<R extends Registered> implements Registrar<R>
 	{
 		if(isRegistered(r))
 		{
-			throw new RuntimeException("Object " + r.toString() + " already registered!");
+			return;
 		}
 
 		onRegister(r);
@@ -62,7 +62,7 @@ public abstract class FCURegistrar<R extends Registered> implements Registrar<R>
 	{
 		if(!isRegistered(r))
 		{
-			throw new RuntimeException("Object " + r.toString() + " is not registered");
+			return;
 		}
 
 		onUnregister(r);

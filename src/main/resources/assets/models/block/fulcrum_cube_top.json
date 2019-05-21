@@ -2,7 +2,7 @@
     "parent": "block/cube_top",
     "display": {
         "head": {
-            "translation": [ 0, -14.664, 0 ],
+            "translation": [ 0, -32.965, 0 ],
             "scale": [ 2.288, 2.288, 2.288 ]
 	    }
     }
