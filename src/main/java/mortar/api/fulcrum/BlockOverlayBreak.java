@@ -17,6 +17,8 @@ public class BlockOverlayBreak extends CustomBlock
 		}
 
 		setModel(DefaultBlockModel.CUBE_ALL);
+		getModel().rewrite("$id", getID());
+		setName("Break Stage " + stage);
 		setTexture(getID(), "/assets/textures/blocks/destroy_stage_" + stage + ".png");
 		setHardness(-1);
 		setEffectiveToolType(ToolType.HAND);

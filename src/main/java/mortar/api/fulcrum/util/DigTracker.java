@@ -3,11 +3,13 @@ package mortar.api.fulcrum.util;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 
 import mortar.api.fulcrum.ContentAssist;
-import mortar.api.fulcrum.Fulcrum;
+import mortar.api.fulcrum.FulcrumInstance;
+import mortar.api.fulcrum.object.CustomBlock;
 import mortar.api.nms.Catalyst;
 import mortar.api.sched.J;
 import mortar.api.world.PE;
@@ -22,12 +24,14 @@ public class DigTracker
 	private GMap<Block, Double> speed;
 	private GMap<Block, Double> progress;
 	private GMap<Player, Block> digging;
+	private GMap<Block, ArmorStand> breakStands;
 
 	public DigTracker()
 	{
 		speed = new GMap<>();
 		progress = new GMap<>();
 		digging = new GMap<>();
+		breakStands = new GMap<>();
 		J.sr(() -> tick(), 0);
 	}
 
@@ -67,22 +71,25 @@ public class DigTracker
 
 			if(progress.containsKey(i))
 			{
-				if(!i.getType().equals(Fulcrum.SOLID_DIGGING) && !i.isEmpty())
+				int stage = (int) (progress.get(i) * 9.0);
+				CustomBlock block = (CustomBlock) FulcrumInstance.instance.getRegistered("break_stage_" + stage);
+
+				if(!breakStands.containsKey(i))
 				{
-					i.setType(Fulcrum.SOLID_DIGGING);
+					ArmorStand a = block.placeAt(i);
+					breakStands.put(i, a);
 				}
 
-				Catalyst.host.sendViewDistancedPacket(i.getChunk(), new PacketPlayOutBlockBreakAnimation(getBlockPos(i), new BlockPosition(i.getX(), i.getY(), i.getZ()), (int) (progress.get(i) * 9.0)));
+				else
+				{
+					breakStands.get(i).setHelmet(block.toItemStack(1));
+				}
 			}
 
-			else
+			else if(breakStands.containsKey(i))
 			{
-				if(i.getType().equals(Fulcrum.SOLID_DIGGING))
-				{
-					i.setType(Fulcrum.SOLID_IDLE);
-				}
-
-				Catalyst.host.sendViewDistancedPacket(i.getChunk(), new PacketPlayOutBlockBreakAnimation(getBlockPos(i), new BlockPosition(i.getX(), i.getY(), i.getZ()), (int) (-1)));
+				breakStands.get(i).remove();
+				breakStands.remove(i);
 			}
 		}
 
@@ -125,9 +132,10 @@ public class DigTracker
 				speed.remove(b);
 			}
 
-			if(b.getType().equals(Fulcrum.SOLID_DIGGING))
+			if(breakStands.containsKey(b))
 			{
-				b.setType(Fulcrum.SOLID_IDLE);
+				breakStands.get(b).remove();
+				breakStands.remove(b);
 			}
 
 			Catalyst.host.sendViewDistancedPacket(b.getChunk(), new PacketPlayOutBlockBreakAnimation(getBlockPos(b), new BlockPosition(b.getX(), b.getY(), b.getZ()), (int) (-1)));

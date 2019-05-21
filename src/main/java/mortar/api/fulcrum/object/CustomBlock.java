@@ -165,7 +165,7 @@ public class CustomBlock extends CustomItem implements IBlock
 	}
 
 	@Override
-	public void placeAt(Block at)
+	public ArmorStand placeAt(Block at)
 	{
 		Location l = at.getLocation().clone().add(0.5, 0.5, 0.5);
 		BlockStand12 entity = new BlockStand12(((CraftWorld) l.getWorld()).getHandle(), l.getX(), l.getY(), l.getZ());
@@ -196,7 +196,11 @@ public class CustomBlock extends CustomItem implements IBlock
 			{
 				l.getBlock().setType(Material.BARRIER);
 			}
+
+			return a;
 		}
+
+		return null;
 	}
 
 	@Override

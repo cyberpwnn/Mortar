@@ -35,7 +35,6 @@ public class Fulcrum
 	public static AllocationStrategy allocationStrategy = AllocationStrategy.SEQUENTIAL;
 
 	public static final Material SOLID_IDLE = Material.BARRIER;
-	public static final Material SOLID_DIGGING = Material.GLASS;
 
 	public FulcrumController getFulcrum()
 	{

@@ -295,6 +295,11 @@ public class FulcrumInstance implements Listener
 		return getRegistry().allocator().getAllocation(itemStack.getType(), itemStack.getDurability());
 	}
 
+	public IAllocation getRegistered(String id)
+	{
+		return getRegistry().item().getRegistry(id);
+	}
+
 	public boolean isRegistered(ItemStack itemStack)
 	{
 		//@builder

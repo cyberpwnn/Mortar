@@ -2,6 +2,7 @@ package mortar.api.fulcrum.util;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -9,7 +10,7 @@ public interface IBlock
 {
 	public void removeAt(Block at);
 
-	public void placeAt(Block at);
+	public ArmorStand placeAt(Block at);
 
 	public void getDrops(Block at, Player who, ItemStack tool, PotentialDropList drops);
 
