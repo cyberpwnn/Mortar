@@ -3,13 +3,13 @@ mortar.api.config
 mortar.api.fulcrum
 mortar.api.fulcrum.object
 mortar.api.fulcrum.registry
+mortar.api.fulcrum.resourcepack
 mortar.api.fulcrum.util
 mortar.api.fx
 mortar.api.generator
 mortar.api.inventory
 mortar.api.nms
 mortar.api.particle
-mortar.api.resourcepack
 mortar.api.rift
 mortar.api.sched
 mortar.api.scm
