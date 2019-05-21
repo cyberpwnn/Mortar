@@ -1,4 +1,4 @@
-package mortar.api.resourcepack;
+package mortar.api.fulcrum.resourcepack;
 
 public enum TextureSubType
 {

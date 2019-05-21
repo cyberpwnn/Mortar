@@ -13,6 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import mortar.api.fulcrum.BlockStand12;
 import mortar.api.fulcrum.FulcrumInstance;
 import mortar.api.fulcrum.FulcrumRegistry;
+import mortar.api.fulcrum.resourcepack.ModelType;
+import mortar.api.fulcrum.resourcepack.TextureType;
 import mortar.api.fulcrum.util.BlockCollision;
 import mortar.api.fulcrum.util.BlockHardness;
 import mortar.api.fulcrum.util.BlockSoundCategory;
@@ -20,8 +22,6 @@ import mortar.api.fulcrum.util.DefaultBlockModel;
 import mortar.api.fulcrum.util.IBlock;
 import mortar.api.fulcrum.util.IResource;
 import mortar.api.fulcrum.util.PotentialDropList;
-import mortar.api.resourcepack.ModelType;
-import mortar.api.resourcepack.TextureType;
 import mortar.lang.collection.GMap;
 
 public class CustomBlock extends CustomItem implements IBlock

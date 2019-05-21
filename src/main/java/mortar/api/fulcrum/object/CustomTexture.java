@@ -1,10 +1,10 @@
 package mortar.api.fulcrum.object;
 
+import mortar.api.fulcrum.resourcepack.PackNode;
+import mortar.api.fulcrum.resourcepack.TextureSubSubType;
+import mortar.api.fulcrum.resourcepack.TextureSubType;
+import mortar.api.fulcrum.resourcepack.TextureType;
 import mortar.api.fulcrum.util.IResource;
-import mortar.api.resourcepack.PackNode;
-import mortar.api.resourcepack.TextureSubSubType;
-import mortar.api.resourcepack.TextureSubType;
-import mortar.api.resourcepack.TextureType;
 
 public class CustomTexture extends CustomResource
 {

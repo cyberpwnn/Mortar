@@ -32,6 +32,7 @@ import org.bukkit.inventory.ItemStack;
 
 import mortar.api.fulcrum.object.CustomBlock;
 import mortar.api.fulcrum.object.CustomItem;
+import mortar.api.fulcrum.resourcepack.ResourcePack;
 import mortar.api.fulcrum.util.BlockSoundCategory;
 import mortar.api.fulcrum.util.BlocksScraper;
 import mortar.api.fulcrum.util.DigTracker;
@@ -47,7 +48,6 @@ import mortar.api.fulcrum.util.PotentialDropList;
 import mortar.api.fulcrum.util.SuperCacheResourceProvider;
 import mortar.api.fulcrum.util.ToolLevel;
 import mortar.api.nms.Catalyst;
-import mortar.api.resourcepack.ResourcePack;
 import mortar.api.sched.J;
 import mortar.bukkit.plugin.MortarAPIPlugin;
 import mortar.compute.math.M;
@@ -353,6 +353,7 @@ public class FulcrumInstance implements Listener
 		getPack().setOverbose(Fulcrum.verbose);
 		getPack().setMinifyJSON(Fulcrum.minifyJSON);
 		getPack().setObfuscate(Fulcrum.obfuscate);
+		getPack().setDeduplicate(Fulcrum.deduplicate);
 		File pack = getResources().fileFor("web/" + packName + ".zip");
 		File hashFile = getResources().fileFor("web/" + packName + ".hash");
 		VIO.writeAll(hashFile, Hasher.bytesToHex(getPack().writeToArchive(pack)));

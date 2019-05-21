@@ -6,12 +6,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import mortar.api.fulcrum.FulcrumInstance;
 import mortar.api.fulcrum.FulcrumRegistry;
+import mortar.api.fulcrum.resourcepack.ModelType;
+import mortar.api.fulcrum.resourcepack.TextureType;
 import mortar.api.fulcrum.util.DefaultItemModel;
 import mortar.api.fulcrum.util.IResource;
 import mortar.api.fulcrum.util.ToolLevel;
 import mortar.api.fulcrum.util.ToolType;
-import mortar.api.resourcepack.ModelType;
-import mortar.api.resourcepack.TextureType;
 import mortar.lang.collection.GMap;
 import mortar.logic.format.F;
 

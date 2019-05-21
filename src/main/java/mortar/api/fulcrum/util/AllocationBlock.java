@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import mortar.api.fulcrum.Fulcrum;
 import mortar.api.fulcrum.FulcrumRegistry;
 import mortar.api.fulcrum.object.CustomModel;
-import mortar.api.resourcepack.ModelType;
+import mortar.api.fulcrum.resourcepack.ModelType;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
 

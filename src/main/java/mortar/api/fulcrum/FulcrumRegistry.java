@@ -9,10 +9,9 @@ import mortar.api.fulcrum.object.CustomSound;
 import mortar.api.fulcrum.object.CustomTexture;
 import mortar.api.fulcrum.object.CustomVorbis;
 import mortar.api.fulcrum.registry.FCURegistrar;
+import mortar.api.fulcrum.resourcepack.ModelType;
+import mortar.api.fulcrum.resourcepack.ResourcePack;
 import mortar.api.fulcrum.util.AllocationBlock;
-import mortar.api.fulcrum.util.JarResorce;
-import mortar.api.resourcepack.ModelType;
-import mortar.api.resourcepack.ResourcePack;
 import mortar.bukkit.plugin.Mortar;
 import mortar.lang.json.JSONException;
 import mortar.lang.json.JSONObject;
@@ -113,7 +112,7 @@ public class FulcrumRegistry
 
 	private void dependBlockModel(String name)
 	{
-		model().register(new CustomModel(name, new JarResorce(Fulcrum.class, "assets/models/block/" + name + ".json"), ModelType.BLOCK));
+		model().register(new CustomModel(name, f().getResource("assets/models/block/" + name + ".json"), ModelType.BLOCK));
 	}
 
 	public FCURegistrar<CustomItem> item()

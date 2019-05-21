@@ -1,8 +1,8 @@
 package mortar.api.fulcrum.object;
 
+import mortar.api.fulcrum.resourcepack.ModelType;
+import mortar.api.fulcrum.resourcepack.PackNode;
 import mortar.api.fulcrum.util.IResource;
-import mortar.api.resourcepack.ModelType;
-import mortar.api.resourcepack.PackNode;
 
 public class CustomModel extends CustomTextResource
 {

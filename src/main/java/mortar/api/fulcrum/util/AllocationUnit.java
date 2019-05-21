@@ -41,6 +41,7 @@ public class AllocationUnit
 		textures.put("layer0", getTexture());
 		model.put("parent", getParent());
 		model.put("textures", textures);
+		model.put("##", "required");
 
 		return model;
 	}
