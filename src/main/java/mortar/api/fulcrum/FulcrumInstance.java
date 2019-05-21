@@ -30,8 +30,8 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import mortar.api.fulcrum.object.FCUBlock;
-import mortar.api.fulcrum.object.FCUItem;
+import mortar.api.fulcrum.object.CustomBlock;
+import mortar.api.fulcrum.object.CustomItem;
 import mortar.api.fulcrum.util.BlockSoundCategory;
 import mortar.api.fulcrum.util.BlocksScraper;
 import mortar.api.fulcrum.util.DigTracker;
@@ -147,7 +147,7 @@ public class FulcrumInstance implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void on(PlayerStartDiggingEvent e)
 	{
-		FCUBlock fu = ContentAssist.getBlock(e.getBlock());
+		CustomBlock fu = ContentAssist.getBlock(e.getBlock());
 
 		if(fu != null)
 		{
@@ -160,7 +160,7 @@ public class FulcrumInstance implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void on(PlayerCancelledDiggingEvent e)
 	{
-		FCUBlock fu = ContentAssist.getBlock(e.getBlock());
+		CustomBlock fu = ContentAssist.getBlock(e.getBlock());
 
 		if(fu != null)
 		{
@@ -171,7 +171,7 @@ public class FulcrumInstance implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void on(PlayerFinishedDiggingEvent e)
 	{
-		FCUBlock fu = ContentAssist.getBlock(e.getBlock());
+		CustomBlock fu = ContentAssist.getBlock(e.getBlock());
 
 		if(fu != null)
 		{
@@ -183,7 +183,7 @@ public class FulcrumInstance implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void on(BlockBreakEvent e)
 	{
-		FCUBlock f = ContentAssist.getBlock(e.getBlock());
+		CustomBlock f = ContentAssist.getBlock(e.getBlock());
 
 		if(f != null)
 		{
@@ -258,7 +258,7 @@ public class FulcrumInstance implements Listener
 		}
 	}
 
-	private boolean placeAllocation(FCUBlock block, Block clicked, Block at)
+	private boolean placeAllocation(CustomBlock block, Block clicked, Block at)
 	{
 		Block b = at;
 
@@ -326,7 +326,7 @@ public class FulcrumInstance implements Listener
 
 			if(b.getType().equals(Material.BARRIER))
 			{
-				FCUBlock cb = ContentAssist.getBlock(b);
+				CustomBlock cb = ContentAssist.getBlock(b);
 
 				if(cb != null)
 				{
@@ -364,7 +364,7 @@ public class FulcrumInstance implements Listener
 
 		if(is != null && isRegistered(is))
 		{
-			FCUItem item = (FCUItem) getRegistered(is);
+			CustomItem item = (CustomItem) getRegistered(is);
 			int count = item.getMaxStackSize();
 			int left = e.getOldCursor().getAmount();
 			int div = e.getRawSlots().size();
@@ -461,7 +461,7 @@ public class FulcrumInstance implements Listener
 		{
 			if(cursor != null && isRegistered(cursor))
 			{
-				int stack = ((FCUItem) getRegistered(cursor)).getMaxStackSize();
+				int stack = ((CustomItem) getRegistered(cursor)).getMaxStackSize();
 
 				ItemStack[] isx = e.getClickedInventory().getContents();
 
@@ -534,7 +534,7 @@ public class FulcrumInstance implements Listener
 						{
 							if(is != null && cursor.getType().equals(is.getType()) && cursor.getDurability() == is.getDurability() && cursor.getItemMeta().isUnbreakable() && is.getItemMeta().isUnbreakable())
 							{
-								int count = ((FCUItem) getRegistered(cursor)).getMaxStackSize();
+								int count = ((CustomItem) getRegistered(cursor)).getMaxStackSize();
 								int maxPull = count - is.getAmount();
 
 								if(cursor.getAmount() == 1 && is.getAmount() < count)
@@ -570,7 +570,7 @@ public class FulcrumInstance implements Listener
 						{
 							if(is != null && cursor.getType().equals(is.getType()) && cursor.getDurability() == is.getDurability() && cursor.getItemMeta().isUnbreakable() && is.getItemMeta().isUnbreakable())
 							{
-								int count = ((FCUItem) getRegistered(cursor)).getMaxStackSize();
+								int count = ((CustomItem) getRegistered(cursor)).getMaxStackSize();
 								int maxPull = count - is.getAmount();
 
 								while(maxPull > 0 && cursor.getAmount() > 1)
@@ -642,7 +642,7 @@ public class FulcrumInstance implements Listener
 	public void addToInventory(Inventory inv, ItemStack is, int hint)
 	{
 		ItemStack[] iss = inv.getContents();
-		FCUItem it = (FCUItem) getRegistered(is);
+		CustomItem it = (CustomItem) getRegistered(is);
 		int left = is.getAmount();
 		int z = -1;
 

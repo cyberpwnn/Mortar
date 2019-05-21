@@ -5,7 +5,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 import mortar.api.fulcrum.FulcrumInstance;
-import mortar.api.fulcrum.object.FCUBlock;
+import mortar.api.fulcrum.object.CustomBlock;
 
 public class ToolLevel
 {
@@ -66,7 +66,7 @@ public class ToolLevel
 		return (1D / ((h * 1.5) / m)) / 20D;
 	}
 
-	public static double getMiningSpeed(FCUBlock block, ItemStack is)
+	public static double getMiningSpeed(CustomBlock block, ItemStack is)
 	{
 		double h = block.getHardness();
 		int l = ToolLevel.getToolLevel(is);

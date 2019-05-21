@@ -2,9 +2,9 @@ package mortar.api.atests;
 
 import org.bukkit.SoundCategory;
 
-import mortar.api.fulcrum.object.FCUSound;
+import mortar.api.fulcrum.object.CustomSound;
 
-public class SoundSteelLand extends FCUSound
+public class SoundSteelLand extends CustomSound
 {
 	public SoundSteelLand()
 	{

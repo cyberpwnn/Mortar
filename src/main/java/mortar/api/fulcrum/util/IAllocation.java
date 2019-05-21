@@ -2,7 +2,7 @@ package mortar.api.fulcrum.util;
 
 import org.bukkit.Material;
 
-import mortar.api.fulcrum.object.FCUBlock;
+import mortar.api.fulcrum.object.CustomBlock;
 
 public interface IAllocation
 {
@@ -18,7 +18,7 @@ public interface IAllocation
 
 	public void onAllocated(AllocationUnit unit, short id);
 
-	public FCUBlock block();
+	public CustomBlock block();
 
 	public boolean isBlock();
 

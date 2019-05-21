@@ -2,11 +2,11 @@ package mortar.api.atests;
 
 import org.bukkit.Material;
 
-import mortar.api.fulcrum.object.FCUBlock;
+import mortar.api.fulcrum.object.CustomBlock;
 import mortar.api.fulcrum.util.BlockCollision;
 import mortar.api.fulcrum.util.BlockSoundCategory;
 
-public class BlockExample extends FCUBlock
+public class BlockExample extends CustomBlock
 {
 	public BlockExample(String id)
 	{

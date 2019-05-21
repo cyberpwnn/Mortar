@@ -1,7 +1,7 @@
 package mortar.fulcrum;
 
 import mortar.api.fulcrum.FulcrumInstance;
-import mortar.api.fulcrum.object.FCUItem;
+import mortar.api.fulcrum.object.CustomItem;
 import mortar.bukkit.command.MortarCommand;
 import mortar.bukkit.command.MortarSender;
 import mortar.bukkit.plugin.MortarAPIPlugin;
@@ -29,7 +29,7 @@ public class CommandFulcrumGive extends MortarCommand
 
 		if(type.equals("item"))
 		{
-			FCUItem item = FulcrumInstance.instance.getRegistry().item().getRegistry(id);
+			CustomItem item = FulcrumInstance.instance.getRegistry().item().getRegistry(id);
 
 			if(item != null)
 			{

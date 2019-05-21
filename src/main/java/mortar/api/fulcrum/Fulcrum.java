@@ -24,6 +24,9 @@ public class Fulcrum
 	public static boolean verbose = true;
 
 	@FulcrumParameter
+	public static boolean registerExamples = false;
+
+	@FulcrumParameter
 	public static AllocationStrategy allocationStrategy = AllocationStrategy.SEQUENTIAL;
 
 	public FulcrumController getFulcrum()

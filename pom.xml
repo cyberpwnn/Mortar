@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.volmit</groupId>
 	<artifactId>Mortar</artifactId>
-	<version>1.0.48</version>
+	<version>1.0.49</version>
 	<name>Mortar</name>
 	<description>That crap between the bricks</description>
 	<developers>
@@ -29,16 +29,7 @@
 				<filtering>true</filtering>
 				<includes>
 					<include>**/*.yml</include>
-					<include>**/*.json</include>
 					<include>**/*.info</include>
-					<include>**/*.txt</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**/*.yml</include>
 					<include>**/*.json</include>
 					<include>**/*.html</include>
 					<include>**/*.css</include>
@@ -53,13 +44,6 @@
 					<include>**/*.ogg</include>
 					<include>**/*.png</include>
 					<include>**/*.lang</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/java</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**/*.java</include>
 				</includes>
 			</resource>
 		</resources>
@@ -183,6 +167,10 @@
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
 		<repository>
+			<id>volmit</id>
+			<url>http://nexus.volmit.com/content/repositories/volmit</url>
+		</repository>
+		<repository>
 			<id>fawe</id>
 			<url>http://ci.athion.net/job/FastAsyncWorldEdit/ws/mvn/</url>
 		</repository>
@@ -193,10 +181,6 @@
 		<repository>
 			<id>dmulloy2-repo</id>
 			<url>http://repo.dmulloy2.net/nexus/repository/public/</url>
-		</repository>
-		<repository>
-			<id>volmit</id>
-			<url>http://nexus.volmit.com/content/repositories/volmit</url>
 		</repository>
 		<repository>
 			<id>placeholderapi</id>

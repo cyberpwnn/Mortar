@@ -4,12 +4,12 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 
-import mortar.api.fulcrum.object.FCUBlock;
+import mortar.api.fulcrum.object.CustomBlock;
 import mortar.api.fulcrum.util.IAllocation;
 
 public class ContentAssist
 {
-	public static FCUBlock getBlock(Block b)
+	public static CustomBlock getBlock(Block b)
 	{
 		ArmorStand a = null;
 
@@ -31,7 +31,7 @@ public class ContentAssist
 
 		if(al != null)
 		{
-			return (FCUBlock) al;
+			return (CustomBlock) al;
 		}
 
 		return null;

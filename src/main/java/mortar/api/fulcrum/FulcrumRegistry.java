@@ -2,12 +2,12 @@ package mortar.api.fulcrum;
 
 import java.io.IOException;
 
-import mortar.api.fulcrum.object.FCUItem;
-import mortar.api.fulcrum.object.FCULang;
-import mortar.api.fulcrum.object.FCUModel;
-import mortar.api.fulcrum.object.FCUSound;
-import mortar.api.fulcrum.object.FCUTexture;
-import mortar.api.fulcrum.object.FCUVorbis;
+import mortar.api.fulcrum.object.CustomItem;
+import mortar.api.fulcrum.object.CustomLang;
+import mortar.api.fulcrum.object.CustomModel;
+import mortar.api.fulcrum.object.CustomSound;
+import mortar.api.fulcrum.object.CustomTexture;
+import mortar.api.fulcrum.object.CustomVorbis;
 import mortar.api.fulcrum.registry.FCURegistrar;
 import mortar.api.fulcrum.util.AllocationBlock;
 import mortar.api.resourcepack.ModelType;
@@ -19,12 +19,12 @@ import mortar.logic.io.VIO;
 
 public class FulcrumRegistry
 {
-	private final FCURegistrar<FCUItem> items;
-	private final FCURegistrar<FCUTexture> textures;
-	private final FCURegistrar<FCUModel> models;
-	private final FCURegistrar<FCUSound> sounds;
-	private final FCURegistrar<FCUVorbis> vorbis;
-	private final FCURegistrar<FCULang> lang;
+	private final FCURegistrar<CustomItem> items;
+	private final FCURegistrar<CustomTexture> textures;
+	private final FCURegistrar<CustomModel> models;
+	private final FCURegistrar<CustomSound> sounds;
+	private final FCURegistrar<CustomVorbis> vorbis;
+	private final FCURegistrar<CustomLang> lang;
 	private final StringBuilder langBuild;
 	private final AllocationBlock allocator;
 	private final JSONObject soundsJSON;
@@ -36,56 +36,56 @@ public class FulcrumRegistry
 		langBuild = new StringBuilder();
 		soundsJSON = new JSONObject(VIO.readAll(getClass().getResourceAsStream("/assets/sounds-default.json")));
 
-		lang = new FCURegistrar<FCULang>()
+		lang = new FCURegistrar<CustomLang>()
 		{
 			@Override
-			public void onRegister(FCULang r)
+			public void onRegister(CustomLang r)
 			{
 				langBuild.append(r.toLine() + "\n");
 			}
 		};
 
-		items = new FCURegistrar<FCUItem>()
+		items = new FCURegistrar<CustomItem>()
 		{
 			@Override
-			public void onRegister(FCUItem r)
+			public void onRegister(CustomItem r)
 			{
 				allocator.allocate(r);
 				r.registerResources(FulcrumRegistry.this);
 			}
 		};
 
-		textures = new FCURegistrar<FCUTexture>()
+		textures = new FCURegistrar<CustomTexture>()
 		{
 			@Override
-			public void onRegister(FCUTexture r)
+			public void onRegister(CustomTexture r)
 			{
 				getPack().setResource(r.toPackPath(), r.toURL());
 			}
 		};
 
-		vorbis = new FCURegistrar<FCUVorbis>()
+		vorbis = new FCURegistrar<CustomVorbis>()
 		{
 			@Override
-			public void onRegister(FCUVorbis r)
+			public void onRegister(CustomVorbis r)
 			{
 				getPack().setResource(r.toPackPath(), r.toURL());
 			}
 		};
 
-		models = new FCURegistrar<FCUModel>()
+		models = new FCURegistrar<CustomModel>()
 		{
 			@Override
-			public void onRegister(FCUModel r)
+			public void onRegister(CustomModel r)
 			{
 				getPack().setResource(r.toPackPath(), r.toURL());
 			}
 		};
 
-		sounds = new FCURegistrar<FCUSound>()
+		sounds = new FCURegistrar<CustomSound>()
 		{
 			@Override
-			public void onRegister(FCUSound r)
+			public void onRegister(CustomSound r)
 			{
 				r.registerResources(FulcrumRegistry.this);
 				r.addToJSON(soundsJSON);
@@ -112,35 +112,35 @@ public class FulcrumRegistry
 
 	private void dependBlockModel(String name)
 	{
-		model().register(new FCUModel(name, getClass(), "assets/models/block/" + name + ".json", ModelType.BLOCK));
+		model().register(new CustomModel(name, getClass(), "assets/models/block/" + name + ".json", ModelType.BLOCK));
 	}
 
-	public FCURegistrar<FCUItem> item()
+	public FCURegistrar<CustomItem> item()
 	{
 		return items;
 	}
 
-	public FCURegistrar<FCUTexture> texture()
+	public FCURegistrar<CustomTexture> texture()
 	{
 		return textures;
 	}
 
-	public FCURegistrar<FCUSound> sound()
+	public FCURegistrar<CustomSound> sound()
 	{
 		return sounds;
 	}
 
-	public FCURegistrar<FCUVorbis> vorbis()
+	public FCURegistrar<CustomVorbis> vorbis()
 	{
 		return vorbis;
 	}
 
-	public FCURegistrar<FCUModel> model()
+	public FCURegistrar<CustomModel> model()
 	{
 		return models;
 	}
 
-	public FCURegistrar<FCULang> lang()
+	public FCURegistrar<CustomLang> lang()
 	{
 		return lang;
 	}

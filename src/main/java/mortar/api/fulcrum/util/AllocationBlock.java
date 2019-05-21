@@ -4,7 +4,7 @@ import org.bukkit.Material;
 
 import mortar.api.fulcrum.Fulcrum;
 import mortar.api.fulcrum.FulcrumRegistry;
-import mortar.api.fulcrum.object.FCUModel;
+import mortar.api.fulcrum.object.CustomModel;
 import mortar.api.resourcepack.ModelType;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
@@ -35,11 +35,11 @@ public class AllocationBlock
 		{
 			if(i.getAllocated() > 0)
 			{
-				registry.model().register(new FCUModel(i.getModel(), i.generateModel().toString(Fulcrum.minifyJSON ? 0 : 4), ModelType.ITEM));
+				registry.model().register(new CustomModel(i.getModel(), i.generateModel().toString(Fulcrum.minifyJSON ? 0 : 4), ModelType.ITEM));
 
 				if(Fulcrum.generateModelNormals)
 				{
-					registry.model().register(new FCUModel(i.getModelNormal(), i.generateNormal().toString(Fulcrum.minifyJSON ? 0 : 4), ModelType.ITEM));
+					registry.model().register(new CustomModel(i.getModelNormal(), i.generateNormal().toString(Fulcrum.minifyJSON ? 0 : 4), ModelType.ITEM));
 				}
 			}
 		}

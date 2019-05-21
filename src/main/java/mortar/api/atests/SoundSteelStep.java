@@ -2,9 +2,9 @@ package mortar.api.atests;
 
 import org.bukkit.SoundCategory;
 
-import mortar.api.fulcrum.object.FCUSound;
+import mortar.api.fulcrum.object.CustomSound;
 
-public class SoundSteelStep extends FCUSound
+public class SoundSteelStep extends CustomSound
 {
 	public SoundSteelStep()
 	{
