@@ -3,6 +3,7 @@ package mortar.api.fulcrum.object;
 import java.io.IOException;
 
 import mortar.api.fulcrum.FulcrumInstance;
+import mortar.api.fulcrum.util.IResource;
 import mortar.logic.io.VIO;
 
 public class CustomTextResource extends CustomResource
@@ -12,9 +13,9 @@ public class CustomTextResource extends CustomResource
 		super(id, FulcrumInstance.instance.getResources().cacheResourceText(id, text));
 	}
 
-	public CustomTextResource(String id, Class<?> anchor, String resource)
+	public CustomTextResource(String id, IResource resource)
 	{
-		super(id, anchor, resource);
+		super(id, resource);
 	}
 
 	public void rewrite(String string, String idx)

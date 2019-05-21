@@ -10,6 +10,7 @@ import mortar.api.fulcrum.object.CustomTexture;
 import mortar.api.fulcrum.object.CustomVorbis;
 import mortar.api.fulcrum.registry.FCURegistrar;
 import mortar.api.fulcrum.util.AllocationBlock;
+import mortar.api.fulcrum.util.JarResorce;
 import mortar.api.resourcepack.ModelType;
 import mortar.api.resourcepack.ResourcePack;
 import mortar.bukkit.plugin.Mortar;
@@ -112,7 +113,7 @@ public class FulcrumRegistry
 
 	private void dependBlockModel(String name)
 	{
-		model().register(new CustomModel(name, getClass(), "assets/models/block/" + name + ".json", ModelType.BLOCK));
+		model().register(new CustomModel(name, new JarResorce(Fulcrum.class, "assets/models/block/" + name + ".json"), ModelType.BLOCK));
 	}
 
 	public FCURegistrar<CustomItem> item()

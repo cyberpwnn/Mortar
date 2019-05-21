@@ -11,12 +11,15 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
 
 import mortar.api.fulcrum.BlockStand12;
+import mortar.api.fulcrum.Fulcrum;
 import mortar.api.fulcrum.FulcrumRegistry;
 import mortar.api.fulcrum.util.BlockCollision;
 import mortar.api.fulcrum.util.BlockHardness;
 import mortar.api.fulcrum.util.BlockSoundCategory;
 import mortar.api.fulcrum.util.DefaultBlockModel;
 import mortar.api.fulcrum.util.IBlock;
+import mortar.api.fulcrum.util.IResource;
+import mortar.api.fulcrum.util.JarResorce;
 import mortar.api.fulcrum.util.PotentialDropList;
 import mortar.api.resourcepack.ModelType;
 import mortar.api.resourcepack.TextureType;
@@ -35,7 +38,7 @@ public class CustomBlock extends CustomItem implements IBlock
 		super(id);
 		sounds = new GMap<>();
 		textures = new GMap<>();
-		setTexture(getID(), "assets/textures/blocks/unknown.png");
+		setTexture(getID(), new JarResorce(Fulcrum.class, "assets/textures/blocks/unknown.png"));
 		setCollisionMode(BlockCollision.FULL);
 		setHardnessLike(Material.STONE);
 		setEffectiveToolLike(Material.STONE);
@@ -45,13 +48,13 @@ public class CustomBlock extends CustomItem implements IBlock
 
 	public void setModel(DefaultBlockModel model)
 	{
-		setModel(model.getPath());
+		setModel(new JarResorce(Fulcrum.class, model.getPath()));
 	}
 
 	@Override
-	public void setModel(String modelResource)
+	public void setModel(IResource modelResource)
 	{
-		setModel(new CustomModel(getID(), getClass(), modelResource, ModelType.BLOCK));
+		setModel(new CustomModel(getID(), modelResource, ModelType.BLOCK));
 	}
 
 	@Override
@@ -110,15 +113,15 @@ public class CustomBlock extends CustomItem implements IBlock
 	}
 
 	@Override
-	public void setTexture(String name, String resource)
+	public void setTexture(String name, IResource resource)
 	{
-		textures.put(name, new CustomTexture(name, getClass(), resource, TextureType.BLOCKS));
+		textures.put(name, new CustomTexture(name, resource, TextureType.BLOCKS));
 	}
 
 	@Override
-	public void setModel(String name, String resource)
+	public void setModel(String name, IResource resource)
 	{
-		model = new CustomModel(name, getClass(), resource, ModelType.BLOCK);
+		model = new CustomModel(name, resource, ModelType.BLOCK);
 	}
 
 	@Override

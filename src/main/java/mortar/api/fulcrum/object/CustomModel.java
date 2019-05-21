@@ -1,5 +1,6 @@
 package mortar.api.fulcrum.object;
 
+import mortar.api.fulcrum.util.IResource;
 import mortar.api.resourcepack.ModelType;
 import mortar.api.resourcepack.PackNode;
 
@@ -13,9 +14,9 @@ public class CustomModel extends CustomTextResource
 		this.modelType = modelType;
 	}
 
-	public CustomModel(String id, Class<?> anchor, String resource, ModelType modelType)
+	public CustomModel(String id, IResource resource, ModelType modelType)
 	{
-		super(id, anchor, resource);
+		super(id, resource);
 		this.modelType = modelType;
 	}
 

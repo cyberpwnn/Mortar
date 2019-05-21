@@ -6,6 +6,7 @@ import java.net.URL;
 
 import mortar.api.fulcrum.FulcrumInstance;
 import mortar.api.fulcrum.registry.FCURegisteredObject;
+import mortar.api.fulcrum.util.IResource;
 
 public class CustomResource extends FCURegisteredObject
 {
@@ -20,6 +21,11 @@ public class CustomResource extends FCURegisteredObject
 		{
 			throw new RuntimeException("Cached resource key cannot be null!");
 		}
+	}
+
+	public CustomResource(String id, IResource resource)
+	{
+		this(id, FulcrumInstance.instance.getResources().cacheResource(resource));
 	}
 
 	protected void updateCacheKey(String ncc)
@@ -41,11 +47,6 @@ public class CustomResource extends FCURegisteredObject
 		}
 
 		return null;
-	}
-
-	public CustomResource(String id, Class<?> anchor, String resource)
-	{
-		this(id, FulcrumInstance.instance.getResources().cacheResource(anchor, resource));
 	}
 
 	public InputStream stream()

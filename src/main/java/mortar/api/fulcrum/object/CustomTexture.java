@@ -1,5 +1,6 @@
 package mortar.api.fulcrum.object;
 
+import mortar.api.fulcrum.util.IResource;
 import mortar.api.resourcepack.PackNode;
 import mortar.api.resourcepack.TextureSubSubType;
 import mortar.api.resourcepack.TextureSubType;
@@ -19,9 +20,9 @@ public class CustomTexture extends CustomResource
 		this.subSubType = subSubType;
 	}
 
-	public CustomTexture(String id, Class<?> anchor, String resource, TextureType type, TextureSubType subType, TextureSubSubType subSubType)
+	public CustomTexture(String id, IResource resource, TextureType type, TextureSubType subType, TextureSubSubType subSubType)
 	{
-		super(id, anchor, resource);
+		super(id, resource);
 		this.type = type;
 		this.subType = subType;
 		this.subSubType = subSubType;
@@ -34,9 +35,9 @@ public class CustomTexture extends CustomResource
 		this.subType = subType;
 	}
 
-	public CustomTexture(String id, Class<?> anchor, String resource, TextureType type, TextureSubType subType)
+	public CustomTexture(String id, IResource resource, TextureType type, TextureSubType subType)
 	{
-		super(id, anchor, resource);
+		super(id, resource);
 		this.type = type;
 		this.subType = subType;
 	}
@@ -47,9 +48,9 @@ public class CustomTexture extends CustomResource
 		this.type = type;
 	}
 
-	public CustomTexture(String id, Class<?> anchor, String resource, TextureType type)
+	public CustomTexture(String id, IResource resource, TextureType type)
 	{
-		super(id, anchor, resource);
+		super(id, resource);
 		this.type = type;
 	}
 

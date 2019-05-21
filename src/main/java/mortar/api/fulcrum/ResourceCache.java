@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import mortar.api.fulcrum.util.IResource;
 import mortar.logic.io.VIO;
 
 public class ResourceCache
@@ -143,6 +144,42 @@ public class ResourceCache
 		catch(MalformedURLException e)
 		{
 			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public String cacheResource(IResource r)
+	{
+		String cacheKey = "res/" + r.getVirtualPath();
+		File f = fileFor(cacheKey);
+		f.getParentFile().mkdirs();
+
+		try
+		{
+			InputStream in = r.getInputStream();
+			FileOutputStream fos = new FileOutputStream(f);
+			VIO.fullTransfer(in, fos, 16819);
+			in.close();
+			fos.close();
+		}
+
+		catch(Throwable e)
+		{
+
+		}
+
+		if(f.exists())
+		{
+			try
+			{
+				return cacheKey;
+			}
+
+			catch(Throwable e)
+			{
+
+			}
 		}
 
 		return null;

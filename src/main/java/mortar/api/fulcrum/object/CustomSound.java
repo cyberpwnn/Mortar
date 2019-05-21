@@ -4,6 +4,8 @@ import org.bukkit.SoundCategory;
 
 import mortar.api.fulcrum.FulcrumRegistry;
 import mortar.api.fulcrum.registry.FCURegisteredObject;
+import mortar.api.fulcrum.util.IResource;
+import mortar.api.fulcrum.util.JarResorce;
 import mortar.api.sound.Audible;
 import mortar.api.sound.Audio;
 import mortar.lang.collection.GList;
@@ -33,13 +35,13 @@ public class CustomSound extends FCURegisteredObject
 	{
 		for(int i = from; i <= to; i++)
 		{
-			addSound(id.replaceAll("\\Q$\\E", i + ""), anchor, path.replaceAll("\\Q$\\E", i + ""));
+			addSound(id.replaceAll("\\Q$\\E", i + ""), new JarResorce(anchor, path));
 		}
 	}
 
-	public void addSound(String id, Class<?> anchor, String path)
+	public void addSound(String id, IResource resource)
 	{
-		sounds.add(new CustomVorbis(id, anchor, path));
+		sounds.add(new CustomVorbis(id, resource));
 	}
 
 	public float getDefaultVolume()

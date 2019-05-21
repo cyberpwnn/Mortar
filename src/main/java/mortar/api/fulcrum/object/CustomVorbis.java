@@ -1,5 +1,7 @@
 package mortar.api.fulcrum.object;
 
+import mortar.api.fulcrum.util.IResource;
+
 public class CustomVorbis extends CustomResource
 {
 	public CustomVorbis(String id, String cacheKey)
@@ -7,9 +9,9 @@ public class CustomVorbis extends CustomResource
 		super(id, cacheKey);
 	}
 
-	public CustomVorbis(String id, Class<?> anchor, String resource)
+	public CustomVorbis(String id, IResource resource)
 	{
-		super(id, anchor, resource);
+		super(id, resource);
 	}
 
 	public String toPackPath()

@@ -43,6 +43,7 @@ import mortar.api.fulcrum.util.PlayerCancelledDiggingEvent;
 import mortar.api.fulcrum.util.PlayerFinishedDiggingEvent;
 import mortar.api.fulcrum.util.PlayerStartDiggingEvent;
 import mortar.api.fulcrum.util.PotentialDropList;
+import mortar.api.fulcrum.util.SuperCacheResourceProvider;
 import mortar.api.fulcrum.util.ToolLevel;
 import mortar.api.nms.Catalyst;
 import mortar.api.resourcepack.ResourcePack;
@@ -66,6 +67,7 @@ public class FulcrumInstance implements Listener
 	private DigTracker digTracker;
 	private BlocksScraper blockScraper;
 	private ObfuscationSupplier obfuscationSupplier;
+	private SuperCacheResourceProvider resourceProvider;
 
 	public FulcrumInstance() throws JSONException, IOException
 	{
@@ -740,5 +742,10 @@ public class FulcrumInstance implements Listener
 	public ObfuscationSupplier getObfuscationSupplier()
 	{
 		return obfuscationSupplier;
+	}
+
+	public SuperCacheResourceProvider getResourceProvider()
+	{
+		return resourceProvider;
 	}
 }

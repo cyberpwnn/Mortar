@@ -4,8 +4,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import mortar.api.fulcrum.Fulcrum;
 import mortar.api.fulcrum.FulcrumRegistry;
 import mortar.api.fulcrum.util.DefaultItemModel;
+import mortar.api.fulcrum.util.IResource;
+import mortar.api.fulcrum.util.JarResorce;
 import mortar.api.fulcrum.util.ToolLevel;
 import mortar.api.fulcrum.util.ToolType;
 import mortar.api.resourcepack.ModelType;
@@ -26,7 +29,7 @@ public class CustomItem extends CustomCollective
 	{
 		super(id);
 		textures = new GMap<>();
-		setTexture(id, "assets/textures/items/unknown.png");
+		setTexture(id, new JarResorce(Fulcrum.class, "assets/textures/items/unknown.png"));
 		setModel(DefaultItemModel.ITEM);
 		model.rewrite("$id", id);
 		setName(getFancyNameFromID());
@@ -79,14 +82,14 @@ public class CustomItem extends CustomCollective
 		textures.clear();
 	}
 
-	public void setTexture(String name, String resource)
+	public void setTexture(String name, IResource resource)
 	{
-		textures.put(name, new CustomTexture(name, getClass(), resource, TextureType.ITEMS));
+		textures.put(name, new CustomTexture(name, resource, TextureType.ITEMS));
 	}
 
-	public void setModel(String name, String resource)
+	public void setModel(String name, IResource resource)
 	{
-		model = new CustomModel(name, getClass(), resource, ModelType.ITEM);
+		model = new CustomModel(name, resource, ModelType.ITEM);
 	}
 
 	@Override
@@ -172,11 +175,11 @@ public class CustomItem extends CustomCollective
 
 	public void setModel(DefaultItemModel model)
 	{
-		setModel(model.getPath());
+		setModel(new JarResorce(Fulcrum.class, model.getPath()));
 	}
 
-	public void setModel(String modelResource)
+	public void setModel(IResource modelResource)
 	{
-		setModel(new CustomModel(getID(), getClass(), modelResource, ModelType.ITEM));
+		setModel(new CustomModel(getID(), modelResource, ModelType.ITEM));
 	}
 }
