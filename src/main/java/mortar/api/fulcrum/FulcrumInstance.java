@@ -38,6 +38,7 @@ import mortar.api.fulcrum.util.DigTracker;
 import mortar.api.fulcrum.util.EntityNMS12;
 import mortar.api.fulcrum.util.EntityNMS12.Type;
 import mortar.api.fulcrum.util.IAllocation;
+import mortar.api.fulcrum.util.IResource;
 import mortar.api.fulcrum.util.PlayerBlockEvent;
 import mortar.api.fulcrum.util.PlayerCancelledDiggingEvent;
 import mortar.api.fulcrum.util.PlayerFinishedDiggingEvent;
@@ -82,6 +83,7 @@ public class FulcrumInstance implements Listener
 		packName = UUID.randomUUID().toString();
 		instance = this;
 		resources = new ResourceCache("fcu-" + MortarAPIPlugin.p.getDescription().getVersion());
+		resourceProvider = new SuperCacheResourceProvider(getResources().getBase());
 		pack = new ResourcePack();
 		registry = new FulcrumRegistry();
 		VIO.delete(getResources().fileFor("web"));
@@ -737,6 +739,11 @@ public class FulcrumInstance implements Listener
 		{
 			((Player) e).updateInventory();
 		}
+	}
+
+	public IResource getResource(String path)
+	{
+		return getResourceProvider().get(path);
 	}
 
 	public ObfuscationSupplier getObfuscationSupplier()

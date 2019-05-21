@@ -23,6 +23,7 @@ public class SuperCacheResourceProvider implements IResourceProvider
 
 	public void cacheAllResources()
 	{
+		D.as(this).l("Caching Resources");
 		for(File i : new File("plugins").listFiles())
 		{
 			if(i.isFile() && i.getName().endsWith(".jar"))
@@ -37,7 +38,7 @@ public class SuperCacheResourceProvider implements IResourceProvider
 		if(ZipUtil.containsEntry(jar, "assets"))
 		{
 			ZipUtil.unpack(jar, getResourcesFile());
-			D.as(this).v("Cached Assets from jar " + jar.getName());
+			D.as(this).l("Cached Assets from jar " + jar.getName());
 			for(File i : getResourcesFile().listFiles())
 			{
 				if(!(i.isDirectory() && i.getName().equals("assets")))

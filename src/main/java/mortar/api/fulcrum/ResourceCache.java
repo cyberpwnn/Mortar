@@ -258,4 +258,9 @@ public class ResourceCache
 
 		return null;
 	}
+
+	public File getBase()
+	{
+		return cacheDir;
+	}
 }

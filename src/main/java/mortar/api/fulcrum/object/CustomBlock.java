@@ -11,7 +11,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
 
 import mortar.api.fulcrum.BlockStand12;
-import mortar.api.fulcrum.Fulcrum;
+import mortar.api.fulcrum.FulcrumInstance;
 import mortar.api.fulcrum.FulcrumRegistry;
 import mortar.api.fulcrum.util.BlockCollision;
 import mortar.api.fulcrum.util.BlockHardness;
@@ -19,7 +19,6 @@ import mortar.api.fulcrum.util.BlockSoundCategory;
 import mortar.api.fulcrum.util.DefaultBlockModel;
 import mortar.api.fulcrum.util.IBlock;
 import mortar.api.fulcrum.util.IResource;
-import mortar.api.fulcrum.util.JarResorce;
 import mortar.api.fulcrum.util.PotentialDropList;
 import mortar.api.resourcepack.ModelType;
 import mortar.api.resourcepack.TextureType;
@@ -38,7 +37,7 @@ public class CustomBlock extends CustomItem implements IBlock
 		super(id);
 		sounds = new GMap<>();
 		textures = new GMap<>();
-		setTexture(getID(), new JarResorce(Fulcrum.class, "assets/textures/blocks/unknown.png"));
+		setTexture(getID(), "assets/textures/blocks/unknown.png");
 		setCollisionMode(BlockCollision.FULL);
 		setHardnessLike(Material.STONE);
 		setEffectiveToolLike(Material.STONE);
@@ -48,7 +47,13 @@ public class CustomBlock extends CustomItem implements IBlock
 
 	public void setModel(DefaultBlockModel model)
 	{
-		setModel(new JarResorce(Fulcrum.class, model.getPath()));
+		setModel(model.getPath());
+	}
+
+	@Override
+	public void setModel(String modelResource)
+	{
+		setModel(new CustomModel(getID(), FulcrumInstance.instance.getResource(modelResource), ModelType.BLOCK));
 	}
 
 	@Override

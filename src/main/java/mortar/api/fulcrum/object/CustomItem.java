@@ -4,11 +4,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import mortar.api.fulcrum.Fulcrum;
+import mortar.api.fulcrum.FulcrumInstance;
 import mortar.api.fulcrum.FulcrumRegistry;
 import mortar.api.fulcrum.util.DefaultItemModel;
 import mortar.api.fulcrum.util.IResource;
-import mortar.api.fulcrum.util.JarResorce;
 import mortar.api.fulcrum.util.ToolLevel;
 import mortar.api.fulcrum.util.ToolType;
 import mortar.api.resourcepack.ModelType;
@@ -29,13 +28,18 @@ public class CustomItem extends CustomCollective
 	{
 		super(id);
 		textures = new GMap<>();
-		setTexture(id, new JarResorce(Fulcrum.class, "assets/textures/items/unknown.png"));
+		setTexture(id, "assets/textures/items/unknown.png");
 		setModel(DefaultItemModel.ITEM);
 		model.rewrite("$id", id);
 		setName(getFancyNameFromID());
 		setMaxStackSize(64);
 		setItemToolType(ToolType.HAND);
 		setItemToolLevel(ToolLevel.HAND);
+	}
+
+	public void setTexture(String id, String r)
+	{
+		setTexture(id, FulcrumInstance.instance.getResource(r));
 	}
 
 	public int getItemToolLevel()
@@ -175,7 +179,12 @@ public class CustomItem extends CustomCollective
 
 	public void setModel(DefaultItemModel model)
 	{
-		setModel(new JarResorce(Fulcrum.class, model.getPath()));
+		setModel(model.getPath());
+	}
+
+	public void setModel(String modelResource)
+	{
+		setModel(new CustomModel(getID(), FulcrumInstance.instance.getResource(modelResource), ModelType.ITEM));
 	}
 
 	public void setModel(IResource modelResource)
