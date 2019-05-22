@@ -158,6 +158,7 @@ public class CustomBlock extends CustomItem implements IBlock
 			{
 				if(((ArmorStand) i).getHelmet().getType().equals(toItemStack(1).getType()))
 				{
+					BlockStand12.allowDelete.add(i.getEntityId());
 					i.remove();
 				}
 			}
@@ -173,35 +174,35 @@ public class CustomBlock extends CustomItem implements IBlock
 		entity.pitch = 0;
 		entity.lastPitch = 0;
 		entity.positionChanged = false;
+		ArmorStand a = (ArmorStand) entity.getBukkitEntity();
+		a.setAI(false);
+		a.setGravity(false);
+		a.setBasePlate(false);
+		a.setArms(false);
+		a.setSmall(true);
+		a.setMarker(true);
+		a.setInvulnerable(true);
+		a.setVisible(false);
+		a.setCanPickupItems(false);
+		a.setCollidable(false);
+		a.setRemoveWhenFarAway(false);
+		a.setSilent(true);
+		a.setHelmet(toItemStack(1));
+		entity.world.addEntity(entity, SpawnReason.CUSTOM);
 
-		if(entity.world.addEntity(entity, SpawnReason.CUSTOM))
-		{
-			ArmorStand a = (ArmorStand) entity.getBukkitEntity();
-			a.setAI(false);
-			a.setGravity(false);
-			a.setBasePlate(false);
-			a.setArms(false);
-			a.setSmall(true);
-			a.setMarker(true);
-			a.setInvulnerable(true);
-			a.setVisible(false);
-			a.setCanPickupItems(false);
-			a.setCollidable(false);
-			a.setRemoveWhenFarAway(false);
-			a.setSilent(true);
-			a.setHelmet(toItemStack(1));
+		return a;
+	}
 
-			return a;
-		}
-
-		return null;
+	public ArmorStand replaceAt(Block at)
+	{
+		return constructArmorStand(at);
 	}
 
 	@Override
 	public ArmorStand placeAt(Block at)
 	{
 		ArmorStand as = constructArmorStand(at);
-		
+
 		if(as != null)
 		{
 			if(getCollisionMode().equals(BlockCollision.FULL))

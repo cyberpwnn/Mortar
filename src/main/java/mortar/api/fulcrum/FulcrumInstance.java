@@ -264,6 +264,16 @@ public class FulcrumInstance implements Listener
 		}
 	}
 
+	public boolean canOverwrite(Material m)
+	{
+		if(m.equals(Material.LONG_GRASS) || m.equals(Material.AIR) || m.equals(Material.WATER) || m.equals(Material.STATIONARY_WATER) || m.equals(Material.LAVA) || m.equals(Material.STATIONARY_LAVA) || m.equals(Material.DEAD_BUSH))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void on(PlayerInteractEvent e)
 	{
@@ -285,7 +295,21 @@ public class FulcrumInstance implements Listener
 
 			if(a.isBlock())
 			{
-				if(placeAllocation(a.block(), e.getClickedBlock(), e.getClickedBlock().getWorld().getBlockAt(e.getClickedBlock().getX() + e.getBlockFace().getModX(), e.getClickedBlock().getY() + e.getBlockFace().getModY(), e.getClickedBlock().getZ() + e.getBlockFace().getModZ())))
+				BlockFace f = e.getBlockFace();
+				Block c = e.getClickedBlock();
+				Block at = c.getWorld().getBlockAt(c.getX() + f.getModX(), c.getY() + f.getModY(), c.getZ() + f.getModZ());
+
+				if(!canOverwrite(at.getType()))
+				{
+					return;
+				}
+
+				if(canOverwrite(c.getType()))
+				{
+					at = c;
+				}
+
+				if(placeAllocation(a.block(), at))
 				{
 					if(!e.getPlayer().getGameMode().equals(GameMode.CREATIVE))
 					{
@@ -317,14 +341,9 @@ public class FulcrumInstance implements Listener
 		}
 	}
 
-	private boolean placeAllocation(CustomBlock block, Block clicked, Block at)
+	private boolean placeAllocation(CustomBlock block, Block at)
 	{
 		Block b = at;
-
-		if(!clicked.getType().isSolid())
-		{
-			b = clicked;
-		}
 
 		for(Entity i : b.getWorld().getNearbyEntities(b.getLocation().clone().add(0.5, 0.5, 0.5), 0.25, 0.25, 0.25))
 		{

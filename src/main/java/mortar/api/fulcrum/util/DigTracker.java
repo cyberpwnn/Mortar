@@ -7,6 +7,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 
+import mortar.api.fulcrum.BlockStand12;
 import mortar.api.fulcrum.ContentAssist;
 import mortar.api.fulcrum.FulcrumInstance;
 import mortar.api.fulcrum.object.CustomBlock;
@@ -78,6 +79,7 @@ public class DigTracker
 
 				if(breakStands.containsKey(i))
 				{
+					BlockStand12.allowDelete.add(breakStands.get(i).getEntityId());
 					breakStands.get(i).remove();
 					breakStands.remove(i);
 				}
@@ -126,6 +128,7 @@ public class DigTracker
 
 			else if(breakStands.containsKey(i))
 			{
+				BlockStand12.allowDelete.add(breakStands.get(i).getEntityId());
 				breakStands.get(i).remove();
 				breakStands.remove(i);
 			}
@@ -167,6 +170,7 @@ public class DigTracker
 
 			if(breakStands.containsKey(b))
 			{
+				BlockStand12.allowDelete.add(breakStands.get(b).getEntityId());
 				breakStands.get(b).remove();
 				breakStands.remove(b);
 			}
