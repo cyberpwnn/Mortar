@@ -12,7 +12,6 @@ import mortar.api.fulcrum.FulcrumInstance;
 import mortar.api.fulcrum.object.CustomBlock;
 import mortar.api.nms.Catalyst;
 import mortar.api.sched.J;
-import mortar.api.world.PE;
 import mortar.compute.math.M;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
@@ -23,6 +22,7 @@ public class DigTracker
 {
 	private GMap<Block, Double> speed;
 	private GMap<Block, Double> progress;
+	private GMap<Player, Integer> digDelay;
 	private GMap<Player, Block> digging;
 	private GMap<Block, ArmorStand> breakStands;
 
@@ -32,6 +32,7 @@ public class DigTracker
 		progress = new GMap<>();
 		digging = new GMap<>();
 		breakStands = new GMap<>();
+		digDelay = new GMap<>();
 		J.sr(() -> tick(), 0);
 	}
 
@@ -47,10 +48,47 @@ public class DigTracker
 		return b.getX() + b.getY() + b.getZ();
 	}
 
+	@SuppressWarnings("deprecation")
 	public void tick()
 	{
+		for(Player i : digDelay.k())
+		{
+			if(digDelay.get(i) < 2)
+			{
+				digDelay.remove(i);
+				continue;
+			}
+
+			digDelay.put(i, digDelay.get(i) - 1);
+		}
+
 		for(Block i : progress.k())
 		{
+			Player primaryDigger = null;
+
+			try
+			{
+				primaryDigger = getDigging(i).get(0);
+			}
+
+			catch(Throwable e)
+			{
+				progress.remove(i);
+				speed.remove(i);
+
+				if(breakStands.containsKey(i))
+				{
+					breakStands.get(i).remove();
+					breakStands.remove(i);
+				}
+			}
+
+			if(hasDelay(primaryDigger))
+			{
+				continue;
+			}
+
+			speed.put(i, ToolLevel.getMiningSpeed(primaryDigger, ContentAssist.getBlock(i), primaryDigger.getItemInHand()));
 			double digSpeed = speed.containsKey(i) ? speed.get(i) : 1D / 40D;
 			progress.put(i, progress.get(i) + digSpeed);
 			Player breaker = getDigging(i).get(0);
@@ -97,11 +135,6 @@ public class DigTracker
 		{
 			digging.clear();
 			speed.clear();
-		}
-
-		for(Player i : digging.k())
-		{
-			PE.SLOW_DIGGING.a(-1).d(3).apply(i);
 		}
 	}
 
@@ -170,5 +203,15 @@ public class DigTracker
 	public Block getDigging(Player p)
 	{
 		return digging.get(p);
+	}
+
+	public boolean hasDelay(Player p)
+	{
+		return digDelay.containsKey(p);
+	}
+
+	public void imposeDelay(Player p, int ticks)
+	{
+		digDelay.put(p, ticks);
 	}
 }

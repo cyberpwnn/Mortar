@@ -264,6 +264,28 @@ public class ResourcePack
 
 	public void writeToFolder(File f) throws IOException
 	{
+		getMeta().getProperties().add("uses-zlibcompression");
+
+		if(deduplicate)
+		{
+			getMeta().getProperties().add("uses-deduplication");
+		}
+
+		if(minifyJSON)
+		{
+			getMeta().getProperties().add("uses-minification");
+		}
+
+		if(obfuscate)
+		{
+			getMeta().getProperties().add("uses-obfuscation");
+		}
+
+		if(optimizePngs)
+		{
+			getMeta().getProperties().add("uses-png-opts");
+		}
+
 		f.mkdirs();
 		totalSaved = 0;
 		writePackContent(new File(f, "pack.mcmeta"), getMeta().toString());

@@ -69,14 +69,22 @@
                 <goals>
                   <goal>exec</goal>
                 </goals>
+                <configuration>
+                  <skip>false</skip>
+                  <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/copy.bat</executable>
+                  <arguments>
+                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.51.jar</argument>
+                    <argument>C:\Users\cyberpwn\Documents\development\servers\dynamic\plugins\Mortar.jar</argument>
+                  </arguments>
+                </configuration>
               </execution>
             </executions>
             <configuration>
-              <skip>${skip.copy}</skip>
-              <executable>${project.basedir}/scripts/copy.bat</executable>
+              <skip>false</skip>
+              <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/copy.bat</executable>
               <arguments>
-                <argument>${project.basedir}\target\${project.name}-${project.version}.jar</argument>
-                <argument>${development.location}</argument>
+                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.51.jar</argument>
+                <argument>C:\Users\cyberpwn\Documents\development\servers\dynamic\plugins\Mortar.jar</argument>
               </arguments>
             </configuration>
           </plugin>
@@ -89,7 +97,6 @@
         <plugins>
           <plugin>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -101,32 +108,22 @@
           </plugin>
           <plugin>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>
                 <goals>
                   <goal>jar</goal>
                 </goals>
-                <configuration>
-                  <reportOutputDirectory>C:\Users\cyberpwn\Documents\development\workspace\Mortar/javadoc</reportOutputDirectory>
-                  <destDir>javadoc</destDir>
-                  <additionalJOptions>
-                    <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-Mortar</additionalJOption>
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                  </additionalJOptions>
-                  <stylesheetfile>C:\Users\cyberpwn\Documents\development\workspace\Mortar\stylesheet.css</stylesheetfile>
-                </configuration>
               </execution>
             </executions>
             <configuration>
-              <reportOutputDirectory>C:\Users\cyberpwn\Documents\development\workspace\Mortar/javadoc</reportOutputDirectory>
+              <reportOutputDirectory>${project.basedir}/javadoc</reportOutputDirectory>
               <destDir>javadoc</destDir>
               <additionalJOptions>
-                <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-Mortar</additionalJOption>
-                <additionalparam>-Xdoclint:none</additionalparam>
+                <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-${project.name}</additionalJOption>
+                <additionalparam>${javadoc.opts}</additionalparam>
               </additionalJOptions>
-              <stylesheetfile>C:\Users\cyberpwn\Documents\development\workspace\Mortar\stylesheet.css</stylesheetfile>
+              <stylesheetfile>${project.basedir}\stylesheet.css</stylesheetfile>
             </configuration>
           </plugin>
           <plugin>
@@ -140,26 +137,16 @@
                 <goals>
                   <goal>exec</goal>
                 </goals>
-                <configuration>
-                  <skip>false</skip>
-                  <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/doublecopy.bat</executable>
-                  <arguments>
-                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.51.jar</argument>
-                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\1.0.51\Mortar-1.0.51.jar</argument>
-                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\Mortar.jar</argument>
-                    <argument>1.0.51</argument>
-                  </arguments>
-                </configuration>
               </execution>
             </executions>
             <configuration>
-              <skip>false</skip>
-              <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/doublecopy.bat</executable>
+              <skip>${skip.copy}</skip>
+              <executable>${project.basedir}/scripts/doublecopy.bat</executable>
               <arguments>
-                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.51.jar</argument>
-                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\1.0.51\Mortar-1.0.51.jar</argument>
-                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\Mortar.jar</argument>
-                <argument>1.0.51</argument>
+                <argument>${project.basedir}\target\${project.name}-${project.version}.jar</argument>
+                <argument>${project.basedir}\release\${project.version}\Mortar-${project.version}.jar</argument>
+                <argument>${project.basedir}\release\Mortar.jar</argument>
+                <argument>${project.version}</argument>
               </arguments>
             </configuration>
           </plugin>

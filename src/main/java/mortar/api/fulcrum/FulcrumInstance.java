@@ -53,6 +53,7 @@ import mortar.api.fulcrum.util.PlayerStartDiggingEvent;
 import mortar.api.fulcrum.util.PotentialDropList;
 import mortar.api.fulcrum.util.SuperCacheResourceProvider;
 import mortar.api.fulcrum.util.ToolLevel;
+import mortar.api.fulcrum.util.ToolType;
 import mortar.api.nms.Catalyst;
 import mortar.api.sched.J;
 import mortar.bukkit.plugin.MortarAPIPlugin;
@@ -154,6 +155,7 @@ public class FulcrumInstance implements Listener
 		});
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void on(PlayerStartDiggingEvent e)
 	{
@@ -161,9 +163,18 @@ public class FulcrumInstance implements Listener
 
 		if(fu != null)
 		{
-			@SuppressWarnings("deprecation")
-			ItemStack is = e.getPlayer().getItemInHand();
-			getDigTracker().startedDigging(e.getPlayer(), e.getBlock(), ToolLevel.getMiningSpeed(fu, is));
+			double speed = ToolLevel.getMiningSpeed(e.getPlayer(), fu, e.getPlayer().getItemInHand());
+
+			if((speed / 20D) * 50D > fu.getHardness())
+			{
+				J.s(() -> Bukkit.getPluginManager().callEvent(new BlockBreakEvent(e.getBlock(), e.getPlayer())));
+			}
+
+			else
+			{
+				getDigTracker().startedDigging(e.getPlayer(), e.getBlock(), speed);
+			}
+
 		}
 	}
 
@@ -197,9 +208,39 @@ public class FulcrumInstance implements Listener
 
 		if(f != null)
 		{
+			ItemStack is = e.getPlayer().getItemInHand();
+			boolean shouldDrop = true;
+			int toolLevel = ToolLevel.getToolLevel(is);
+			int minLevel = f.getMinimumToolLevel();
+			boolean instantBreak = false;
+			double speed = ToolLevel.getMiningSpeed(e.getPlayer(), f, is);
+			String toolType = ToolType.getType(is);
+			String blockTool = f.getEffectiveToolType();
+			boolean toolsMatch = toolType.equals(blockTool);
+
+			if((speed / 20D) * 30D > f.getHardness() && toolsMatch)
+			{
+				instantBreak = true;
+			}
+
+			if(toolLevel < minLevel)
+			{
+				shouldDrop = false;
+			}
+
+			if(minLevel > ToolLevel.HAND && !toolsMatch)
+			{
+				shouldDrop = false;
+			}
+
+			if((speed / 20D) * 30D > f.getHardness() && toolsMatch)
+			{
+				instantBreak = true;
+			}
+
 			PotentialDropList pdl = new PotentialDropList();
 
-			if(!e.getPlayer().getGameMode().equals(GameMode.CREATIVE))
+			if(!e.getPlayer().getGameMode().equals(GameMode.CREATIVE) && shouldDrop)
 			{
 				f.getDrops(e.getBlock(), e.getPlayer(), e.getPlayer().getItemInHand(), pdl);
 			}
@@ -208,9 +249,17 @@ public class FulcrumInstance implements Listener
 			f.playSound(e.getBlock(), BlockSoundCategory.BREAK);
 			Location a = e.getBlock().getLocation().clone().add(0.5, 0.5, 0.5);
 
-			for(ItemStack i : pdl.computeDrops())
+			if(shouldDrop)
 			{
-				a.getWorld().dropItemNaturally(a, i);
+				for(ItemStack i : pdl.computeDrops())
+				{
+					a.getWorld().dropItemNaturally(a, i);
+				}
+			}
+
+			if(!e.getPlayer().getGameMode().equals(GameMode.CREATIVE))
+			{
+				getDigTracker().imposeDelay(e.getPlayer(), instantBreak ? 1 : 5);
 			}
 		}
 	}
@@ -357,6 +406,10 @@ public class FulcrumInstance implements Listener
 	private void doRegistry() throws Exception
 	{
 		EntityNMS12.registerEntity("block_stand", Type.ARMOR_STAND, BlockStand12.class);
+		getPack().getMeta().setRevision(UUID.randomUUID().toString().split("-")[1]);
+		getPack().getMeta().setProduction(false);
+		getPack().getMeta().setVendorName("Your Server");
+		getPack().getMeta().setVendorURL("yourserver.net");
 		getRegistry().begin();
 		registerExamples();
 		registerBreakBlocks();
