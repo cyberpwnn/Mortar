@@ -40,6 +40,8 @@ public interface Element
 
 	public Element addLore(String loreLine);
 
+	public ItemStack getItemStack();
+
 	public GList<String> getLore();
 
 	public Element call(ElementEvent event, Element context);
@@ -55,4 +57,6 @@ public interface Element
 	public Element onDraggedInto(Callback<Element> into);
 
 	public Element onOtherDraggedInto(Callback<Element> other);
+
+	public Element setItemStack(ItemStack itemStack);
 }

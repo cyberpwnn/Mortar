@@ -1,7 +1,9 @@
 package mortar.fulcrum;
 
 import mortar.api.fulcrum.FulcrumInstance;
+import mortar.api.fulcrum.object.CustomInventory;
 import mortar.api.fulcrum.object.CustomItem;
+import mortar.api.fulcrum.object.CustomSound;
 import mortar.bukkit.command.MortarCommand;
 import mortar.bukkit.command.MortarSender;
 import mortar.bukkit.plugin.MortarAPIPlugin;
@@ -27,9 +29,9 @@ public class CommandFulcrumGive extends MortarCommand
 		String type = tag.split(":")[0];
 		String id = tag.split(":")[1];
 
-		if(type.equals("item"))
+		if(type.equals("item") || type.equals("block") || type.equals("skin"))
 		{
-			CustomItem item = FulcrumInstance.instance.getRegistry().item().getRegistry(id);
+			CustomItem item = (CustomItem) FulcrumInstance.instance.getRegistry().collective().getRegistry(id);
 
 			if(item != null)
 			{
@@ -40,6 +42,41 @@ public class CommandFulcrumGive extends MortarCommand
 			{
 				sender.sendMessage("Cannot find " + id);
 			}
+		}
+
+		else if(type.equals("inventory"))
+		{
+			CustomInventory inv = FulcrumInstance.instance.getRegistry().inventory().getRegistry(id);
+
+			if(inv != null)
+			{
+				inv.showWindow(sender.player());
+			}
+
+			else
+			{
+				sender.sendMessage("Cannot find " + id);
+			}
+		}
+
+		else if(type.equals("sound"))
+		{
+			CustomSound sound = FulcrumInstance.instance.getRegistry().sound().getRegistry(id);
+
+			if(sound != null)
+			{
+				sound.constructAudible().play(sender.player());
+			}
+
+			else
+			{
+				sender.sendMessage("Cannot find " + id);
+			}
+		}
+
+		else
+		{
+			sender.sendMessage("Try /fu list");
 		}
 
 		return true;

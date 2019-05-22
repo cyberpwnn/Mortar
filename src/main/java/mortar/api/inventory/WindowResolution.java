@@ -4,6 +4,7 @@ import org.bukkit.event.inventory.InventoryType;
 
 public enum WindowResolution
 {
+	W9_H3(9, 3, InventoryType.CHEST),
 	W9_H6(9, 6, InventoryType.CHEST),
 	W5_H1(5, 1, InventoryType.HOPPER),
 	W3_H3(3, 3, InventoryType.DROPPER);

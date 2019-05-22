@@ -14,6 +14,9 @@ public class Fulcrum
 	public static boolean minifyJSON = true;
 
 	@FulcrumParameter
+	public static boolean rebuildOnStartOnly = true;
+
+	@FulcrumParameter
 	public static boolean generateModelNormals = true;
 
 	@FulcrumParameter
@@ -32,7 +35,7 @@ public class Fulcrum
 	public static boolean deduplicate = true;
 
 	@FulcrumParameter
-	public static AllocationStrategy allocationStrategy = AllocationStrategy.SEQUENTIAL;
+	public static AllocationStrategy allocationStrategy = AllocationStrategy.CYCLIC;
 
 	public static final Material SOLID_IDLE = Material.BARRIER;
 

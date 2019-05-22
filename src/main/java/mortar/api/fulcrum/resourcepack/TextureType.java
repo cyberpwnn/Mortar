@@ -14,5 +14,6 @@ public enum TextureType
 	MISC,
 	MODELS,
 	PAINTING,
-	PARTICLE;
+	PARTICLE,
+	INVENTORIES;
 }

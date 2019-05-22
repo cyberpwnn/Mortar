@@ -12,11 +12,13 @@ import mortar.lang.collection.GMap;
 public class AllocationBlock
 {
 	private final GMap<Material, AllocationUnit> allocationUnits;
+	private final GList<Material> allocationOrder;
 	private final AllocationStrategy strat;
 
 	public AllocationBlock(AllocationStrategy stat)
 	{
 		allocationUnits = new GMap<>();
+		allocationOrder = new GList<>();
 		this.strat = stat;
 	}
 
@@ -108,8 +110,10 @@ public class AllocationBlock
 	{
 		if(strat.equals(AllocationStrategy.SEQUENTIAL))
 		{
-			for(AllocationUnit i : allocationUnits.v())
+			for(Material m : allocationOrder)
 			{
+				AllocationUnit i = allocationUnits.get(m);
+
 				if(i.hasNextID())
 				{
 					return i;
@@ -119,7 +123,7 @@ public class AllocationBlock
 
 		else if(strat.equals(AllocationStrategy.CYCLIC))
 		{
-			GList<AllocationUnit> u = allocationUnits.v();
+			GList<AllocationUnit> u = getOrderedAllocationUnits();
 			int m = getAllocated();
 
 			for(int c = m; c < m + allocationUnits.size(); c++)
@@ -136,8 +140,21 @@ public class AllocationBlock
 		throw new RuntimeException("Out of allocation capacity!");
 	}
 
+	private GList<AllocationUnit> getOrderedAllocationUnits()
+	{
+		GList<AllocationUnit> a = new GList<>();
+
+		for(Material i : allocationOrder)
+		{
+			a.add(allocationUnits.get(i));
+		}
+
+		return a;
+	}
+
 	public void add(Material material, String model, String texture, String parent)
 	{
 		allocationUnits.put(material, new AllocationUnit(material, model, texture, parent));
+		allocationOrder.add(material);
 	}
 }

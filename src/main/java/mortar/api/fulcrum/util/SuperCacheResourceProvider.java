@@ -78,6 +78,8 @@ public class SuperCacheResourceProvider implements IResourceProvider
 			return new FileResource(f);
 		}
 
+		D.as(this).f("Unable to locate " + path);
+
 		return null;
 	}
 

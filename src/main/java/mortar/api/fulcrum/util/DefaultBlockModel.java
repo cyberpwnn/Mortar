@@ -17,4 +17,14 @@ public enum DefaultBlockModel
 	{
 		return "/assets/models/block/default_" + name().toLowerCase() + ".json";
 	}
+
+	public String getFulcrumPath()
+	{
+		return "/assets/models/block/fulcrum_" + name().toLowerCase() + ".json";
+	}
+
+	public String getName()
+	{
+		return "fulcrum_" + name().toLowerCase();
+	}
 }

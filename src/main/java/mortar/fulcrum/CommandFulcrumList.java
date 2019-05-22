@@ -1,10 +1,12 @@
 package mortar.fulcrum;
 
 import mortar.api.fulcrum.FulcrumInstance;
-import mortar.api.fulcrum.object.CustomItem;
+import mortar.api.fulcrum.registry.FCURegistrar;
+import mortar.api.fulcrum.registry.Registered;
 import mortar.bukkit.command.MortarCommand;
 import mortar.bukkit.command.MortarSender;
 import mortar.bukkit.plugin.MortarAPIPlugin;
+import mortar.lang.collection.GMap;
 
 public class CommandFulcrumList extends MortarCommand
 {
@@ -17,9 +19,29 @@ public class CommandFulcrumList extends MortarCommand
 	@Override
 	public boolean handle(MortarSender sender, String[] args)
 	{
-		for(CustomItem i : FulcrumInstance.instance.getRegistry().item().getRegistries())
+		GMap<String, FCURegistrar<? extends Registered>> map = FulcrumInstance.instance.getRegistry().getRegistries();
+
+		if(args.length == 0)
 		{
-			sender.sendMessage("item:" + i.getID());
+			for(String i : map.k())
+			{
+				sender.sendMessage(i + " (" + map.get(i).getRegistriesByID().size() + " registered)");
+			}
+
+			return true;
+		}
+
+		String type = args[0].toLowerCase().trim();
+
+		for(String i : map.k())
+		{
+			if(type.equalsIgnoreCase(i))
+			{
+				for(String j : map.get(i).getRegistriesByID().k())
+				{
+					sender.sendMessage(type + ":" + j);
+				}
+			}
 		}
 
 		return true;

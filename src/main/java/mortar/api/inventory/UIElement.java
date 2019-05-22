@@ -26,9 +26,11 @@ public class UIElement implements Element
 	private Callback<Element> eDraggedInto;
 	private Callback<Element> eOtherDraggedInto;
 	private int count;
+	private ItemStack itemStack;
 
 	public UIElement(String id)
 	{
+		itemStack = null;
 		this.id = id;
 		lore = new GList<>();
 		enchanted = false;
@@ -207,6 +209,11 @@ public class UIElement implements Element
 	@Override
 	public ItemStack computeItemStack()
 	{
+		if(getItemStack() != null)
+		{
+			return itemStack;
+		}
+
 		try
 		{
 			ItemStack is = new ItemStack(getMaterial().getMaterial(), getCount(), getEffectiveDurability(), getMaterial().getData());
@@ -257,5 +264,18 @@ public class UIElement implements Element
 			int prog = (int) ((double) getMaterial().getMaterial().getMaxDurability() * (1D - getProgress()));
 			return (short) M.clip(prog, 1, (getMaterial().getMaterial().getMaxDurability() - 1));
 		}
+	}
+
+	@Override
+	public Element setItemStack(ItemStack itemStack)
+	{
+		this.itemStack = itemStack;
+		return this;
+	}
+
+	@Override
+	public ItemStack getItemStack()
+	{
+		return itemStack;
 	}
 }

@@ -476,7 +476,7 @@ public class UIWindow implements Window, Listener
 	{
 		close();
 		this.resolution = resolution;
-		setViewportHeight((int) M.clip(getViewportHeight(), 1, getResolution().getMaxHeight()));
+		setViewportHeight(getResolution().getMaxHeight());
 		return this;
 	}
 

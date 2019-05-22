@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 
@@ -75,6 +76,7 @@ public class MortarAPIPlugin extends MortarPlugin
 	@Override
 	public void start()
 	{
+		justStarted();
 		Configurator.JSON.load(cfg = new MortarConfig(), getDataFile("config.json"));
 		v("Configuration Loaded... Looks like we're in debug mode!");
 		M.initTicking();
@@ -90,6 +92,21 @@ public class MortarAPIPlugin extends MortarPlugin
 		J.sr(() -> M.uptick(), 0);
 		v("Updating & Log Flushing Initiated");
 		startNMS();
+	}
+
+	private void justStarted()
+	{
+		File f = new File("server.properties");
+
+		if(M.ms() - f.lastModified() < TimeUnit.SECONDS.toMillis(30))
+		{
+			Mortar.STARTUP_LOAD = true;
+		}
+
+		else
+		{
+			Mortar.STARTUP_LOAD = false;
+		}
 	}
 
 	public MortarConfig getMortarConfig()

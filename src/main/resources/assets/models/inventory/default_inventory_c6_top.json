@@ -1,0 +1,6 @@
+{
+    "parent": "inventory/fulcrum_inventory_c6_top",
+    "textures": {
+        "texture": "inventories/$id"
+    }
+}

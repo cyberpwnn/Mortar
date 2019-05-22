@@ -28,8 +28,10 @@ public class CommandFulcrum extends MortarCommand
 	@Override
 	public boolean handle(MortarSender sender, String[] args)
 	{
-		sender.sendMessage("/fu compile [-v|-n|-h]");
-		sender.sendMessage("/fu flash [<pack> [player] | list]");
+		sender.sendMessage("/fu list - List registries");
+		sender.sendMessage("/fu give <type>:<id>");
+		sender.sendMessage("/fu compile - Reregister & Compile new Pack");
+		sender.sendMessage("/fu flash - Flash Pack");
 		return true;
 	}
 }

@@ -2,6 +2,7 @@ package mortar.api.fulcrum;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -30,20 +31,22 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.io.Files;
+
 import mortar.api.atests.BlockExampleCased;
 import mortar.api.atests.BlockExampleCauldron;
 import mortar.api.atests.BlockExampleCompanion;
 import mortar.api.atests.BlockExampleCube;
 import mortar.api.atests.BlockExampleFramed;
 import mortar.api.atests.BlockExamplePedestal;
+import mortar.api.atests.InventoryExampleChest;
+import mortar.api.atests.InventoryExampleChestDouble;
 import mortar.api.fulcrum.object.CustomBlock;
 import mortar.api.fulcrum.object.CustomItem;
 import mortar.api.fulcrum.resourcepack.ResourcePack;
 import mortar.api.fulcrum.util.BlockSoundCategory;
 import mortar.api.fulcrum.util.BlocksScraper;
 import mortar.api.fulcrum.util.DigTracker;
-import mortar.api.fulcrum.util.EntityNMS12;
-import mortar.api.fulcrum.util.EntityNMS12.Type;
 import mortar.api.fulcrum.util.IAllocation;
 import mortar.api.fulcrum.util.IResource;
 import mortar.api.fulcrum.util.PlayerBlockEvent;
@@ -56,6 +59,7 @@ import mortar.api.fulcrum.util.ToolLevel;
 import mortar.api.fulcrum.util.ToolType;
 import mortar.api.nms.Catalyst;
 import mortar.api.sched.J;
+import mortar.bukkit.plugin.Mortar;
 import mortar.bukkit.plugin.MortarAPIPlugin;
 import mortar.compute.math.M;
 import mortar.lang.json.JSONException;
@@ -365,7 +369,7 @@ public class FulcrumInstance implements Listener
 
 	public IAllocation getRegistered(String id)
 	{
-		return getRegistry().item().getRegistry(id);
+		return getRegistry().collective().getRegistry(id);
 	}
 
 	public boolean isRegistered(ItemStack itemStack)
@@ -422,37 +426,61 @@ public class FulcrumInstance implements Listener
 		}
 	}
 
+	public void rebuild() throws NoSuchAlgorithmException, IOException
+	{
+		File fc = new File("cache/packcache/pack.zip");
+		File pack = getResources().fileFor("web/" + packName + ".zip");
+		File hashFile = getResources().fileFor("web/" + packName + ".hash");
+		fc.getParentFile().mkdirs();
+		VIO.writeAll(hashFile, Hasher.bytesToHex(getPack().writeToArchive(pack)));
+		Files.copy(pack, fc);
+	}
+
 	private void doRegistry() throws Exception
 	{
-		EntityNMS12.registerEntity("block_stand", Type.ARMOR_STAND, BlockStand12.class);
 		getPack().getMeta().setRevision(UUID.randomUUID().toString().split("-")[1]);
 		getPack().getMeta().setProduction(false);
 		getPack().getMeta().setVendorName("Your Server");
 		getPack().getMeta().setVendorURL("yourserver.net");
+		getPack().getMeta().setPackDescription("Some pack description");
+		getPack().getMeta().setPackFormat(3);
 		getRegistry().begin();
 		registerExamples();
 		registerBreakBlocks();
 		getRegistry().complete();
-		getPack().getMeta().setPackFormat(3);
-		getPack().getMeta().setPackDescription("Some pack description");
+		MortarAPIPlugin.p.registerListener(this);
+		web = new ShittyWebserver(Fulcrum.webServerPort, getResources().fileFor("web"));
+		web.start();
 		getPack().setOptimizePngs(Fulcrum.optimizeImages);
 		getPack().setOverbose(Fulcrum.verbose);
 		getPack().setMinifyJSON(Fulcrum.minifyJSON);
 		getPack().setObfuscate(Fulcrum.obfuscate);
 		getPack().setDeduplicate(Fulcrum.deduplicate);
+		File fc = new File("cache/packcache/pack.zip");
 		File pack = getResources().fileFor("web/" + packName + ".zip");
 		File hashFile = getResources().fileFor("web/" + packName + ".hash");
-		VIO.writeAll(hashFile, Hasher.bytesToHex(getPack().writeToArchive(pack)));
-		MortarAPIPlugin.p.registerListener(this);
-		web = new ShittyWebserver(Fulcrum.webServerPort, getResources().fileFor("web"));
-		web.start();
+		fc.getParentFile().mkdirs();
+		getPack().o("Pack Cached: " + fc.exists() + " " + fc.getAbsolutePath());
+		getPack().o("Just Started: " + Mortar.STARTUP_LOAD);
+
+		if(fc.exists() && !Mortar.STARTUP_LOAD)
+		{
+			Files.copy(fc, pack);
+			getPack().o("Using Cached Resource pack. Use /fu rebuild to force rebuild!");
+		}
+
+		else
+		{
+			VIO.writeAll(hashFile, Hasher.bytesToHex(getPack().writeToArchive(pack)));
+			Files.copy(pack, fc);
+		}
 	}
 
 	private void registerBreakBlocks()
 	{
 		for(int i = 0; i < 10; i++)
 		{
-			getRegistry().item().register(new BlockOverlayBreak(i));
+			getRegistry().block().register(new BlockOverlayBreak(i));
 		}
 	}
 
@@ -460,12 +488,14 @@ public class FulcrumInstance implements Listener
 	{
 		if(Fulcrum.registerExamples)
 		{
-			getRegistry().item().register(new BlockExampleCube());
-			getRegistry().item().register(new BlockExampleFramed());
-			getRegistry().item().register(new BlockExampleCased());
-			getRegistry().item().register(new BlockExampleCompanion());
-			getRegistry().item().register(new BlockExampleCauldron());
-			getRegistry().item().register(new BlockExamplePedestal());
+			getRegistry().block().register(new BlockExampleCube());
+			getRegistry().block().register(new BlockExampleFramed());
+			getRegistry().block().register(new BlockExampleCased());
+			getRegistry().block().register(new BlockExampleCompanion());
+			getRegistry().block().register(new BlockExampleCauldron());
+			getRegistry().block().register(new BlockExamplePedestal());
+			getRegistry().inventory().register(new InventoryExampleChest());
+			getRegistry().inventory().register(new InventoryExampleChestDouble());
 		}
 	}
 

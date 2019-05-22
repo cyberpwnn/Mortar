@@ -26,6 +26,7 @@ import mortar.util.text.TXT;
 public class Mortar
 {
 	public static final int API_VERSION = readAPIVersion();
+	public static boolean STARTUP_LOAD = false;
 
 	public static boolean isMainThread()
 	{
