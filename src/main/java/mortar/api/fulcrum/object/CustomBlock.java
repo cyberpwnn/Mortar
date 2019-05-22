@@ -164,8 +164,7 @@ public class CustomBlock extends CustomItem implements IBlock
 		}
 	}
 
-	@Override
-	public ArmorStand placeAt(Block at)
+	private ArmorStand constructArmorStand(Block at)
 	{
 		Location l = at.getLocation().clone().add(0.5, 0.5, 0.5);
 		BlockStand12 entity = new BlockStand12(((CraftWorld) l.getWorld()).getHandle(), l.getX(), l.getY(), l.getZ());
@@ -192,15 +191,26 @@ public class CustomBlock extends CustomItem implements IBlock
 			a.setSilent(true);
 			a.setHelmet(toItemStack(1));
 
-			if(getCollisionMode().equals(BlockCollision.FULL))
-			{
-				l.getBlock().setType(Material.BARRIER);
-			}
-
 			return a;
 		}
 
 		return null;
+	}
+
+	@Override
+	public ArmorStand placeAt(Block at)
+	{
+		ArmorStand as = constructArmorStand(at);
+		
+		if(as != null)
+		{
+			if(getCollisionMode().equals(BlockCollision.FULL))
+			{
+				at.setType(Material.BARRIER);
+			}
+		}
+
+		return as;
 	}
 
 	@Override
