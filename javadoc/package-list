@@ -14,6 +14,7 @@ mortar.api.rift
 mortar.api.sched
 mortar.api.scm
 mortar.api.sound
+mortar.api.sparse
 mortar.api.sql
 mortar.api.world
 mortar.bukkit.command
