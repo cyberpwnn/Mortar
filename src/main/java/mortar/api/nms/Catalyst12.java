@@ -106,6 +106,7 @@ public class Catalyst12 extends CatalystPacketListener implements CatalystHost
 	public void relight(Chunk c)
 	{
 		((CraftChunk) c).getHandle().initLighting();
+		((CraftChunk) c).getHandle().markDirty();
 	}
 
 	// START PACKETS
@@ -965,7 +966,7 @@ public class Catalyst12 extends CatalystPacketListener implements CatalystHost
 		}
 
 		IBlockData data = s.getType(xx & 15, yy & 15, zz & 15);
-		return new MaterialBlock(Block.getId(data.getBlock()), (byte) data.getBlock().toLegacyData(data) << 12);
+		return new MaterialBlock(Block.getId(data.getBlock()), (byte) data.getBlock().toLegacyData(data));
 	}
 
 	@Override

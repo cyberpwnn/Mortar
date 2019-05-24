@@ -112,7 +112,7 @@ public class FulcrumInstance implements Listener
 		packName = UUID.randomUUID().toString();
 		instance = this;
 		resources = new ResourceCache("fcu-" + MortarAPIPlugin.p.getDescription().getVersion());
-		resourceProvider = new SuperCacheResourceProvider(getResources().getBase());
+		resourceProvider = new SuperCacheResourceProvider(new File(getResources().getBase(), "resources"));
 		pack = new ResourcePack();
 		registry = new FulcrumRegistry();
 		VIO.delete(getResources().fileFor("web"));
