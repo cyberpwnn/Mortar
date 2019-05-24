@@ -11,7 +11,7 @@ public class Fulcrum
 	public static int webServerPort = 25541;
 
 	@FulcrumParameter
-	public static boolean minifyJSON = true;
+	public static boolean minifyJSON = false;
 
 	@FulcrumParameter
 	public static boolean rebuildOnStartOnly = true;
@@ -20,7 +20,7 @@ public class Fulcrum
 	public static boolean generateModelNormals = true;
 
 	@FulcrumParameter
-	public static boolean optimizeImages = true;
+	public static boolean optimizeImages = false;
 
 	@FulcrumParameter
 	public static boolean obfuscate = false;
@@ -32,7 +32,10 @@ public class Fulcrum
 	public static boolean registerExamples = true;
 
 	@FulcrumParameter
-	public static boolean deduplicate = true;
+	public static boolean deduplicate = false;
+
+	@FulcrumParameter
+	public static boolean filterSparseData = true;
 
 	@FulcrumParameter
 	public static AllocationStrategy allocationStrategy = AllocationStrategy.CYCLIC;

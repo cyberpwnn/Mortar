@@ -9,9 +9,11 @@ import mortar.api.fulcrum.FulcrumRegistry;
 import mortar.api.fulcrum.resourcepack.ModelType;
 import mortar.api.fulcrum.resourcepack.TextureType;
 import mortar.api.fulcrum.util.DefaultItemModel;
+import mortar.api.fulcrum.util.FCUID;
 import mortar.api.fulcrum.util.IResource;
 import mortar.api.fulcrum.util.ToolLevel;
 import mortar.api.fulcrum.util.ToolType;
+import mortar.api.sparse.SparseProperties;
 import mortar.lang.collection.GMap;
 import mortar.logic.format.F;
 
@@ -72,6 +74,7 @@ public class CustomItem extends CustomCollective
 		im.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		im.setLocalizedName(getLocalizedName());
 		is.setItemMeta(im);
+		SparseProperties.from(is).set("fcuid", new FCUID(getID())).toItem(is);
 
 		return is;
 	}

@@ -3,14 +3,24 @@ package mortar.api.fulcrum;
 import java.io.File;
 import java.io.IOException;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+
 import mortar.api.fulcrum.util.EntityNMS12;
 import mortar.api.fulcrum.util.EntityNMS12.Type;
+import mortar.api.sched.AR;
 import mortar.api.sched.J;
 import mortar.bukkit.plugin.Controller;
 import mortar.lang.json.JSONException;
 
 public class FulcrumController extends Controller
 {
+	private boolean active;
+
 	@Override
 	public void start()
 	{
@@ -32,6 +42,40 @@ public class FulcrumController extends Controller
 					e.printStackTrace();
 				}
 			});
+
+			new AR(20)
+			{
+				@Override
+				public void run()
+				{
+					if(FulcrumInstance.ready)
+					{
+						cancel();
+						J.s(() -> dump());
+					}
+				}
+			};
+		}
+	}
+
+	private void dump()
+	{
+		if(!active || !FulcrumInstance.ready)
+		{
+			return;
+		}
+
+		for(Player i : Bukkit.getOnlinePlayers())
+		{
+			FulcrumInstance.instance.on(new PlayerJoinEvent(i, "this isnt real!"));
+		}
+
+		for(World i : Bukkit.getWorlds())
+		{
+			for(Chunk j : i.getLoadedChunks())
+			{
+				FulcrumInstance.instance.on(new ChunkLoadEvent(j, false));
+			}
 		}
 	}
 

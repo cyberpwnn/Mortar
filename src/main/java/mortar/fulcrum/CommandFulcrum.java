@@ -19,6 +19,9 @@ public class CommandFulcrum extends MortarCommand
 	@Command
 	private CommandFulcrumList list;
 
+	@Command
+	private CommandFulcrumSparse sparse;
+
 	public CommandFulcrum()
 	{
 		super("fulcrum", "fu");
@@ -28,6 +31,7 @@ public class CommandFulcrum extends MortarCommand
 	@Override
 	public boolean handle(MortarSender sender, String[] args)
 	{
+		sender.sendMessage("/fu sparse - List sparse entries on item.");
 		sender.sendMessage("/fu list - List registries");
 		sender.sendMessage("/fu give <type>:<id>");
 		sender.sendMessage("/fu compile - Reregister & Compile new Pack");

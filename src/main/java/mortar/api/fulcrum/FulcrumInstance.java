@@ -3,16 +3,22 @@ package mortar.api.fulcrum;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,10 +32,14 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.google.common.io.Files;
 
@@ -62,16 +72,23 @@ import mortar.api.sched.J;
 import mortar.bukkit.plugin.Mortar;
 import mortar.bukkit.plugin.MortarAPIPlugin;
 import mortar.compute.math.M;
+import mortar.lang.collection.GList;
+import mortar.lang.collection.GSet;
 import mortar.lang.json.JSONException;
 import mortar.logic.io.Hasher;
 import mortar.logic.io.VIO;
+import mortar.util.reflection.V;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
 import net.minecraft.server.v1_12_R1.PacketPlayOutCollect;
+import net.minecraft.server.v1_12_R1.PacketPlayOutSetSlot;
+import net.minecraft.server.v1_12_R1.PacketPlayOutWindowItems;
 
 public class FulcrumInstance implements Listener
 {
+	public static boolean ready = false;
 	public static String packName;
 	public static FulcrumInstance instance;
+	private GSet<Long> checkedChunks;
 	private ResourceCache resources;
 	private ResourcePack pack;
 	private FulcrumRegistry registry;
@@ -83,6 +100,7 @@ public class FulcrumInstance implements Listener
 
 	public FulcrumInstance() throws JSONException, IOException
 	{
+		ready = false;
 		if(instance != null)
 		{
 			MortarAPIPlugin.p.unregisterListener(this);
@@ -99,64 +117,193 @@ public class FulcrumInstance implements Listener
 		registry = new FulcrumRegistry();
 		VIO.delete(getResources().fileFor("web"));
 
+		Catalyst.host.addOutgoingListener(PacketPlayOutSetSlot.class, (sender, q) ->
+		{
+			if(Fulcrum.filterSparseData && q instanceof PacketPlayOutSetSlot)
+			{
+				PacketPlayOutSetSlot packet = (PacketPlayOutSetSlot) q;
+				new V(packet).set("c", filter((net.minecraft.server.v1_12_R1.ItemStack) new V(packet).get("c")));
+				return packet;
+			}
+
+			return q;
+		});
+
+		Catalyst.host.addOutgoingListener(PacketPlayOutWindowItems.class, (sender, q) ->
+		{
+			if(Fulcrum.filterSparseData && q instanceof PacketPlayOutWindowItems)
+			{
+				PacketPlayOutWindowItems packet = (PacketPlayOutWindowItems) q;
+
+				List<net.minecraft.server.v1_12_R1.ItemStack> nmsItems = new V(packet).get("b");
+				List<net.minecraft.server.v1_12_R1.ItemStack> fill = new GList<>();
+
+				for(net.minecraft.server.v1_12_R1.ItemStack is : new GList<>(nmsItems))
+				{
+					fill.add(filter(is));
+				}
+
+				new V(packet).set("b", fill);
+				return packet;
+			}
+
+			return q;
+		});
+
 		Catalyst.host.addIncomingListener("PacketPlayInBlockDig", (sender, packet) ->
 		{
-			PlayerBlockEvent ex = null;
-
 			if(packet instanceof PacketPlayInBlockDig)
 			{
 				PacketPlayInBlockDig dig = ((PacketPlayInBlockDig) packet);
 				Location l = new Location(sender.getWorld(), dig.a().getX(), dig.a().getY(), dig.a().getZ());
-				Block b = l.getBlock();
-				BlockFace f = null;
 
-				switch(dig.b())
+				J.s(() ->
 				{
-					case DOWN:
-						f = BlockFace.DOWN;
-						break;
-					case EAST:
-						f = BlockFace.EAST;
-						break;
-					case NORTH:
-						f = BlockFace.NORTH;
-						break;
-					case SOUTH:
-						f = BlockFace.SOUTH;
-						break;
-					case UP:
-						f = BlockFace.UP;
-						break;
-					case WEST:
-						f = BlockFace.WEST;
-						break;
-					default:
-						break;
+					Block b = l.getBlock();
+					PlayerBlockEvent ex = null;
+					BlockFace f = null;
+
+					switch(dig.b())
+					{
+						case DOWN:
+							f = BlockFace.DOWN;
+							break;
+						case EAST:
+							f = BlockFace.EAST;
+							break;
+						case NORTH:
+							f = BlockFace.NORTH;
+							break;
+						case SOUTH:
+							f = BlockFace.SOUTH;
+							break;
+						case UP:
+							f = BlockFace.UP;
+							break;
+						case WEST:
+							f = BlockFace.WEST;
+							break;
+						default:
+							break;
+					}
+
+					switch(dig.c())
+					{
+						case ABORT_DESTROY_BLOCK:
+							ex = new PlayerCancelledDiggingEvent(sender, b, f);
+							break;
+						case START_DESTROY_BLOCK:
+							ex = new PlayerStartDiggingEvent(sender, b, f);
+							break;
+						case STOP_DESTROY_BLOCK:
+							ex = new PlayerFinishedDiggingEvent(sender, b, f);
+							break;
+						default:
+							break;
+					}
+
+					if(ex != null)
+					{
+						Bukkit.getPluginManager().callEvent(ex);
+					}
+				});
+			}
+
+			return packet;
+		});
+	}
+
+	@EventHandler
+	public void on(PlayerJoinEvent e)
+	{
+		J.s(() ->
+		{
+			ContentAssist.validate(e.getPlayer().getInventory());
+			e.getPlayer().updateInventory();
+		}, M.rand(1, 20));
+	}
+
+	@EventHandler
+	public void on(ChunkLoadEvent e)
+	{
+		J.s(() -> check(e.getChunk()), M.rand(1, 20));
+	}
+
+	public void check(Chunk c)
+	{
+		long id = getChunkID(c);
+
+		if(checkedChunks == null)
+		{
+			checkedChunks = new GSet<Long>();
+		}
+
+		if(!checkedChunks.contains(id))
+		{
+			checkedChunks.add(id);
+
+			for(Entity i : c.getEntities())
+			{
+				if(i instanceof Item)
+				{
+					ContentAssist.validate((Item) i);
 				}
 
-				switch(dig.c())
+				else if(i instanceof ArmorStand)
 				{
-					case ABORT_DESTROY_BLOCK:
-						ex = new PlayerCancelledDiggingEvent(sender, b, f);
-						break;
-					case START_DESTROY_BLOCK:
-						ex = new PlayerStartDiggingEvent(sender, b, f);
-						break;
-					case STOP_DESTROY_BLOCK:
-						ex = new PlayerFinishedDiggingEvent(sender, b, f);
-						break;
-					default:
-						break;
-				}
-
-				if(ex != null)
-				{
-					Bukkit.getPluginManager().callEvent(ex);
+					ContentAssist.validate((ArmorStand) i);
 				}
 			}
 
-			return ex != null ? ex.isCancelled() ? null : packet : packet;
-		});
+			for(BlockState i : c.getTileEntities())
+			{
+				if(i instanceof InventoryHolder)
+				{
+					ContentAssist.validate(((InventoryHolder) i).getInventory());
+				}
+			}
+		}
+	}
+
+	private long getChunkID(Chunk c)
+	{
+		return (((long) c.getX()) << 32) | (c.getZ() & 0xffffffffL);
+	}
+
+	private net.minecraft.server.v1_12_R1.ItemStack filter(net.minecraft.server.v1_12_R1.ItemStack is)
+	{
+		return CraftItemStack.asNMSCopy(filter(CraftItemStack.asBukkitCopy(is)));
+	}
+
+	private ItemStack filter(ItemStack is)
+	{
+		try
+		{
+			ItemMeta im = is.getItemMeta();
+
+			if(im.hasLore())
+			{
+				GList<String> lore = new GList<String>(im.getLore());
+
+				for(String i : lore.copy())
+				{
+					if(i.startsWith("sparse://"))
+					{
+						lore.remove(i);
+					}
+				}
+
+				im.setLore(lore);
+				is.setItemMeta(im);
+			}
+		}
+
+		catch(Throwable e)
+		{
+
+		}
+
+		return is;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -474,6 +621,8 @@ public class FulcrumInstance implements Listener
 			VIO.writeAll(hashFile, Hasher.bytesToHex(getPack().writeToArchive(pack)));
 			Files.copy(pack, fc);
 		}
+
+		ready = true;
 	}
 
 	private void registerBreakBlocks()

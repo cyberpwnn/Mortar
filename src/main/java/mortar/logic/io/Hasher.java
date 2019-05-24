@@ -1,5 +1,7 @@
 package mortar.logic.io;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,8 +10,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.UUID;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
+import mortar.api.sql.CustomOutputStream;
 import mortar.compute.math.M;
 
 public class Hasher
@@ -92,5 +98,27 @@ public class Hasher
 		}
 
 		return null;
+	}
+
+	public static String decompress(String gz) throws IOException
+	{
+		ByteArrayInputStream bin = new ByteArrayInputStream(Base64.getDecoder().decode(gz));
+		GZIPInputStream gzi = new GZIPInputStream(bin);
+		ByteArrayOutputStream boas = new ByteArrayOutputStream();
+		VIO.fullTransfer(gzi, boas, 256);
+		gzi.close();
+
+		return new String(boas.toByteArray(), StandardCharsets.UTF_8);
+	}
+
+	public static String compress(String text) throws IOException
+	{
+		ByteArrayOutputStream boas = new ByteArrayOutputStream();
+		GZIPOutputStream gzo = new CustomOutputStream(boas, 9);
+		gzo.write(text.getBytes(StandardCharsets.UTF_8));
+		gzo.flush();
+		gzo.close();
+
+		return Base64.getEncoder().encodeToString(boas.toByteArray());
 	}
 }
