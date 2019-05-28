@@ -7,6 +7,7 @@ import mortar.lang.collection.GList;
 import mortar.lang.json.JSONArray;
 import mortar.lang.json.JSONObject;
 import mortar.logic.io.VIO;
+import mortar.util.text.D;
 
 public class WrappedJSONConfiguration implements ConfigWrapper
 {
@@ -46,6 +47,7 @@ public class WrappedJSONConfiguration implements ConfigWrapper
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void set(String key, Object oo)
 	{
@@ -59,6 +61,19 @@ public class WrappedJSONConfiguration implements ConfigWrapper
 		else
 		{
 			o = oo;
+		}
+
+		if(o instanceof GList)
+		{
+			try
+			{
+				o = ((GList<String>) o).toJSONStringArray();
+			}
+
+			catch(Throwable e)
+			{
+				D.as("ID10T Advisor").w("GLists in Object-Configs only support String Lists for json providers.");
+			}
 		}
 
 		if(!key.contains("."))
