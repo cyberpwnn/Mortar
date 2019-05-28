@@ -300,6 +300,5 @@ public abstract class DL
 		protected void closeStream() throws IOException {
 			in.close();
 		}
-		
 	}
 }

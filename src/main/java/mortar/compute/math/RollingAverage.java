@@ -10,10 +10,10 @@ import java.util.Arrays;
  */
 public class RollingAverage
 {
-	private double[] data;
-	private double average;
-	private boolean dirty;
-	private int currentIndex;
+	protected Double[] data;
+	protected double average;
+	protected boolean dirty;
+	protected int currentIndex;
 
 	/**
 	 * Create a rolling average
@@ -23,7 +23,8 @@ public class RollingAverage
 	 */
 	public RollingAverage(int size)
 	{
-		data = new double[size];
+		data = new Double[size];
+		put(0);
 	}
 
 	/**
@@ -55,16 +56,26 @@ public class RollingAverage
 		return average;
 	}
 
-	private double computeAverage()
+	protected double computeAverage()
 	{
-		double a = 0;
-
-		for(int i = 0; i < data.length; i++)
+		try
 		{
-			a += data[i];
+			double a = 0;
+
+			for(int i = 0; i < data.length; i++)
+			{
+				a += data[i];
+			}
+
+			return a / data.length;
 		}
 
-		return a / data.length;
+		catch(Throwable e)
+		{
+
+		}
+
+		return 0;
 	}
 
 	/**

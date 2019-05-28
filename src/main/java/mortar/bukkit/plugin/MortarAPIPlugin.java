@@ -19,6 +19,7 @@ import mortar.api.nms.NMP;
 import mortar.api.sched.J;
 import mortar.api.scm.CommandSCM;
 import mortar.api.scm.SCMController;
+import mortar.api.tetris.JobScheduler;
 import mortar.bukkit.command.Command;
 import mortar.bukkit.command.MortarSender;
 import mortar.bukkit.command.Permission;
@@ -90,6 +91,8 @@ public class MortarAPIPlugin extends MortarPlugin
 		J.sr(() -> flushLogBuffer(), 10);
 		J.ar(() -> M.uptickAsync(), 0);
 		J.sr(() -> M.uptick(), 0);
+		J.ar(() -> JobScheduler.scheduler.tick(), 0);
+		J.sr(() -> JobScheduler.scheduler.tock(), 0);
 		v("Updating & Log Flushing Initiated");
 		startNMS();
 	}
@@ -145,6 +148,7 @@ public class MortarAPIPlugin extends MortarPlugin
 	{
 		stopNMS();
 		flushLogBuffer();
+		JobScheduler.scheduler.completeNow();
 	}
 
 	private void stopNMS()
