@@ -20,7 +20,8 @@ public class Configurator
 {
 	public static final Configurator JSON = new Configurator(WrappedJSONConfiguration.class);
 	public static final Configurator BUKKIT = Platform.isBukkit() ? new Configurator(WrappedBukkitFileConfiguration.class) : null;
-	public static Configurator DEFAULT = BUKKIT != null ? BUKKIT : JSON;
+	public static final Configurator BUNGEECORD = Platform.isBungeecord() ? new Configurator(WrappedBungeecordFileConfiguration.class) : null;
+	public static Configurator DEFAULT = BUKKIT != null ? BUKKIT : BUNGEECORD != null ? BUNGEECORD : JSON;
 
 	private final Class<? extends ConfigWrapper> cfg;
 
