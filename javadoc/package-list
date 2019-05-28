@@ -16,6 +16,7 @@ mortar.api.scm
 mortar.api.sound
 mortar.api.sparse
 mortar.api.sql
+mortar.api.tetris
 mortar.api.world
 mortar.bukkit.command
 mortar.bukkit.lace
