@@ -2,6 +2,7 @@ package mortar.api.inventory;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -220,6 +221,7 @@ public class UIElement implements Element
 			ItemMeta im = is.getItemMeta();
 			im.setDisplayName(getName());
 			im.setLore(getLore().copy());
+			im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
 			if(isEnchanted())
 			{

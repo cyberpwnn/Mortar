@@ -24,7 +24,7 @@ public class RollingAverage
 	public RollingAverage(int size)
 	{
 		data = new Double[size];
-		put(0);
+		put(0D);
 	}
 
 	/**

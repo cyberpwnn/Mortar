@@ -65,8 +65,22 @@ public class UniversalParser
 		{
 			fields.add(i);
 		}
+		Object m = null;
+		try
+		{
+			m = type.getConstructor().newInstance();
+		}
 
-		Object m = type.getConstructor().newInstance();
+		catch(Throwable e)
+		{
+			System.out.println("ERROR CANNOT FIND DEFAULT CONSTRUCTOR FOR CLASS " + type.getCanonicalName());
+			e.printStackTrace();
+		}
+
+		if(m == null)
+		{
+			return null;
+		}
 
 		for(String i : o.keySet())
 		{
