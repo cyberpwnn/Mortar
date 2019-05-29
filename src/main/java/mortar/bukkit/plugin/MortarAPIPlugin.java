@@ -16,6 +16,7 @@ import mortar.api.config.Configurator;
 import mortar.api.fulcrum.FulcrumController;
 import mortar.api.nms.Catalyst;
 import mortar.api.nms.NMP;
+import mortar.api.pluginmessage.PluginMessageController;
 import mortar.api.sched.J;
 import mortar.api.scm.CommandSCM;
 import mortar.api.scm.SCMController;
@@ -67,6 +68,9 @@ public class MortarAPIPlugin extends MortarPlugin
 
 	@Control
 	private FulcrumController fulcrumController;
+
+	@Control
+	private PluginMessageController pluginMessageController;
 
 	@Control
 	private SCMController scmController;

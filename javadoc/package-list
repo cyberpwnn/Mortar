@@ -10,6 +10,7 @@ mortar.api.generator
 mortar.api.inventory
 mortar.api.nms
 mortar.api.particle
+mortar.api.pluginmessage
 mortar.api.rift
 mortar.api.sched
 mortar.api.scm
