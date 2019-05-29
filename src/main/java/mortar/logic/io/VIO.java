@@ -386,6 +386,16 @@ public class VIO
 
 	public static void writeAll(File f, Object c) throws IOException
 	{
+		try
+		{
+			f.getParentFile().mkdirs();
+		}
+
+		catch(Throwable e)
+		{
+
+		}
+
 		PrintWriter pw = new PrintWriter(new FileWriter(f));
 		pw.println(c.toString());
 		pw.close();

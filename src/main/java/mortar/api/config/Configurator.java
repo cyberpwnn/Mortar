@@ -20,8 +20,7 @@ public class Configurator
 {
 	public static final Configurator JSON = new Configurator(WrappedJSONConfiguration.class);
 	public static final Configurator BUKKIT = Platform.isBukkit() ? new Configurator(WrappedBukkitFileConfiguration.class) : null;
-	public static final Configurator BUNGEECORD = Platform.isBungeecord() ? new Configurator(WrappedBungeecordFileConfiguration.class) : null;
-	public static Configurator DEFAULT = BUKKIT != null ? BUKKIT : BUNGEECORD != null ? BUNGEECORD : JSON;
+	public static Configurator DEFAULT = BUKKIT != null ? BUKKIT : JSON;
 
 	private final Class<? extends ConfigWrapper> cfg;
 
@@ -173,7 +172,7 @@ public class Configurator
 
 					catch(Throwable e)
 					{
-
+						e.printStackTrace();
 					}
 				}
 
@@ -186,13 +185,13 @@ public class Configurator
 
 					catch(Throwable e)
 					{
-
+						e.printStackTrace();
 					}
 				}
 
 				else
 				{
-
+					System.out.println("Else?");
 				}
 			}
 		}

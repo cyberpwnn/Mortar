@@ -105,7 +105,14 @@ public class WrappedJSONConfiguration implements ConfigWrapper
 	{
 		if(!key.contains("."))
 		{
-			return wrapped.get(key);
+			Object o = wrapped.get(key);
+
+			if(o instanceof JSONArray)
+			{
+				o = GList.fromJSONAny((JSONArray) o);
+			}
+
+			return o;
 		}
 
 		else
