@@ -16,7 +16,6 @@ import mortar.api.config.Configurator;
 import mortar.api.fulcrum.FulcrumController;
 import mortar.api.nms.Catalyst;
 import mortar.api.nms.NMP;
-import mortar.api.pluginmessage.PluginMessageController;
 import mortar.api.sched.J;
 import mortar.api.scm.CommandSCM;
 import mortar.api.scm.SCMController;
@@ -70,9 +69,6 @@ public class MortarAPIPlugin extends MortarPlugin
 	private FulcrumController fulcrumController;
 
 	@Control
-	private PluginMessageController pluginMessageController;
-
-	@Control
 	private SCMController scmController;
 
 	private static Queue<String> logQueue;
@@ -99,6 +95,7 @@ public class MortarAPIPlugin extends MortarPlugin
 		J.sr(() -> JobScheduler.scheduler.tock(), 0);
 		v("Updating & Log Flushing Initiated");
 		startNMS();
+		Bukkit.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 	}
 
 	private void justStarted()

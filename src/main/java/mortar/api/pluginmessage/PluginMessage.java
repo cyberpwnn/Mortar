@@ -24,6 +24,12 @@ public class PluginMessage
 		return this;
 	}
 
+	@Override
+	public String toString()
+	{
+		return data.toString();
+	}
+
 	public PluginMessage send(Player... ps)
 	{
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
