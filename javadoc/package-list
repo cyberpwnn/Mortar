@@ -20,6 +20,7 @@ mortar.api.sql
 mortar.api.tetris
 mortar.api.world
 mortar.bukkit.command
+mortar.bukkit.data
 mortar.bukkit.lace
 mortar.bukkit.plugin
 mortar.compute.math
