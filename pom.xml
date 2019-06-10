@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.volmit</groupId>
 	<artifactId>Mortar</artifactId>
-	<version>1.0.61</version>
+	<version>1.0.64</version>
 	<name>Mortar</name>
 	<description>That crap between the bricks</description>
 	<developers>
@@ -322,7 +322,7 @@
 			<artifactId>pngtastic</artifactId>
 			<version>1.5</version>
 		</dependency>
-				<dependency>
+		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
 			<version>9.4.8.v20171121</version>
@@ -336,6 +336,11 @@
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-util</artifactId>
 			<version>9.4.8.v20171121</version>
+		</dependency>
+		<dependency>
+			<groupId>d4j</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>2.1.1</version>
 		</dependency>
 	</dependencies>
 	<distributionManagement>
