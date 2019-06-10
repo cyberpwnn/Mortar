@@ -78,7 +78,6 @@ public class Tome
 		int currentLine = 0;
 		int maxLines = 11;
 		int maxCharacters = 25;
-		int sectionCount = 0;
 		meta.setDisplayName(getRoot().getName());
 		meta.setAuthor(getRoot().getAuthor());
 		meta.setGeneration(Generation.TATTERED);
@@ -89,7 +88,6 @@ public class Tome
 		{
 			if(a instanceof TomeSection)
 			{
-				sectionCount++;
 				TomeSection section = (TomeSection) a;
 				tables.add(section.getSectionName());
 
