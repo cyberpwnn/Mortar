@@ -1,0 +1,39 @@
+<?xml version = "1.0"?>
+<book name = "The Tales of Books" author = "Mortar" volume = "II", id = "talesofbooks2">
+	<section name = "Section I">
+		<header>Fancy Text for Headers</header>
+		<p>This is Basic Text. This text is indented and seperates from other text. Paragraphs are great for describing large amounts of text.</p>
+		<p><f color="red">Red</f> and <f color="green">Green</f> paragraph in a single line.</p>
+		<p><f color="red" format="bold">Bolded Red</f></p>
+		<p><f color="red" format="bold" click="run /some command">Bolded Red</f></p>
+		<p><f format="underline" click="run /some command">Underlined Clickable Command</f></p>
+		<p><f format="underline" click="suggest /some command">Underlined Clickable Suggest Command</f></p>
+		<p><f format="underline" click="goto anchor3">Underlined Clickable GOTO</f></p>
+		<p><f format="underline" click="url https://google.com/">Underlined URL Click</f></p>
+		<p><f format="underline" click="open screenshots/123-345-567.png">Underlined Open File</f></p>
+		<p><f color="red" format="bold">
+				<hover>
+					<header>Fancy Text for Headers</header>
+					<p><f color="blue">Paragraphs</f></p>
+					<ul>
+						<p>Un-Ordered List Item 1</p>
+						<p>Un-Ordered List Item 2</p>
+						<p>Un-Ordered List Item 3</p>
+					</ul>
+				</hover>Bolded Red with hover text</f></p>
+		<ul>
+			<p>Un-Ordered List Item 1</p>
+			<p>Un-Ordered List Item 2</p>
+			<p>Un-Ordered List Item 3</p>
+		</ul>
+		<anchor name="anchor3"/>
+		<ol>
+			<p>Ordered List Item 1</p>
+			<p>Ordered List Item 2</p>
+			<p>Ordered List Item 3</p>
+		</ol>
+	</section>
+	<section name = "Section II">
+		<p>Another section</p>
+	</section>
+</book>
