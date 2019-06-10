@@ -56,7 +56,12 @@ public class BlocksScraper
 
 	public int getMinimumLevel(Block b)
 	{
-		return blockMinimums.containsKey(b.getType()) ? blockMinimums.get(b.getType()) : 0;
+		return getMinimumLevel(b.getType());
+	}
+
+	public int getMinimumLevel(Material m)
+	{
+		return blockMinimums.containsKey(m) ? blockMinimums.get(m) : 0;
 	}
 
 	public String getEffectiveTool(Block b)
