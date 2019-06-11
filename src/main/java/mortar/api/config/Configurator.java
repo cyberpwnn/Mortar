@@ -137,6 +137,11 @@ public class Configurator
 
 		for(Field i : c.getDeclaredFields())
 		{
+			if(i.isAnnotationPresent(Ignore.class))
+			{
+				continue;
+			}
+
 			i.setAccessible(true);
 
 			if(i.isAnnotationPresent(Key.class))
@@ -148,6 +153,11 @@ public class Configurator
 
 		for(Field i : c.getDeclaredFields())
 		{
+			if(i.isAnnotationPresent(Ignore.class))
+			{
+				continue;
+			}
+
 			i.setAccessible(true);
 
 			if((explicit && i.isAnnotationPresent(Key.class)) || !explicit)
@@ -244,6 +254,11 @@ public class Configurator
 
 		for(Field i : c.getDeclaredFields())
 		{
+			if(i.isAnnotationPresent(Ignore.class))
+			{
+				continue;
+			}
+
 			i.setAccessible(true);
 
 			if((explicit && i.isAnnotationPresent(Key.class)) || !explicit)

@@ -435,11 +435,14 @@ public class VIO
 
 	public static void deleteUp(File f)
 	{
-		f.delete();
-
-		if(f.getParentFile().list().length == 0)
+		if(f.exists())
 		{
-			deleteUp(f.getParentFile());
+			f.delete();
+
+			if(f.getParentFile().list().length == 0)
+			{
+				deleteUp(f.getParentFile());
+			}
 		}
 	}
 }
