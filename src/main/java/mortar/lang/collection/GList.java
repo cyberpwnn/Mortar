@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 
 import mortar.compute.math.M;
 import mortar.lang.json.JSONArray;
@@ -39,6 +40,23 @@ public class GList<T> extends ArrayList<T>
 	public void addLast(T t)
 	{
 		add(t);
+	}
+
+	public <B> GList<B> convert(Function<T, B> converter)
+	{
+		GList<B> bb = new GList<>();
+
+		for(T i : this)
+		{
+			B b = converter.apply(i);
+
+			if(b != null)
+			{
+				bb.add(b);
+			}
+		}
+
+		return bb;
 	}
 
 	public GList<T> grepExplicit(int startIndex, int endIndex)
