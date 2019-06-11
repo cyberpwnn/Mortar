@@ -15,7 +15,6 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftMetaBook;
-import org.bukkit.craftbukkit.v1_12_R1.util.CraftChatMessage;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BookMeta.Generation;
@@ -24,21 +23,20 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.SAXReader;
 
+import mortar.api.nms.Catalyst;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
 import mortar.logic.format.F;
 import mortar.logic.io.VIO;
 import mortar.util.text.Alphabet;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ClickEvent.Action;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
-import net.minecraft.server.v1_12_R1.ChatClickable;
 import net.minecraft.server.v1_12_R1.ChatClickable.EnumClickAction;
-import net.minecraft.server.v1_12_R1.ChatComponentScore;
-import net.minecraft.server.v1_12_R1.ChatHoverable;
-import net.minecraft.server.v1_12_R1.ChatHoverable.EnumHoverAction;
-import net.minecraft.server.v1_12_R1.ChatModifier;
-import net.minecraft.server.v1_12_R1.EnumChatFormat;
-import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 
 public class Tome
 {
@@ -46,7 +44,7 @@ public class Tome
 	public static final char[] NUM_FILLED = new char[] {'\u2776', '\u2777', '\u2778', '\u2779', '\u277A', '\u277B', '\u277C', '\u277D', '\u277E', '\u277F'};
 	private TomeComponentBook root;
 	private boolean preprocessed;
-	private GList<IChatBaseComponent> cache;
+	private GList<BaseComponent> cache;
 
 	public Tome()
 	{
@@ -160,7 +158,7 @@ public class Tome
 
 		if(!cache.isEmpty())
 		{
-			book.pages.addAll(cache);
+			Catalyst.host.add(book, cache);
 			return book;
 		}
 
@@ -173,7 +171,7 @@ public class Tome
 		int maxLines = 11;
 		int maxCharacters = 25;
 
-		IChatBaseComponent content = CraftChatMessage.fromString("", true)[0];
+		BaseComponent content = new TextComponent("");
 
 		for(TomeComponent a : root.getComponents())
 		{
@@ -197,20 +195,20 @@ public class Tome
 				{
 					if(b instanceof TomeHeader)
 					{
-						IChatBaseComponent line = exportChildren((TomeParagraph) b);
-						content.addSibling(line);
+						BaseComponent line = exportChildren((TomeParagraph) b);
+						content.addExtra(line);
 					}
 
 					else if(b instanceof TomeParagraph)
 					{
-						IChatBaseComponent line = exportChildren((TomeParagraph) b);
-						content.addSibling(line);
+						BaseComponent line = exportChildren((TomeParagraph) b);
+						content.addExtra(line);
 					}
 
 					else if(b instanceof TomeAnchor)
 					{
-						IChatBaseComponent line = CraftChatMessage.fromString("!!anchor!!:" + ((TomeAnchor) b).getAnchorName(), true)[0];
-						content.addSibling(line);
+						BaseComponent line = new TextComponent("!!anchor!!:" + ((TomeAnchor) b).getAnchorName());
+						content.addExtra(line);
 					}
 
 					else if(b instanceof TomeUnorederdList)
@@ -219,8 +217,8 @@ public class Tome
 						{
 							if(c instanceof TomeParagraph)
 							{
-								IChatBaseComponent line = exportChildren((TomeParagraph) c, "\u2712");
-								content.addSibling(line);
+								BaseComponent line = exportChildren((TomeParagraph) c, "\u2712");
+								content.addExtra(line);
 							}
 
 							else if(c instanceof TomeAnchor)
@@ -229,7 +227,7 @@ public class Tome
 							}
 						}
 
-						content.a("\n");
+						content.addExtra("\n");
 					}
 
 					else if(b instanceof TomeOrderedList)
@@ -240,8 +238,8 @@ public class Tome
 						{
 							if(c instanceof TomeParagraph)
 							{
-								IChatBaseComponent line = exportChildren((TomeParagraph) c, num(m));
-								content.addSibling(line);
+								BaseComponent line = exportChildren((TomeParagraph) c, num(m));
+								content.addExtra(line);
 								m++;
 							}
 
@@ -251,18 +249,18 @@ public class Tome
 							}
 						}
 
-						content.a("\n");
+						content.addExtra("\n");
 					}
 				}
 			}
 		}
 
-		GList<IChatBaseComponent> elements = new GList<>(content.a());
-		GMap<Integer, GList<IChatBaseComponent>> pageListing = new GMap<>();
+		GList<BaseComponent> elements = new GList<>(content.getExtra());
+		GMap<Integer, GList<BaseComponent>> pageListing = new GMap<>();
 
 		while(!elements.isEmpty())
 		{
-			IChatBaseComponent next = elements.get(0);
+			BaseComponent next = elements.get(0);
 			String raw = next.toPlainText();
 			int nls = StringUtils.countMatches(raw, '\n');
 			int lineConsumption = 0;
@@ -300,7 +298,7 @@ public class Tome
 			currentLine += lineConsumption;
 		}
 
-		GList<IChatBaseComponent> prePages = new GList<>();
+		GList<BaseComponent> prePages = new GList<>();
 
 		if(properties.get("frontPage").equals("true"))
 		{
@@ -314,79 +312,79 @@ public class Tome
 
 		for(Integer i : pageListing.k())
 		{
-			IChatBaseComponent cp = CraftChatMessage.fromString("", true)[0];
-			cp.a().addAll(pageListing.get(i));
+			BaseComponent cp = new TextComponent();
+			cp.getExtra().addAll(pageListing.get(i));
 			prePages.add(cp);
 		}
 
 		int pg = 1;
 
-		for(IChatBaseComponent i : prePages)
+		for(BaseComponent i : prePages)
 		{
-			for(IChatBaseComponent j : new GList<>(i.a()))
+			for(BaseComponent j : new GList<>(i.getExtra()))
 			{
-				for(IChatBaseComponent k : new GList<>(j.a()))
+				for(BaseComponent k : new GList<>(j.getExtra()))
 				{
-					for(IChatBaseComponent l : new GList<>(k.a()))
+					for(BaseComponent l : new GList<>(k.getExtra()))
 					{
-						for(IChatBaseComponent m : new GList<>(l.a()))
+						for(BaseComponent m : new GList<>(l.getExtra()))
 						{
-							for(IChatBaseComponent n : new GList<>(m.a()))
+							for(BaseComponent n : new GList<>(m.getExtra()))
 							{
-								if(n.getText().startsWith("!!anchor!!:"))
+								if(n instanceof TextComponent && ((TextComponent) n).getText().startsWith("!!anchor!!:"))
 								{
-									anchorPages.put(n.getText().split(":")[1], pg);
-									m.a().remove(n);
+									anchorPages.put(((TextComponent) n).getText().split(":")[1], pg);
+									m.getExtra().remove(n);
 								}
 							}
 
-							if(m.getText().startsWith("!!anchor!!:"))
+							if(m instanceof TextComponent && ((TextComponent) m).getText().startsWith("!!anchor!!:"))
 							{
-								anchorPages.put(m.getText().split(":")[1], pg);
-								l.a().remove(m);
+								anchorPages.put(((TextComponent) m).getText().split(":")[1], pg);
+								l.getExtra().remove(m);
 							}
 						}
 
-						if(l.getText().startsWith("!!anchor!!:"))
+						if(l instanceof TextComponent && ((TextComponent) l).getText().startsWith("!!anchor!!:"))
 						{
-							anchorPages.put(l.getText().split(":")[1], pg);
-							k.a().remove(l);
+							anchorPages.put(((TextComponent) l).getText().split(":")[1], pg);
+							k.getExtra().remove(l);
 						}
 					}
 
-					if(k.getText().startsWith("!!anchor!!:"))
+					if(k instanceof TextComponent && ((TextComponent) k).getText().startsWith("!!anchor!!:"))
 					{
-						anchorPages.put(k.getText().split(":")[1], pg);
-						j.a().remove(k);
+						anchorPages.put(((TextComponent) k).getText().split(":")[1], pg);
+						j.getExtra().remove(k);
 					}
 				}
 
-				if(j.getText().startsWith("!!anchor!!:"))
+				if(j instanceof TextComponent && ((TextComponent) j).getText().startsWith("!!anchor!!:"))
 				{
-					anchorPages.put(j.getText().split(":")[1], pg);
-					i.a().remove(j);
+					anchorPages.put(((TextComponent) j).getText().split(":")[1], pg);
+					i.getExtra().remove(j);
 				}
 			}
 
 			pg++;
 		}
 
-		for(IChatBaseComponent i : prePages)
+		for(BaseComponent i : prePages)
 		{
 			try
 			{
-				if(i.getChatModifier().h().a().equals(EnumClickAction.CHANGE_PAGE))
+				if(i.getClickEvent().getAction().equals(EnumClickAction.CHANGE_PAGE))
 				{
-					Integer nt = anchorPages.get(i.getChatModifier().h().b());
+					Integer nt = anchorPages.get(i.getClickEvent().getValue());
 
 					if(nt != null)
 					{
-						i.getChatModifier().setChatClickable(new ChatClickable(EnumClickAction.CHANGE_PAGE, "" + nt));
+						i.setClickEvent(new ClickEvent(Action.CHANGE_PAGE, "" + nt));
 					}
 
 					else
 					{
-						i.getChatModifier().setChatClickable(null);
+						i.setClickEvent(null);
 					}
 				}
 			}
@@ -396,22 +394,22 @@ public class Tome
 
 			}
 
-			for(IChatBaseComponent j : i.a())
+			for(BaseComponent j : i.getExtra())
 			{
 				try
 				{
-					if(j.getChatModifier().h().a().equals(EnumClickAction.CHANGE_PAGE))
+					if(j.getClickEvent().getAction().equals(EnumClickAction.CHANGE_PAGE))
 					{
-						Integer nt = anchorPages.get(j.getChatModifier().h().b());
+						Integer nt = anchorPages.get(j.getClickEvent().getValue());
 
 						if(nt != null)
 						{
-							j.getChatModifier().setChatClickable(new ChatClickable(EnumClickAction.CHANGE_PAGE, "" + nt));
+							j.setClickEvent(new ClickEvent(Action.CHANGE_PAGE, "" + nt));
 						}
 
 						else
 						{
-							j.getChatModifier().setChatClickable(null);
+							j.setClickEvent(null);
 						}
 					}
 				}
@@ -421,22 +419,22 @@ public class Tome
 
 				}
 
-				for(IChatBaseComponent k : j.a())
+				for(BaseComponent k : j.getExtra())
 				{
 					try
 					{
-						if(k.getChatModifier().h().a().equals(EnumClickAction.CHANGE_PAGE))
+						if(k.getClickEvent().getAction().equals(EnumClickAction.CHANGE_PAGE))
 						{
-							Integer nt = anchorPages.get(k.getChatModifier().h().b());
+							Integer nt = anchorPages.get(k.getClickEvent().getValue());
 
 							if(nt != null)
 							{
-								k.getChatModifier().setChatClickable(new ChatClickable(EnumClickAction.CHANGE_PAGE, "" + nt));
+								k.setClickEvent(new ClickEvent(Action.CHANGE_PAGE, "" + nt));
 							}
 
 							else
 							{
-								k.getChatModifier().setChatClickable(null);
+								k.setClickEvent(null);
 							}
 						}
 					}
@@ -446,22 +444,22 @@ public class Tome
 
 					}
 
-					for(IChatBaseComponent l : k.a())
+					for(BaseComponent l : k.getExtra())
 					{
 						try
 						{
-							if(l.getChatModifier().h().a().equals(EnumClickAction.CHANGE_PAGE))
+							if(l.getClickEvent().getAction().equals(EnumClickAction.CHANGE_PAGE))
 							{
-								Integer nt = anchorPages.get(l.getChatModifier().h().b());
+								Integer nt = anchorPages.get(l.getClickEvent().getValue());
 
 								if(nt != null)
 								{
-									l.getChatModifier().setChatClickable(new ChatClickable(EnumClickAction.CHANGE_PAGE, "" + nt));
+									l.setClickEvent(new ClickEvent(Action.CHANGE_PAGE, "" + nt));
 								}
 
 								else
 								{
-									l.getChatModifier().setChatClickable(null);
+									l.setClickEvent(null);
 								}
 							}
 						}
@@ -471,22 +469,22 @@ public class Tome
 
 						}
 
-						for(IChatBaseComponent m : l.a())
+						for(BaseComponent m : l.getExtra())
 						{
 							try
 							{
-								if(m.getChatModifier().h().a().equals(EnumClickAction.CHANGE_PAGE))
+								if(m.getClickEvent().getAction().equals(EnumClickAction.CHANGE_PAGE))
 								{
-									Integer nt = anchorPages.get(m.getChatModifier().h().b());
+									Integer nt = anchorPages.get(m.getClickEvent().getValue());
 
 									if(nt != null)
 									{
-										m.getChatModifier().setChatClickable(new ChatClickable(EnumClickAction.CHANGE_PAGE, "" + nt));
+										m.setClickEvent(new ClickEvent(Action.CHANGE_PAGE, "" + nt));
 									}
 
 									else
 									{
-										m.getChatModifier().setChatClickable(null);
+										m.setClickEvent(null);
 									}
 								}
 							}
@@ -496,24 +494,22 @@ public class Tome
 
 							}
 
-							for(IChatBaseComponent n : m.a())
+							for(BaseComponent n : m.getExtra())
 							{
-								n.a().add(new ChatComponentScore("name", "obj"));
-
 								try
 								{
-									if(n.getChatModifier().h().a().equals(EnumClickAction.CHANGE_PAGE))
+									if(n.getClickEvent().getAction().equals(EnumClickAction.CHANGE_PAGE))
 									{
-										Integer nt = anchorPages.get(n.getChatModifier().h().b());
+										Integer nt = anchorPages.get(n.getClickEvent().getValue());
 
 										if(nt != null)
 										{
-											n.getChatModifier().setChatClickable(new ChatClickable(EnumClickAction.CHANGE_PAGE, "" + nt));
+											n.setClickEvent(new ClickEvent(Action.CHANGE_PAGE, "" + nt));
 										}
 
 										else
 										{
-											n.getChatModifier().setChatClickable(null);
+											n.setClickEvent(null);
 										}
 									}
 								}
@@ -530,7 +526,7 @@ public class Tome
 		}
 
 		cache = prePages.copy();
-		book.pages.addAll(prePages);
+		Catalyst.host.add(book, prePages);
 
 		BaseComponent b = null;
 		ComponentSerializer.toString(b);
@@ -586,37 +582,31 @@ public class Tome
 		return g;
 	}
 
-	private GList<IChatBaseComponent> exportTableOfContents(GList<String> tables)
+	private GList<BaseComponent> exportTableOfContents(GList<String> tables)
 	{
-		GList<IChatBaseComponent> pg = new GList<>();
+		GList<BaseComponent> pg = new GList<>();
 
 		int sec = 0;
 		int toc = 0;
-		IChatBaseComponent pageBuffer = CraftChatMessage.fromString("", true)[0];
-		ChatModifier cmodx = new ChatModifier();
-		cmodx.setBold(true);
-		cmodx.setUnderline(true);
-		IChatBaseComponent t = CraftChatMessage.fromString("Table Of Contents", true)[0];
-		t.setChatModifier(cmodx);
-		pageBuffer.a().add(t);
-		pageBuffer.a("\n\n");
+		BaseComponent pageBuffer = new TextComponent();
+		BaseComponent t = new TextComponent("Table Of Contents");
+		t.setBold(true);
+		t.setUnderlined(true);
+		pageBuffer.addExtra(t);
+		pageBuffer.addExtra("\n\n");
 		boolean ad = false;
 		for(String i : tables)
 		{
 			ad = true;
-			ChatModifier cmod = new ChatModifier();
-			ChatModifier cmodxx = new ChatModifier();
-			cmod.setItalic(true);
-			cmod.setChatClickable(new ChatClickable(EnumClickAction.CHANGE_PAGE, "s" + sec));
-			cmod.setChatHoverable(new ChatHoverable(EnumHoverAction.SHOW_TEXT, CraftChatMessage.fromString("Click to see '" + i + "'.", true)[0]));
-			IChatBaseComponent content = CraftChatMessage.fromString("", true)[0];
-			IChatBaseComponent nib = CraftChatMessage.fromString("\u270E ", true)[0];
-			IChatBaseComponent text = CraftChatMessage.fromString(i, true)[0];
-			nib.setChatModifier(cmodxx);
-			text.setChatModifier(cmod);
-			content.a().add(nib);
-			content.a().add(text);
-			pageBuffer.a().add(content);
+			BaseComponent content = new TextComponent();
+			BaseComponent nib = new TextComponent("\u270E ");
+			BaseComponent text = new TextComponent(i);
+			text.setItalic(true);
+			text.setClickEvent(new ClickEvent(Action.CHANGE_PAGE, "s" + sec));
+			text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[] {new TextComponent("Click to see '" + i + "'.")}));
+			content.addExtra(nib);
+			content.addExtra(text);
+			pageBuffer.addExtra(content);
 			toc++;
 			sec++;
 
@@ -625,19 +615,17 @@ public class Tome
 				ad = false;
 				toc = 0;
 				pg.add(pageBuffer);
-				pageBuffer = CraftChatMessage.fromString("", true)[0];
-				cmodx = new ChatModifier();
-				cmodx.setBold(true);
-				cmodx.setUnderline(true);
-				t = CraftChatMessage.fromString("Table Of Contents", true)[0];
-				t.setChatModifier(cmodx);
-				pageBuffer.a().add(t);
-				pageBuffer.a("\n\n");
+				pageBuffer = new TextComponent();
+				t = new TextComponent("Table Of Contents");
+				t.setBold(true);
+				t.setUnderlined(true);
+				pageBuffer.addExtra(t);
+				pageBuffer.addExtra("\n\n");
 			}
 
 			else
 			{
-				pageBuffer.a("\n");
+				pageBuffer.addExtra("\n");
 			}
 		}
 
@@ -649,48 +637,44 @@ public class Tome
 		return pg;
 	}
 
-	private IChatBaseComponent exportFrontPage()
+	private BaseComponent exportFrontPage()
 	{
-		IChatBaseComponent cFrontPage = CraftChatMessage.fromString("", true)[0];
-		IChatBaseComponent cInd = CraftChatMessage.fromString(F.repeat("\n", 5), true)[0];
-		IChatBaseComponent cTitle = CraftChatMessage.fromString(getName() + "\n", true)[0];
-		IChatBaseComponent cBy = CraftChatMessage.fromString("By " + getAuthor() + "\n", true)[0];
-		IChatBaseComponent cVolume = CraftChatMessage.fromString("Vol. " + getVolume() + "\n", true)[0];
-		ChatModifier boldUnderline = new ChatModifier();
-		boldUnderline.setBold(true);
-		boldUnderline.setUnderline(true);
-		ChatModifier italic = new ChatModifier();
-		italic.setItalic(true);
-		cTitle.setChatModifier(boldUnderline);
-		cBy.setChatModifier(italic);
-		cVolume.setChatModifier(italic);
-		cFrontPage.a().add(cInd);
-		cFrontPage.a().add(cTitle);
-		cFrontPage.a().add(cBy);
+		TextComponent cFrontPage = new TextComponent();
+		TextComponent cInd = new TextComponent(F.repeat("\n", 5));
+		TextComponent cTitle = new TextComponent(getName() + "\n");
+		TextComponent cBy = new TextComponent("By " + getAuthor() + "\n");
+		TextComponent cVolume = new TextComponent("Vol. " + getVolume() + "\n");
+		cTitle.setBold(true);
+		cTitle.setUnderlined(true);
+		cBy.setItalic(true);
+		cVolume.setItalic(true);
+		cFrontPage.getExtra().add(cInd);
+		cFrontPage.getExtra().add(cTitle);
+		cFrontPage.getExtra().add(cBy);
 
 		if(!getVolume().isEmpty())
 		{
-			cFrontPage.a().add(cVolume);
+			cFrontPage.getExtra().add(cVolume);
 		}
 
 		return cFrontPage;
 	}
 
-	private IChatBaseComponent exportChildren(TomeParagraph paragraph)
+	private BaseComponent exportChildren(TomeParagraph paragraph)
 	{
 		return exportChildren(paragraph, "");
 	}
 
-	private IChatBaseComponent exportChildren(TomeHover paragraph)
+	private BaseComponent exportChildren(TomeHover paragraph)
 	{
-		IChatBaseComponent line = CraftChatMessage.fromString("", true)[0];
+		BaseComponent line = new TextComponent();
 
 		for(TomeComponent i : paragraph.getComponents())
 		{
 			if(i instanceof TomeParagraph)
 			{
-				IChatBaseComponent lx = exportChildren((TomeParagraph) i);
-				line.addSibling(lx);
+				BaseComponent lx = exportChildren((TomeParagraph) i);
+				line.addExtra(lx);
 			}
 
 			else if(i instanceof TomeUnorederdList)
@@ -699,8 +683,8 @@ public class Tome
 				{
 					if(c instanceof TomeParagraph)
 					{
-						IChatBaseComponent lx = exportChildren((TomeParagraph) c, "\u2712");
-						line.addSibling(lx);
+						BaseComponent lx = exportChildren((TomeParagraph) c, "\u2712");
+						line.addExtra(lx);
 					}
 
 					else if(c instanceof TomeAnchor)
@@ -718,8 +702,8 @@ public class Tome
 				{
 					if(c instanceof TomeParagraph)
 					{
-						IChatBaseComponent lx = exportChildren((TomeParagraph) c, num(m));
-						line.addSibling(lx);
+						BaseComponent lx = exportChildren((TomeParagraph) c, num(m));
+						line.addExtra(lx);
 						m++;
 					}
 
@@ -732,57 +716,53 @@ public class Tome
 
 			if(i instanceof TomeParagraph)
 			{
-				line.a(((TomeParagraph) i).getText());
+				line.addExtra(((TomeParagraph) i).getText());
 			}
 
 			if(i instanceof TomeFormat)
 			{
-				line.addSibling(exportChildren((TomeFormat) i));
+				line.addExtra(exportChildren((TomeFormat) i));
 			}
 
 			if(i instanceof TomeText)
 			{
-				line.a(((TomeText) i).getText());
+				line.addExtra(((TomeText) i).getText());
 			}
 		}
 
 		return line;
 	}
 
-	private IChatBaseComponent exportChildren(TomeParagraph paragraph, String prefixLine)
+	private BaseComponent exportChildren(TomeParagraph paragraph, String prefixLine)
 	{
-		IChatBaseComponent line = CraftChatMessage.fromString("", true)[0];
-		ChatModifier cmod = new ChatModifier();
-		ChatModifier cmodx = new ChatModifier();
+		BaseComponent line = new TextComponent();
 
 		if(paragraph instanceof TomeHeader)
 		{
-			cmod.setBold(true);
-			cmod.setUnderline(true);
-			line.setChatModifier(cmod);
+			line.setBold(true);
+			line.setUnderlined(true);
 		}
 
 		if(!prefixLine.isEmpty())
 		{
-			IChatBaseComponent x = CraftChatMessage.fromString(prefixLine, true)[0];
-			x.setChatModifier(cmodx);
-			line.a().add(x);
+			BaseComponent x = new TextComponent(prefixLine);
+			line.addExtra(x);
 		}
 
 		for(TomeComponent i : paragraph.getComponents())
 		{
 			if(i instanceof TomeText)
 			{
-				line.a(((TomeText) i).getText());
+				line.addExtra(((TomeText) i).getText());
 			}
 
 			if(i instanceof TomeFormat)
 			{
-				line.addSibling(exportChildren((TomeFormat) i));
+				line.addExtra(exportChildren((TomeFormat) i));
 			}
 		}
 
-		line.a("\n");
+		line.addExtra("\n");
 
 		return line;
 	}
@@ -806,9 +786,9 @@ public class Tome
 		return v.substring(sp.length());
 	}
 
-	private IChatBaseComponent exportChildren(TomeFormat format)
+	private BaseComponent exportChildren(TomeFormat format)
 	{
-		ChatModifier cmod = new ChatModifier();
+		TextComponent sub = new TextComponent();
 
 		if(format.getOnClick() != null)
 		{
@@ -816,58 +796,53 @@ public class Tome
 
 			if(command.startsWith("run "))
 			{
-				cmod.setChatClickable(new ChatClickable(EnumClickAction.RUN_COMMAND, splitFirst(command, " ")));
+				sub.setClickEvent(new ClickEvent(Action.RUN_COMMAND, splitFirst(command, " ")));
 			}
 
 			if(command.startsWith("suggest "))
 			{
-				cmod.setChatClickable(new ChatClickable(EnumClickAction.SUGGEST_COMMAND, splitFirst(command, " ")));
+				sub.setClickEvent(new ClickEvent(Action.SUGGEST_COMMAND, splitFirst(command, " ")));
 			}
 
 			if(command.startsWith("url "))
 			{
-				cmod.setChatClickable(new ChatClickable(EnumClickAction.OPEN_URL, splitFirst(command, " ")));
+				sub.setClickEvent(new ClickEvent(Action.OPEN_URL, splitFirst(command, " ")));
 			}
 
 			if(command.startsWith("open "))
 			{
-				cmod.setChatClickable(new ChatClickable(EnumClickAction.OPEN_FILE, splitFirst(command, " ")));
+				sub.setClickEvent(new ClickEvent(Action.OPEN_FILE, splitFirst(command, " ")));
 			}
 
 			if(command.startsWith("goto "))
 			{
-				cmod.setChatClickable(new ChatClickable(EnumClickAction.CHANGE_PAGE, splitFirst(command, " ")));
+				sub.setClickEvent(new ClickEvent(Action.CHANGE_PAGE, splitFirst(command, " ")));
 			}
 		}
 
-		cmod.setColor(format.getColor() != null ? EnumChatFormat.valueOf(format.getColor().toUpperCase()) : EnumChatFormat.BLACK);
+		sub.setColor(format.getColor() != null ? ChatColor.valueOf(format.getColor().toUpperCase()) : ChatColor.BLACK);
 
 		if(format.getFormat() != null)
 		{
-			cmod.setBold(format.getFormat().contains("bold"));
-			cmod.setUnderline(format.getFormat().contains("underline"));
-			cmod.setStrikethrough(format.getFormat().contains("strikethrough"));
-			cmod.setRandom(format.getFormat().contains("magic"));
-			cmod.setItalic(format.getFormat().contains("italic"));
+			sub.setBold(format.getFormat().contains("bold"));
+			sub.setUnderlined(format.getFormat().contains("underline"));
+			sub.setStrikethrough(format.getFormat().contains("strikethrough"));
+			sub.setObfuscated(format.getFormat().contains("magic"));
+			sub.setItalic(format.getFormat().contains("italic"));
 		}
-
-		String sym = "";
 
 		for(TomeComponent i : format.getComponents())
 		{
 			if(i instanceof TomeHover)
 			{
-				cmod.setChatHoverable(new ChatHoverable(EnumHoverAction.SHOW_TEXT, exportChildren((TomeHover) i)));
+				sub.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[] {exportChildren((TomeHover) i)}));
 			}
 
 			else if(i instanceof TomeText)
 			{
-				sym += ((TomeText) i).getText();
+				sub.setText(sub.getText() + ((TomeText) i).getText());
 			}
 		}
-
-		IChatBaseComponent sub = CraftChatMessage.fromString(sym, true)[0];
-		sub.setChatModifier(cmod);
 
 		return sub;
 	}
