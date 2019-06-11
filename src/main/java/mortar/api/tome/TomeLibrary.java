@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import mortar.lang.collection.GMap;
+import mortar.logic.io.VIO;
 import mortar.util.text.D;
 
 public class TomeLibrary
@@ -38,6 +39,12 @@ public class TomeLibrary
 		tomes.clear();
 
 		File folder = new File("tomes");
+		File raw = new File("tomes/raw");
+		File effective = new File("tomes/effective");
+		VIO.delete(raw);
+		VIO.delete(effective);
+		raw.mkdirs();
+		effective.mkdirs();
 
 		if(folder.exists())
 		{
@@ -49,6 +56,10 @@ public class TomeLibrary
 					{
 						Tome tome = new Tome();
 						tome.load(i);
+						tome.preprocessTome();
+						tome.save(new File(effective, i.getName()));
+						tome.toItemStack();
+						VIO.writeAll(new File(raw, i.getName().replaceAll(".xml", ".json")), tome.toJSON().toString(2));
 						register(tome);
 						D.as("TomeLibrary").l("Loaded Tome " + i.getName() + " [" + tome.getId() + "] (" + tome.getName() + " by " + tome.getAuthor() + ")");
 					}

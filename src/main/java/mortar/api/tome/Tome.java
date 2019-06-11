@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -26,6 +28,8 @@ import org.dom4j.io.SAXReader;
 import mortar.api.nms.Catalyst;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
+import mortar.lang.json.JSONArray;
+import mortar.lang.json.JSONObject;
 import mortar.logic.format.F;
 import mortar.logic.io.VIO;
 import mortar.util.text.Alphabet;
@@ -34,9 +38,9 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.KeybindComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
-import net.minecraft.server.v1_12_R1.ChatClickable.EnumClickAction;
 
 public class Tome
 {
@@ -67,7 +71,7 @@ public class Tome
 		return isc;
 	}
 
-	private void preprocessTome()
+	public void preprocessTome()
 	{
 		if(preprocessed)
 		{
@@ -199,6 +203,12 @@ public class Tome
 						content.addExtra(line);
 					}
 
+					else if(b instanceof TomeKeybind)
+					{
+						BaseComponent line = new KeybindComponent(((TomeKeybind) b).getKeyName());
+						content.addExtra(line);
+					}
+
 					else if(b instanceof TomeParagraph)
 					{
 						BaseComponent line = exportChildren((TomeParagraph) b);
@@ -255,7 +265,7 @@ public class Tome
 			}
 		}
 
-		GList<BaseComponent> elements = new GList<>(content.getExtra());
+		GList<BaseComponent> elements = new GList<>(content.getExtra() == null ? new ArrayList<BaseComponent>() : content.getExtra());
 		GMap<Integer, GList<BaseComponent>> pageListing = new GMap<>();
 
 		while(!elements.isEmpty())
@@ -313,6 +323,8 @@ public class Tome
 		for(Integer i : pageListing.k())
 		{
 			BaseComponent cp = new TextComponent();
+			cp.addExtra("");
+			cp.getExtra().clear();
 			cp.getExtra().addAll(pageListing.get(i));
 			prePages.add(cp);
 		}
@@ -321,19 +333,26 @@ public class Tome
 
 		for(BaseComponent i : prePages)
 		{
-			for(BaseComponent j : new GList<>(i.getExtra()))
+			for(BaseComponent j : new GList<>(i.getExtra() == null ? new ArrayList<>() : i.getExtra()))
 			{
-				for(BaseComponent k : new GList<>(j.getExtra()))
+				for(BaseComponent k : new GList<>(j.getExtra() == null ? new ArrayList<>() : j.getExtra()))
 				{
-					for(BaseComponent l : new GList<>(k.getExtra()))
+					for(BaseComponent l : new GList<>(k.getExtra() == null ? new ArrayList<>() : k.getExtra()))
 					{
-						for(BaseComponent m : new GList<>(l.getExtra()))
+						for(BaseComponent m : new GList<>(l.getExtra() == null ? new ArrayList<>() : l.getExtra()))
 						{
-							for(BaseComponent n : new GList<>(m.getExtra()))
+							for(BaseComponent n : new GList<>(m.getExtra() == null ? new ArrayList<>() : k.getExtra()))
 							{
 								if(n instanceof TextComponent && ((TextComponent) n).getText().startsWith("!!anchor!!:"))
 								{
 									anchorPages.put(((TextComponent) n).getText().split(":")[1], pg);
+
+									if(m.getExtra() == null)
+									{
+										m.addExtra("");
+										m.getExtra().clear();
+									}
+
 									m.getExtra().remove(n);
 								}
 							}
@@ -341,6 +360,13 @@ public class Tome
 							if(m instanceof TextComponent && ((TextComponent) m).getText().startsWith("!!anchor!!:"))
 							{
 								anchorPages.put(((TextComponent) m).getText().split(":")[1], pg);
+
+								if(l.getExtra() == null)
+								{
+									l.addExtra("");
+									l.getExtra().clear();
+								}
+
 								l.getExtra().remove(m);
 							}
 						}
@@ -348,6 +374,13 @@ public class Tome
 						if(l instanceof TextComponent && ((TextComponent) l).getText().startsWith("!!anchor!!:"))
 						{
 							anchorPages.put(((TextComponent) l).getText().split(":")[1], pg);
+
+							if(k.getExtra() == null)
+							{
+								k.addExtra("");
+								k.getExtra().clear();
+							}
+
 							k.getExtra().remove(l);
 						}
 					}
@@ -355,6 +388,13 @@ public class Tome
 					if(k instanceof TextComponent && ((TextComponent) k).getText().startsWith("!!anchor!!:"))
 					{
 						anchorPages.put(((TextComponent) k).getText().split(":")[1], pg);
+
+						if(j.getExtra() == null)
+						{
+							j.addExtra("");
+							j.getExtra().clear();
+						}
+
 						j.getExtra().remove(k);
 					}
 				}
@@ -362,6 +402,13 @@ public class Tome
 				if(j instanceof TextComponent && ((TextComponent) j).getText().startsWith("!!anchor!!:"))
 				{
 					anchorPages.put(((TextComponent) j).getText().split(":")[1], pg);
+
+					if(i.getExtra() == null)
+					{
+						i.addExtra("");
+						i.getExtra().clear();
+					}
+
 					i.getExtra().remove(j);
 				}
 			}
@@ -373,7 +420,7 @@ public class Tome
 		{
 			try
 			{
-				if(i.getClickEvent().getAction().equals(EnumClickAction.CHANGE_PAGE))
+				if(i.getClickEvent().getAction().equals(Action.CHANGE_PAGE))
 				{
 					Integer nt = anchorPages.get(i.getClickEvent().getValue());
 
@@ -394,11 +441,17 @@ public class Tome
 
 			}
 
+			if(i.getExtra() == null)
+			{
+				i.addExtra("");
+				i.getExtra().clear();
+			}
+
 			for(BaseComponent j : i.getExtra())
 			{
 				try
 				{
-					if(j.getClickEvent().getAction().equals(EnumClickAction.CHANGE_PAGE))
+					if(j.getClickEvent().getAction().equals(Action.CHANGE_PAGE))
 					{
 						Integer nt = anchorPages.get(j.getClickEvent().getValue());
 
@@ -419,11 +472,17 @@ public class Tome
 
 				}
 
+				if(j.getExtra() == null)
+				{
+					j.addExtra("");
+					j.getExtra().clear();
+				}
+
 				for(BaseComponent k : j.getExtra())
 				{
 					try
 					{
-						if(k.getClickEvent().getAction().equals(EnumClickAction.CHANGE_PAGE))
+						if(k.getClickEvent().getAction().equals(Action.CHANGE_PAGE))
 						{
 							Integer nt = anchorPages.get(k.getClickEvent().getValue());
 
@@ -444,11 +503,17 @@ public class Tome
 
 					}
 
+					if(k.getExtra() == null)
+					{
+						k.addExtra("");
+						k.getExtra().clear();
+					}
+
 					for(BaseComponent l : k.getExtra())
 					{
 						try
 						{
-							if(l.getClickEvent().getAction().equals(EnumClickAction.CHANGE_PAGE))
+							if(l.getClickEvent().getAction().equals(Action.CHANGE_PAGE))
 							{
 								Integer nt = anchorPages.get(l.getClickEvent().getValue());
 
@@ -469,11 +534,17 @@ public class Tome
 
 						}
 
+						if(l.getExtra() == null)
+						{
+							l.addExtra("");
+							l.getExtra().clear();
+						}
+
 						for(BaseComponent m : l.getExtra())
 						{
 							try
 							{
-								if(m.getClickEvent().getAction().equals(EnumClickAction.CHANGE_PAGE))
+								if(m.getClickEvent().getAction().equals(Action.CHANGE_PAGE))
 								{
 									Integer nt = anchorPages.get(m.getClickEvent().getValue());
 
@@ -494,11 +565,17 @@ public class Tome
 
 							}
 
+							if(m.getExtra() == null)
+							{
+								m.addExtra("");
+								m.getExtra().clear();
+							}
+
 							for(BaseComponent n : m.getExtra())
 							{
 								try
 								{
-									if(n.getClickEvent().getAction().equals(EnumClickAction.CHANGE_PAGE))
+									if(n.getClickEvent().getAction().equals(Action.CHANGE_PAGE))
 									{
 										Integer nt = anchorPages.get(n.getClickEvent().getValue());
 
@@ -523,6 +600,80 @@ public class Tome
 					}
 				}
 			}
+		}
+
+		try
+		{
+			Field f = BaseComponent.class.getDeclaredField("extra");
+			f.setAccessible(true);
+
+			for(BaseComponent i : prePages)
+			{
+				if(i.getExtra() != null && i.getExtra().isEmpty())
+				{
+					f.set(i, null);
+					continue;
+				}
+
+				for(BaseComponent j : i.getExtra())
+				{
+					if(j.getExtra() != null && j.getExtra().isEmpty())
+					{
+						f.set(j, null);
+						continue;
+					}
+
+					for(BaseComponent k : j.getExtra())
+					{
+						if(k.getExtra() != null && k.getExtra().isEmpty())
+						{
+							f.set(k, null);
+							continue;
+						}
+
+						for(BaseComponent l : k.getExtra())
+						{
+							if(l.getExtra() != null && l.getExtra().isEmpty())
+							{
+								f.set(l, null);
+								continue;
+							}
+
+							for(BaseComponent m : l.getExtra())
+							{
+								if(m.getExtra() != null && m.getExtra().isEmpty())
+								{
+									f.set(m, null);
+									continue;
+								}
+
+								for(BaseComponent n : m.getExtra())
+								{
+									if(n.getExtra() != null && n.getExtra().isEmpty())
+									{
+										f.set(n, null);
+										continue;
+									}
+
+									for(BaseComponent o : n.getExtra())
+									{
+										if(o.getExtra() != null && o.getExtra().isEmpty())
+										{
+											f.set(o, null);
+											continue;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		catch(Throwable e)
+		{
+			e.printStackTrace();
 		}
 
 		cache = prePages.copy();
@@ -589,6 +740,8 @@ public class Tome
 		int sec = 0;
 		int toc = 0;
 		BaseComponent pageBuffer = new TextComponent();
+		pageBuffer.addExtra("");
+		pageBuffer.getExtra().clear();
 		BaseComponent t = new TextComponent("Table Of Contents");
 		t.setBold(true);
 		t.setUnderlined(true);
@@ -648,13 +801,13 @@ public class Tome
 		cTitle.setUnderlined(true);
 		cBy.setItalic(true);
 		cVolume.setItalic(true);
-		cFrontPage.getExtra().add(cInd);
-		cFrontPage.getExtra().add(cTitle);
-		cFrontPage.getExtra().add(cBy);
+		cFrontPage.addExtra(cInd);
+		cFrontPage.addExtra(cTitle);
+		cFrontPage.addExtra(cBy);
 
 		if(!getVolume().isEmpty())
 		{
-			cFrontPage.getExtra().add(cVolume);
+			cFrontPage.addExtra(cVolume);
 		}
 
 		return cFrontPage;
@@ -716,7 +869,7 @@ public class Tome
 
 			if(i instanceof TomeParagraph)
 			{
-				line.addExtra(((TomeParagraph) i).getText());
+				// line.addExtra(exportChildren((TomeParagraph) i));
 			}
 
 			if(i instanceof TomeFormat)
@@ -756,7 +909,12 @@ public class Tome
 				line.addExtra(((TomeText) i).getText());
 			}
 
-			if(i instanceof TomeFormat)
+			else if(i instanceof TomeKeybind)
+			{
+				line.addExtra(new KeybindComponent(((TomeKeybind) i).getKeyName()));
+			}
+
+			else if(i instanceof TomeFormat)
 			{
 				line.addExtra(exportChildren((TomeFormat) i));
 			}
@@ -836,6 +994,12 @@ public class Tome
 			if(i instanceof TomeHover)
 			{
 				sub.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[] {exportChildren((TomeHover) i)}));
+			}
+
+			else if(i instanceof TomeKeybind)
+			{
+				BaseComponent line = new KeybindComponent(((TomeKeybind) i).getKeyName());
+				sub.addExtra(line);
 			}
 
 			else if(i instanceof TomeText)
@@ -953,5 +1117,20 @@ public class Tome
 		{
 			throw new RuntimeException(e);
 		}
+	}
+
+	public JSONObject toJSON()
+	{
+		JSONObject j = new JSONObject();
+		JSONArray a = new JSONArray();
+
+		for(BaseComponent i : cache)
+		{
+			a.put(new JSONObject(ComponentSerializer.toString(i)));
+		}
+
+		j.put("pages", a);
+
+		return j;
 	}
 }

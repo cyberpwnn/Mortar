@@ -54,6 +54,11 @@ public class TomeFormat extends TomeComponent
 					component = new TomeHover();
 				}
 
+				if(i.getName().equals("keybind"))
+				{
+					component = new TomeKeybind();
+				}
+
 				if(component != null)
 				{
 					component.read(i);

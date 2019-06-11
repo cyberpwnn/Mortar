@@ -31,6 +31,11 @@ public class TomeParagraph extends TomeText
 					component = new TomeAnchor();
 				}
 
+				else if(i.getName().equals("keybind"))
+				{
+					component = new TomeKeybind();
+				}
+
 				if(component != null)
 				{
 					component.read(i);
