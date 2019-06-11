@@ -1,5 +1,7 @@
 <?xml version = "1.0"?>
-<book name = "The Tales of Books" author = "Mortar" volume = "II", id = "talesofbooks2">
+<book name = "The Tales of Books" author = "Mortar" id = "talesofbooks">
+	<meta property = "frontPage">true</meta>
+	<meta property = "tableOfContents">true</meta>
 	<section name = "Section I">
 		<header>Fancy Text for Headers</header>
 		<p>This is Basic Text. This text is indented and seperates from other text. Paragraphs are great for describing large amounts of text.</p>

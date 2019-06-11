@@ -20,11 +20,13 @@ import mortar.api.sched.J;
 import mortar.api.scm.CommandSCM;
 import mortar.api.scm.SCMController;
 import mortar.api.tetris.JobScheduler;
+import mortar.api.tome.CommandTome;
 import mortar.bukkit.command.Command;
 import mortar.bukkit.command.MortarSender;
 import mortar.bukkit.command.Permission;
 import mortar.compute.math.M;
 import mortar.fulcrum.CommandFulcrum;
+import mortar.lang.collection.LGMap;
 import mortar.lib.control.CacheController;
 import mortar.lib.control.MojangProfileController;
 import mortar.lib.control.RiftController;
@@ -32,6 +34,7 @@ import mortar.util.queue.PhantomQueue;
 import mortar.util.queue.Queue;
 import mortar.util.text.C;
 import mortar.util.text.D;
+import net.md_5.bungee.api.ChatColor;
 
 public class MortarAPIPlugin extends MortarPlugin
 {
@@ -71,6 +74,9 @@ public class MortarAPIPlugin extends MortarPlugin
 	@Control
 	private SCMController scmController;
 
+	@Command
+	private CommandTome tome;
+
 	private static Queue<String> logQueue;
 	private MortarConfig cfg;
 
@@ -88,7 +94,7 @@ public class MortarAPIPlugin extends MortarPlugin
 			J.s(() -> Mortar.checkForUpdates(new MortarSender(Bukkit.getConsoleSender())), 160);
 		}
 
-		J.sr(() -> flushLogBuffer(), 10);
+		J.sr(() -> flushLogBuffer(), 20);
 		J.ar(() -> M.uptickAsync(), 0);
 		J.sr(() -> M.uptick(), 0);
 		J.ar(() -> JobScheduler.scheduler.tick(), 0);
@@ -138,9 +144,31 @@ public class MortarAPIPlugin extends MortarPlugin
 			return;
 		}
 
+		LGMap<String, Integer> count = new LGMap<>();
+
 		while(logQueue.hasNext())
 		{
-			Bukkit.getConsoleSender().sendMessage(logQueue.next());
+			String f = logQueue.next();
+
+			if(!count.containsKey(f))
+			{
+				count.put(f, 0);
+			}
+
+			count.put(f, count.get(f) + 1);
+		}
+
+		for(String i : count.keySet())
+		{
+			if(count.get(i) > 1)
+			{
+				Bukkit.getConsoleSender().sendMessage(i + ChatColor.GOLD + " x" + count.get(i));
+			}
+
+			else
+			{
+				Bukkit.getConsoleSender().sendMessage(i);
+			}
 		}
 	}
 

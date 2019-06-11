@@ -149,6 +149,11 @@ public enum Alphabet
 		return this.toString().substring(0, 1).toLowerCase().toCharArray()[0];
 	}
 
+	public AlphabetRange to(Alphabet a)
+	{
+		return new AlphabetRange(this, a);
+	}
+
 	/**
 	 * ROMEO ALPHA DELTA INDIA OSCAR
 	 *

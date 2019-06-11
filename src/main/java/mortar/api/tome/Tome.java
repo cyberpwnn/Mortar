@@ -13,8 +13,10 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftMetaBook;
 import org.bukkit.craftbukkit.v1_12_R1.util.CraftChatMessage;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BookMeta.Generation;
 import org.dom4j.Document;
@@ -24,11 +26,12 @@ import org.dom4j.io.SAXReader;
 
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
-import mortar.lang.json.JSONObject;
 import mortar.logic.format.F;
 import mortar.logic.io.VIO;
+import mortar.util.text.Alphabet;
 import net.minecraft.server.v1_12_R1.ChatClickable;
 import net.minecraft.server.v1_12_R1.ChatClickable.EnumClickAction;
+import net.minecraft.server.v1_12_R1.ChatComponentScore;
 import net.minecraft.server.v1_12_R1.ChatHoverable;
 import net.minecraft.server.v1_12_R1.ChatHoverable.EnumHoverAction;
 import net.minecraft.server.v1_12_R1.ChatModifier;
@@ -37,13 +40,31 @@ import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 
 public class Tome
 {
+	public static final char[] NUM = new char[] {'\u2780', '\u2781', '\u2782', '\u2783', '\u2784', '\u2785', '\u2786', '\u2787', '\u2788', '\u2789'};
+	public static final char[] NUM_FILLED = new char[] {'\u2776', '\u2777', '\u2778', '\u2779', '\u277A', '\u277B', '\u277C', '\u277D', '\u277E', '\u277F'};
 	private TomeComponentBook root;
 	private boolean preprocessed;
+	private GList<IChatBaseComponent> cache;
 
 	public Tome()
 	{
 		root = new TomeComponentBook();
 		preprocessed = false;
+		cache = new GList<>();
+	}
+
+	public Alphabet getLetter()
+	{
+		return Alphabet.fromChar(getName().trim().charAt(0));
+	}
+
+	public ItemStack toItemStack()
+	{
+		ItemStack isc = new ItemStack(Material.WRITTEN_BOOK);
+		BookMeta bm = (BookMeta) isc.getItemMeta();
+		isc.setItemMeta(export(bm));
+
+		return isc;
 	}
 
 	private void preprocessTome()
@@ -57,32 +78,111 @@ public class Tome
 
 		int m = 0;
 
+		GList<TomeParagraph> filterParagraphs = new GList<>();
+
 		for(TomeComponent a : root.getComponents())
 		{
 			if(a instanceof TomeSection)
 			{
 				TomeSection section = (TomeSection) a;
+				if(section.isSeparate())
+				{
+					section.getComponents().add(0, new TomeText("!!bp!!"));
+				}
+
 				section.getComponents().add(0, new TomeAnchor("s" + m));
 				section.getComponents().add(0, new TomeHeader().add(section.getSectionName()));
+				section.getComponents().add(new TomeParagraph().add("\n"));
+
+				for(TomeComponent i : section.getComponents())
+				{
+					if(i instanceof TomeParagraph && !(i instanceof TomeHeader))
+					{
+						filterParagraphs.add((TomeParagraph) i);
+					}
+
+					for(TomeComponent j : i.getComponents())
+					{
+						if(j instanceof TomeParagraph && !(j instanceof TomeHeader))
+						{
+							filterParagraphs.add((TomeParagraph) j);
+						}
+
+						for(TomeComponent k : i.getComponents())
+						{
+							if(k instanceof TomeParagraph && !(k instanceof TomeHeader))
+							{
+								filterParagraphs.add((TomeParagraph) k);
+							}
+						}
+					}
+				}
+
 				m++;
 			}
 		}
+
+		for(TomeParagraph i : filterParagraphs)
+		{
+			for(int j = 0; j < i.getComponents().size(); j++)
+			{
+				TomeComponent c = i.getComponents().get(j);
+
+				if(c instanceof TomeText && !(c instanceof TomeFormat))
+				{
+					c = new TomeFormat().add(c);
+				}
+
+				i.getComponents().set(j, c);
+			}
+		}
+	}
+
+	private String num(int ind)
+	{
+		if(NUM.length >= ind)
+		{
+			return NUM[ind - 1] + " ";
+		}
+
+		return ind + ". ";
 	}
 
 	public BookMeta export(BookMeta meta)
 	{
 		CraftMetaBook book = (CraftMetaBook) meta;
+		meta.setDisplayName(getRoot().getName());
+		meta.setAuthor(getRoot().getAuthor());
+		meta.setGeneration(Generation.TATTERED);
+		book.pages.clear();
+
+		if(!cache.isEmpty())
+		{
+			book.pages.addAll(cache);
+			return book;
+		}
+
+		preprocessTome();
 		GMap<String, Integer> anchorPages = new GMap<>();
+		GMap<String, String> properties = genDefaultProperties();
 		GList<String> tables = new GList<>();
 		int currentPage = 0;
 		int currentLine = 0;
 		int maxLines = 11;
 		int maxCharacters = 25;
-		meta.setDisplayName(getRoot().getName());
-		meta.setAuthor(getRoot().getAuthor());
-		meta.setGeneration(Generation.TATTERED);
-		book.pages.clear();
+
 		IChatBaseComponent content = CraftChatMessage.fromString("", true)[0];
+
+		for(TomeComponent a : root.getComponents())
+		{
+			if(a instanceof TomeMeta)
+			{
+				TomeMeta tm = (TomeMeta) a;
+				properties.put(tm.getProperty(), tm.getValue());
+			}
+		}
+
+		filterProperties(properties);
 
 		for(TomeComponent a : root.getComponents())
 		{
@@ -138,7 +238,7 @@ public class Tome
 						{
 							if(c instanceof TomeParagraph)
 							{
-								IChatBaseComponent line = exportChildren((TomeParagraph) c, m + ". ");
+								IChatBaseComponent line = exportChildren((TomeParagraph) c, num(m));
 								content.addSibling(line);
 								m++;
 							}
@@ -171,10 +271,20 @@ public class Tome
 				lineConsumption = (int) Math.ceil((double) length / (double) maxCharacters);
 				lineConsumption += (nls - 1) >= 0 ? (nls - 1) : 0;
 
-				if(lineConsumption + currentLine > maxLines)
+				if(lineConsumption + currentLine > maxLines || raw.contains("!!bp!!"))
 				{
 					currentPage++;
 					currentLine = 0;
+
+					if(raw.contains("!!bp!!"))
+					{
+						continue;
+					}
+				}
+
+				else
+				{
+
 				}
 			}
 
@@ -189,8 +299,16 @@ public class Tome
 		}
 
 		GList<IChatBaseComponent> prePages = new GList<>();
-		prePages.add(exportFrontPage());
-		prePages.addAll(exportTableOfContents(tables));
+
+		if(properties.get("frontPage").equals("true"))
+		{
+			prePages.add(exportFrontPage());
+		}
+
+		if(properties.get("tableOfContents").equals("true"))
+		{
+			prePages.addAll(exportTableOfContents(tables));
+		}
 
 		for(Integer i : pageListing.k())
 		{
@@ -378,6 +496,8 @@ public class Tome
 
 							for(IChatBaseComponent n : m.a())
 							{
+								n.a().add(new ChatComponentScore("name", "obj"));
+
 								try
 								{
 									if(n.getChatModifier().h().a().equals(EnumClickAction.CHANGE_PAGE))
@@ -407,14 +527,58 @@ public class Tome
 			}
 		}
 
-		for(IChatBaseComponent i : prePages)
-		{
-			System.out.println(new JSONObject(IChatBaseComponent.ChatSerializer.a(i)).toString(2));
-		}
-
+		cache = prePages.copy();
 		book.pages.addAll(prePages);
 
 		return book;
+	}
+
+	private void filterProperties(GMap<String, String> properties)
+	{
+		GMap<String, String> defaults = genDefaultProperties();
+
+		for(String ii : properties.k())
+		{
+			String i = ii;
+
+			for(String j : defaults.k())
+			{
+				if(i.trim().equalsIgnoreCase(j) && !i.equals(j))
+				{
+					String v = properties.get(i);
+					properties.remove(i);
+					properties.put(j, v);
+					i = j;
+				}
+
+				if(i.equals(j))
+				{
+					if((defaults.get(j).equals("true") || defaults.get(j).equals("false")) && !(i.equals("true") || i.equals("false")))
+					{
+						String v = properties.get(i);
+
+						if(v.trim().equalsIgnoreCase("true") || v.trim().equalsIgnoreCase("1") || v.trim().equalsIgnoreCase("enabled") || v.trim().equalsIgnoreCase("enable") || v.trim().equalsIgnoreCase("on") || v.trim().equalsIgnoreCase("yes") || v.trim().equalsIgnoreCase("+"))
+						{
+							properties.put(i, "true");
+						}
+
+						else
+						{
+							properties.put(i, "false");
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private GMap<String, String> genDefaultProperties()
+	{
+		GMap<String, String> g = new GMap<>();
+		g.put("frontPage", "true");
+		g.put("tableOfContents", "true");
+
+		return g;
 	}
 
 	private GList<IChatBaseComponent> exportTableOfContents(GList<String> tables)
@@ -436,12 +600,14 @@ public class Tome
 		{
 			ad = true;
 			ChatModifier cmod = new ChatModifier();
+			ChatModifier cmodxx = new ChatModifier();
 			cmod.setItalic(true);
 			cmod.setChatClickable(new ChatClickable(EnumClickAction.CHANGE_PAGE, "s" + sec));
 			cmod.setChatHoverable(new ChatHoverable(EnumHoverAction.SHOW_TEXT, CraftChatMessage.fromString("Click to see '" + i + "'.", true)[0]));
 			IChatBaseComponent content = CraftChatMessage.fromString("", true)[0];
 			IChatBaseComponent nib = CraftChatMessage.fromString("\u270E ", true)[0];
 			IChatBaseComponent text = CraftChatMessage.fromString(i, true)[0];
+			nib.setChatModifier(cmodxx);
 			text.setChatModifier(cmod);
 			content.a().add(nib);
 			content.a().add(text);
@@ -516,7 +682,13 @@ public class Tome
 
 		for(TomeComponent i : paragraph.getComponents())
 		{
-			if(i instanceof TomeUnorederdList)
+			if(i instanceof TomeParagraph)
+			{
+				IChatBaseComponent lx = exportChildren((TomeParagraph) i);
+				line.addSibling(lx);
+			}
+
+			else if(i instanceof TomeUnorederdList)
 			{
 				for(TomeComponent c : i.getComponents())
 				{
@@ -533,7 +705,7 @@ public class Tome
 				}
 			}
 
-			if(i instanceof TomeOrderedList)
+			else if(i instanceof TomeOrderedList)
 			{
 				int m = 1;
 
@@ -541,7 +713,7 @@ public class Tome
 				{
 					if(c instanceof TomeParagraph)
 					{
-						IChatBaseComponent lx = exportChildren((TomeParagraph) c, m + ". ");
+						IChatBaseComponent lx = exportChildren((TomeParagraph) c, num(m));
 						line.addSibling(lx);
 						m++;
 					}
@@ -576,6 +748,7 @@ public class Tome
 	{
 		IChatBaseComponent line = CraftChatMessage.fromString("", true)[0];
 		ChatModifier cmod = new ChatModifier();
+		ChatModifier cmodx = new ChatModifier();
 
 		if(paragraph instanceof TomeHeader)
 		{
@@ -586,7 +759,9 @@ public class Tome
 
 		if(!prefixLine.isEmpty())
 		{
-			line.a(prefixLine);
+			IChatBaseComponent x = CraftChatMessage.fromString(prefixLine, true)[0];
+			x.setChatModifier(cmodx);
+			line.a().add(x);
 		}
 
 		for(TomeComponent i : paragraph.getComponents())
@@ -603,11 +778,6 @@ public class Tome
 		}
 
 		line.a("\n");
-
-		if(paragraph instanceof TomeHeader)
-		{
-			line.a("\n");
-		}
 
 		return line;
 	}
@@ -665,37 +835,15 @@ public class Tome
 			}
 		}
 
-		if(format.getColor() != null)
-		{
-			cmod.setColor(EnumChatFormat.valueOf(format.getColor().toUpperCase()));
-		}
+		cmod.setColor(format.getColor() != null ? EnumChatFormat.valueOf(format.getColor().toUpperCase()) : EnumChatFormat.BLACK);
 
 		if(format.getFormat() != null)
 		{
-			if(format.getFormat().contains("bold"))
-			{
-				cmod.setBold(true);
-			}
-
-			if(format.getFormat().contains("underline"))
-			{
-				cmod.setUnderline(true);
-			}
-
-			if(format.getFormat().contains("strikethrough"))
-			{
-				cmod.setStrikethrough(true);
-			}
-
-			if(format.getFormat().contains("italic"))
-			{
-				cmod.setItalic(true);
-			}
-
-			if(format.getFormat().contains("magic"))
-			{
-				cmod.setRandom(true);
-			}
+			cmod.setBold(format.getFormat().contains("bold"));
+			cmod.setUnderline(format.getFormat().contains("underline"));
+			cmod.setStrikethrough(format.getFormat().contains("strikethrough"));
+			cmod.setRandom(format.getFormat().contains("magic"));
+			cmod.setItalic(format.getFormat().contains("italic"));
 		}
 
 		String sym = "";
@@ -769,13 +917,20 @@ public class Tome
 		load(VIO.readAll(f));
 	}
 
-	public void load(String xml) throws DocumentException
+	public void load(String xmlr) throws DocumentException
 	{
+		StringBuilder x = new StringBuilder();
+
+		for(String i : xmlr.split("\\Q\n\\E"))
+		{
+			x.append(i.trim());
+		}
+
+		String xml = x.toString();
 		SAXReader reader = new SAXReader();
 		Document document = reader.read(new StringReader(xml));
 		setRoot(new TomeComponentBook());
 		getRoot().read(document);
-		preprocessTome();
 	}
 
 	public void save(File f) throws IOException

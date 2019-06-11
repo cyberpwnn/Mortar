@@ -9,10 +9,12 @@ import org.dom4j.Node;
 public class TomeSection extends TomeComponent
 {
 	private String name;
+	private boolean separate;
 
 	public TomeSection()
 	{
 		this("");
+		separate = false;
 	}
 
 	@Override
@@ -25,6 +27,11 @@ public class TomeSection extends TomeComponent
 			if(i.getName().equals("name"))
 			{
 				setSectionName(i.getStringValue());
+			}
+
+			if(i.getName().equals("separate"))
+			{
+				setSeparate(Boolean.valueOf(i.getStringValue()));
 			}
 		}
 
@@ -71,6 +78,7 @@ public class TomeSection extends TomeComponent
 	{
 		Element section = parent.addElement("section");
 		section.addAttribute("name", getSectionName());
+		section.addAttribute("separate", isSeparate() + "");
 
 		for(TomeComponent i : getComponents())
 		{
@@ -91,5 +99,25 @@ public class TomeSection extends TomeComponent
 	public void setSectionName(String name)
 	{
 		this.name = name;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public boolean isSeparate()
+	{
+		return separate;
+	}
+
+	public void setSeparate(boolean separate)
+	{
+		this.separate = separate;
 	}
 }

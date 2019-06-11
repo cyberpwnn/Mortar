@@ -51,6 +51,13 @@ public class TomeComponentBook extends TomeComponent implements WritableRoot
 			}
 		}
 
+		for(Iterator<Element> it = e.elementIterator("meta"); it.hasNext();)
+		{
+			TomeMeta meta = new TomeMeta();
+			meta.read(it.next());
+			add(meta);
+		}
+
 		for(Iterator<Element> it = e.elementIterator("section"); it.hasNext();)
 		{
 			TomeSection section = new TomeSection();
