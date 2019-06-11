@@ -4,7 +4,7 @@
   <groupId>com.volmit</groupId>
   <artifactId>Mortar</artifactId>
   <name>Mortar</name>
-  <version>1.0.64</version>
+  <version>1.0.65</version>
   <description>That crap between the bricks</description>
   <developers>
     <developer>
@@ -73,7 +73,7 @@
                   <skip>false</skip>
                   <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/copy.bat</executable>
                   <arguments>
-                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.64.jar</argument>
+                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.65.jar</argument>
                     <argument>C:\Users\cyberpwn\Documents\development\servers\dynamic\plugins\Mortar.jar</argument>
                   </arguments>
                 </configuration>
@@ -83,7 +83,7 @@
               <skip>false</skip>
               <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/copy.bat</executable>
               <arguments>
-                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.64.jar</argument>
+                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.65.jar</argument>
                 <argument>C:\Users\cyberpwn\Documents\development\servers\dynamic\plugins\Mortar.jar</argument>
               </arguments>
             </configuration>
@@ -117,8 +117,6 @@
               </execution>
             </executions>
             <configuration>
-              <reportOutputDirectory>${project.basedir}/javadoc</reportOutputDirectory>
-              <destDir>javadoc</destDir>
               <additionalJOptions>
                 <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-${project.name}</additionalJOption>
                 <additionalparam>${javadoc.opts}</additionalparam>
