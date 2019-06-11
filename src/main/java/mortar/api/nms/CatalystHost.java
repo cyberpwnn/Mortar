@@ -17,9 +17,12 @@ import org.bukkit.util.Vector;
 
 import mortar.api.world.MaterialBlock;
 import mortar.util.text.C;
+import net.md_5.bungee.api.chat.BaseComponent;
 
 public interface CatalystHost extends PacketListener, Listener
 {
+	public Object getIChatBaseComponent(BaseComponent bc);
+
 	public void redstoneParticle(Player p, Color c, Location l, float size);
 
 	public void redstoneParticle(double range, Color c, Location l, float size);

@@ -29,6 +29,8 @@ import mortar.lang.collection.GMap;
 import mortar.logic.format.F;
 import mortar.logic.io.VIO;
 import mortar.util.text.Alphabet;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_12_R1.ChatClickable;
 import net.minecraft.server.v1_12_R1.ChatClickable.EnumClickAction;
 import net.minecraft.server.v1_12_R1.ChatComponentScore;
@@ -529,6 +531,9 @@ public class Tome
 
 		cache = prePages.copy();
 		book.pages.addAll(prePages);
+
+		BaseComponent b = null;
+		ComponentSerializer.toString(b);
 
 		return book;
 	}

@@ -38,6 +38,8 @@ import mortar.lang.collection.GList;
 import mortar.lang.collection.GSet;
 import mortar.util.reflection.V;
 import mortar.util.text.C;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_9_R2.Block;
 import net.minecraft.server.v1_9_R2.BlockPosition;
 import net.minecraft.server.v1_9_R2.ChunkSection;
@@ -977,5 +979,11 @@ public class Catalyst94 extends CatalystPacketListener implements CatalystHost
 	{
 		ParticleColor cx = new ParticleEffect.OrdinaryColor(c.getRed(), c.getGreen(), c.getBlue());
 		ParticleEffect.REDSTONE.display(cx, l, range);
+	}
+
+	@Override
+	public Object getIChatBaseComponent(BaseComponent bc)
+	{
+		return IChatBaseComponent.ChatSerializer.a(ComponentSerializer.toString(bc));
 	}
 }
