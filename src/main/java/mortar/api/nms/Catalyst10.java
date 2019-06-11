@@ -20,12 +20,14 @@ import org.bukkit.craftbukkit.v1_10_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftMetaBook;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.util.Vector;
 
 import mortar.api.particle.ParticleEffect;
@@ -991,5 +993,11 @@ public class Catalyst10 extends CatalystPacketListener implements CatalystHost
 	public Object getIChatBaseComponent(BaseComponent bc)
 	{
 		return IChatBaseComponent.ChatSerializer.a(ComponentSerializer.toString(bc));
+	}
+
+	@Override
+	public void add(BookMeta bm, GList<BaseComponent> pages)
+	{
+		((CraftMetaBook) bm).pages = pages.convert((bc) -> IChatBaseComponent.ChatSerializer.a(ComponentSerializer.toString(bc)));
 	}
 }

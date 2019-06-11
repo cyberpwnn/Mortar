@@ -13,14 +13,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.util.Vector;
 
 import mortar.api.world.MaterialBlock;
+import mortar.lang.collection.GList;
 import mortar.util.text.C;
 import net.md_5.bungee.api.chat.BaseComponent;
 
 public interface CatalystHost extends PacketListener, Listener
 {
+	public void add(BookMeta bm, GList<BaseComponent> pages);
+
 	public Object getIChatBaseComponent(BaseComponent bc);
 
 	public void redstoneParticle(Player p, Color c, Location l, float size);
