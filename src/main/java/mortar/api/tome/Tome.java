@@ -867,11 +867,6 @@ public class Tome
 				}
 			}
 
-			if(i instanceof TomeParagraph)
-			{
-				// line.addExtra(exportChildren((TomeParagraph) i));
-			}
-
 			if(i instanceof TomeFormat)
 			{
 				line.addExtra(exportChildren((TomeFormat) i));
