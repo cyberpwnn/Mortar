@@ -26,6 +26,11 @@ public class M
 		return (int) clip(value, min, max);
 	}
 
+	public static double rangeScale(double amin, double amax, double bmin, double bmax, double b)
+	{
+		return amin + ((amax - amin) * ((b - bmin) / (bmax - bmin)));
+	}
+
 	public static void initTicking()
 	{
 		D d = new D(D.d, "Time");
