@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 
+import mortar.bukkit.compatibility.SoundEnum;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -217,7 +218,7 @@ public class SCMController extends Controller
 
 			if(e.getAction().equals(Action.LEFT_CLICK_BLOCK))
 			{
-				new Audio().s(Sound.ENTITY_ENDEREYE_DEATH).vp(1f, 1.5f).play(e.getPlayer());
+				new Audio().s(SoundEnum.ENTITY_ENDEREYE_DEATH.bukkitSound()).vp(1f, 1.5f).play(e.getPlayer());
 				ParticleEffect.ENCHANTMENT_TABLE.display(2.15f, 40, e.getClickedBlock().getLocation().clone().add(0.5, 1, 0.5), 32);
 				ParticleEffect.SWEEP_ATTACK.display(2.15f, 1, P.getHand(e.getPlayer()), 32);
 
@@ -235,7 +236,7 @@ public class SCMController extends Controller
 
 			else if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK))
 			{
-				new Audio().s(Sound.ENTITY_ENDEREYE_DEATH).vp(1f, 1.2f).play(e.getPlayer());
+				new Audio().s(SoundEnum.ENTITY_ENDEREYE_DEATH.bukkitSound()).vp(1f, 1.2f).play(e.getPlayer());
 				ParticleEffect.ENCHANTMENT_TABLE.display(2.15f, 40, e.getClickedBlock().getLocation().clone().add(0.5, 0.5, 0.5), 32);
 				ParticleEffect.SWEEP_ATTACK.display(2.15f, 1, P.getHand(e.getPlayer()), 32);
 				ItemStack is = i.clone();
