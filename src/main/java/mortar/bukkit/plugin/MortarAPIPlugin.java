@@ -237,7 +237,7 @@ public class MortarAPIPlugin extends MortarPlugin
 
 			else
 			{
-				D.as("Mortar Updater").l("Updates are avalible: " + current + " -> " + version);
+				D.as("Mortar Updater").l("Updates are available: " + current + " -> " + version);
 				HttpURLConnection con = (HttpURLConnection) dl.openConnection();
 				HttpURLConnection.setFollowRedirects(false);
 				con.setConnectTimeout(10000);
