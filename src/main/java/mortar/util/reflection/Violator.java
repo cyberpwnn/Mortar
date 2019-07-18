@@ -108,9 +108,19 @@ public class Violator
 	{
 		if(!h(id(c, null) + "." + name))
 		{
-			Field f = c.getField(name);
-			f.setAccessible(true);
-			p(id(c, null) + "." + name, f);
+			try {
+				Field f = c.getField(name);
+				f.setAccessible(true);
+				p(id(c, null) + "." + name, f);
+			} catch (NoSuchFieldException e) {
+				Class s = c.getSuperclass();
+				if (null == s) {
+					throw e;
+				}
+				Field f = s.getField(name);
+				f.setAccessible(true);
+				p(id(c, null) + "." + name, f);
+			}
 		}
 
 		return (Field) g(id(c, null) + "." + name);
@@ -120,9 +130,19 @@ public class Violator
 	{
 		if(!h(id(c, null) + "." + name))
 		{
-			Field f = c.getDeclaredField(name);
-			f.setAccessible(true);
-			p(id(f, null), f);
+			try {
+				Field f = c.getDeclaredField(name);
+				f.setAccessible(true);
+				p(id(c, null), f);
+			} catch (NoSuchFieldException e) {
+				Class s = c.getSuperclass();
+				if (null == s) {
+					throw e;
+				}
+				Field f = s.getDeclaredField(name);
+				f.setAccessible(true);
+				p(id(c, null) + "." + name, f);
+			}
 		}
 
 		return (Field) g(id(c, null) + "." + name);

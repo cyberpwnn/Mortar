@@ -507,11 +507,6 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 		{
 			SimpleCommandMap m = new V(Bukkit.getServer()).get("commandMap");
 
-			for(Field i : m.getClass().getDeclaredFields())
-			{
-				System.out.println(i.getName());
-			}
-
 			Map<String, Command> k = new V(m).get("knownCommands");
 
 			for(Iterator<Map.Entry<String, Command>> it = k.entrySet().iterator(); it.hasNext();)
@@ -541,7 +536,7 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 
 		catch(Throwable e)
 		{
-
+			e.printStackTrace();
 		}
 	}
 
