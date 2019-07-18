@@ -202,12 +202,14 @@ public class SCMController extends Controller
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void on(PlayerInteractEvent e)
 	{
-		if(e.getItem() == null)
+		final ItemStack i = e.getItem();
+		
+		if(i == null)
 		{
 			return;
 		}
 
-		if(e.getItem().getType().equals(Material.IRON_AXE))
+		if(i.getType().equals(Material.IRON_AXE) && i.hasItemMeta() && i.getItemMeta().getDisplayName().equalsIgnoreCase(C.YELLOW + "SCM Wand"))
 		{
 			e.setCancelled(true);
 
@@ -217,7 +219,7 @@ public class SCMController extends Controller
 				ParticleEffect.ENCHANTMENT_TABLE.display(2.15f, 40, e.getClickedBlock().getLocation().clone().add(0.5, 1, 0.5), 32);
 				ParticleEffect.SWEEP_ATTACK.display(2.15f, 1, P.getHand(e.getPlayer()), 32);
 
-				ItemStack is = e.getItem().clone();
+				ItemStack is = i.clone();
 				ItemMeta im = is.getItemMeta();
 				im.setDisplayName(C.YELLOW + "SCM Wand");
 				Location ll = e.getClickedBlock().getLocation();
@@ -234,7 +236,7 @@ public class SCMController extends Controller
 				new Audio().s(Sound.ENTITY_ENDEREYE_DEATH).vp(1f, 1.2f).play(e.getPlayer());
 				ParticleEffect.ENCHANTMENT_TABLE.display(2.15f, 40, e.getClickedBlock().getLocation().clone().add(0.5, 0.5, 0.5), 32);
 				ParticleEffect.SWEEP_ATTACK.display(2.15f, 1, P.getHand(e.getPlayer()), 32);
-				ItemStack is = e.getItem().clone();
+				ItemStack is = i.clone();
 				ItemMeta im = is.getItemMeta();
 				im.setDisplayName(C.YELLOW + "SCM Wand");
 				Location ll = e.getClickedBlock().getLocation();
