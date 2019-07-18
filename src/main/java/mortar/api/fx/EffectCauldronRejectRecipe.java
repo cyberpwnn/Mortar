@@ -2,6 +2,7 @@ package mortar.api.fx;
 
 import java.awt.Color;
 
+import mortar.bukkit.compatibility.SoundEnum;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -19,7 +20,7 @@ public class EffectCauldronRejectRecipe implements Effect
 
 	public EffectCauldronRejectRecipe()
 	{
-		audio = new Audio().c(SoundCategory.AMBIENT).vp(1f, 1.9f).setSound(Sound.BLOCK_BREWING_STAND_BREW);
+		audio = new Audio().c(SoundCategory.AMBIENT).vp(1f, 1.9f).setSound(SoundEnum.BLOCK_BREWING_STAND_BREW.bukkitSound());
 		audio.addChild(((Audio) audio).clone().p(0.3f).s(Sound.ENTITY_ZOMBIE_INFECT));
 		effect = new ParticleSpellMob().setColor(Color.GREEN);
 	}

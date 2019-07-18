@@ -3,6 +3,7 @@ package mortar.api.scm;
 import java.io.File;
 import java.io.IOException;
 
+import mortar.bukkit.compatibility.SoundEnum;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -48,7 +49,7 @@ public class CommandSCM extends MortarCommand
 
 		else if(args[0].equalsIgnoreCase("wand"))
 		{
-			GSound g = new GSound(Sound.BLOCK_END_PORTAL_FRAME_FILL);
+			GSound g = new GSound(SoundEnum.BLOCK_END_PORTAL_FRAME_FILL.bukkitSound());
 			g.setPitch(0.5f);
 			g.play(sender.player());
 			ItemStack is = new ItemStack(Material.IRON_AXE);
@@ -126,14 +127,14 @@ public class CommandSCM extends MortarCommand
 					{
 						gf.delete();
 						Mortar.getController(SCMController.class).getVolumes().remove(args[1]);
-						new Audio().s(Sound.BLOCK_FIRE_EXTINGUISH).vp(1f, 1.5f).play(sender.player());
+						new Audio().s(SoundEnum.FIZZ.bukkitSound()).vp(1f, 1.5f).play(sender.player());
 						sender.sendMessage(args[1] + " Deleted.");
 					}
 
 					else if(gg.exists())
 					{
 						gg.delete();
-						new Audio().s(Sound.BLOCK_FIRE_EXTINGUISH).vp(1f, 1.5f).play(sender.player());
+						new Audio().s(SoundEnum.FIZZ.bukkitSound()).vp(1f, 1.5f).play(sender.player());
 						sender.sendMessage(args[1] + " (raw) Deleted.");
 					}
 
@@ -190,7 +191,7 @@ public class CommandSCM extends MortarCommand
 							{
 								IVolume vv = new SCMVolume(c, PermutationType.ANY_AXIS);
 								vv.save(Mortar.getController(SCMController.class).getSCMFile(args[1]));
-								new Audio().s(Sound.BLOCK_ENCHANTMENT_TABLE_USE).vp(1f, 1.5f).play(sender.player());
+								new Audio().s(SoundEnum.BLOCK_ENCHANTMENT_TABLE_USE.bukkitSound()).vp(1f, 1.5f).play(sender.player());
 								Mortar.getController(SCMController.class).getVolumes().put(args[1], vv);
 							}
 
@@ -225,7 +226,7 @@ public class CommandSCM extends MortarCommand
 					if(Mortar.getController(SCMController.class).getVolumes().containsKey(args[1]))
 					{
 						Location lx = P.targetBlock((sender.player()), 12);
-						new Audio().s(Sound.BLOCK_ENCHANTMENT_TABLE_USE).vp(1f, 1.5f).play(sender.player());
+						new Audio().s(SoundEnum.BLOCK_ENCHANTMENT_TABLE_USE.bukkitSound()).vp(1f, 1.5f).play(sender.player());
 						Mortar.getController(SCMController.class).getVolumes().get(args[1]).place(lx);
 						sender.sendMessage("SCM Volume " + args[1] + " placed at target.");
 					}

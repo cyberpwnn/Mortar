@@ -1,5 +1,6 @@
 package mortar.api.fx;
 
+import mortar.bukkit.compatibility.SoundEnum;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -19,8 +20,8 @@ public class EffectCauldronBubble implements Effect
 
 	public EffectCauldronBubble()
 	{
-		audio = new Audio().c(SoundCategory.AMBIENT).vp(0.7f, 0.1f).setSound(Sound.ENTITY_BOAT_PADDLE_WATER);
-		audio2 = new Audio().c(SoundCategory.AMBIENT).vp(0.3f, 0.1f).setSound(Sound.ITEM_BUCKET_EMPTY_LAVA);
+		audio = new Audio().c(SoundCategory.AMBIENT).vp(0.7f, 0.1f).setSound(SoundEnum.ENTITY_BOAT_PADDLE_WATER.bukkitSound());
+		audio2 = new Audio().c(SoundCategory.AMBIENT).vp(0.3f, 0.1f).setSound(SoundEnum.ITEM_BUCKET_EMPTY_LAVA.bukkitSound());
 		effect = new ParticleWaterWake().setDirection(new Vector(0, 0.1, 0));
 		effect2 = new ParticleWaterSplash().setDirection(new Vector(0, 0.1, 0));
 	}

@@ -395,7 +395,7 @@ public class SCMController extends Controller
 			((BlockBreakEvent) e.getCause()).getPlayer().sendMessage("Constructed " + e.getVolumeName());
 		}
 
-		new Audio().s(Sound.BLOCK_ENCHANTMENT_TABLE_USE).vp(5f, 1.5f).play(e.getMappedVolume().getReverseRealizedMapping().k().pickRandom());
+		new Audio().s(SoundEnum.BLOCK_ENCHANTMENT_TABLE_USE.bukkitSound()).vp(5f, 1.5f).play(e.getMappedVolume().getReverseRealizedMapping().k().pickRandom());
 	}
 
 	public GMap<String, IVolume> getVolumes()
