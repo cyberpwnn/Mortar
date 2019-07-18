@@ -221,7 +221,8 @@ public class SCMController extends Controller
 				ItemMeta im = is.getItemMeta();
 				im.setDisplayName(C.YELLOW + "SCM Wand");
 				Location ll = e.getClickedBlock().getLocation();
-				GList<String> lx = new GList<String>(im.getLore());
+				GList<String> lx = new GList<>(im.hasLore() ? im.getLore() : new GList<>());
+				if (lx.size() == 0) lx.add("");
 				lx.set(0, C.AQUA + "A: " + ll.getWorld().getName() + "@" + ll.getBlockX() + "." + ll.getBlockY() + "." + ll.getBlockZ());
 				im.setLore(lx);
 				is.setItemMeta(im);
@@ -237,8 +238,9 @@ public class SCMController extends Controller
 				ItemMeta im = is.getItemMeta();
 				im.setDisplayName(C.YELLOW + "SCM Wand");
 				Location ll = e.getClickedBlock().getLocation();
-				GList<String> lx = new GList<String>(im.getLore());
-				lx.set(1, C.AQUA + "B: " + ll.getWorld().getName() + "@" + ll.getBlockX() + "." + ll.getBlockY() + "." + ll.getBlockZ());
+				GList<String> lx = new GList<String>(im.hasLore() ? im.getLore() : new GList<>());
+				if (lx.size() == 0) lx.add("");
+				lx.set(0, C.AQUA + "B: " + ll.getWorld().getName() + "@" + ll.getBlockX() + "." + ll.getBlockY() + "." + ll.getBlockZ());
 				im.setLore(lx);
 				is.setItemMeta(im);
 				e.getPlayer().getInventory().setItemInHand(is);
