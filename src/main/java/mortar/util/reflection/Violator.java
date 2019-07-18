@@ -133,7 +133,7 @@ public class Violator
 			try {
 				Field f = c.getDeclaredField(name);
 				f.setAccessible(true);
-				p(id(c, null), f);
+				p(id(c, null) + "." + name, f);
 			} catch (NoSuchFieldException e) {
 				Class s = c.getSuperclass();
 				if (null == s) {
