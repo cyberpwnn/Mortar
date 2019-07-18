@@ -40,6 +40,8 @@ import mortar.util.text.C;
 
 public class SCMController extends Controller
 {
+	public static final String WAND_NAME = C.YELLOW + "SCM Wand";
+
 	private GMap<String, IVolume> volumes;
 
 	public SCMController()
@@ -209,7 +211,7 @@ public class SCMController extends Controller
 			return;
 		}
 
-		if(i.getType().equals(Material.IRON_AXE) && i.hasItemMeta() && i.getItemMeta().getDisplayName().equalsIgnoreCase(C.YELLOW + "SCM Wand"))
+		if(i.getType().equals(Material.IRON_AXE) && i.hasItemMeta() && i.getItemMeta().getDisplayName().equalsIgnoreCase(WAND_NAME))
 		{
 			e.setCancelled(true);
 
@@ -221,7 +223,7 @@ public class SCMController extends Controller
 
 				ItemStack is = i.clone();
 				ItemMeta im = is.getItemMeta();
-				im.setDisplayName(C.YELLOW + "SCM Wand");
+				im.setDisplayName(WAND_NAME);
 				Location ll = e.getClickedBlock().getLocation();
 				GList<String> lx = new GList<>(im.hasLore() ? im.getLore() : new GList<>());
 				if (lx.size() == 0) lx.add("");
@@ -238,7 +240,7 @@ public class SCMController extends Controller
 				ParticleEffect.SWEEP_ATTACK.display(2.15f, 1, P.getHand(e.getPlayer()), 32);
 				ItemStack is = i.clone();
 				ItemMeta im = is.getItemMeta();
-				im.setDisplayName(C.YELLOW + "SCM Wand");
+				im.setDisplayName(WAND_NAME);
 				Location ll = e.getClickedBlock().getLocation();
 				GList<String> lx = new GList<String>(im.hasLore() ? im.getLore() : new GList<>());
 				if (lx.size() == 0) lx.add("");
@@ -264,7 +266,7 @@ public class SCMController extends Controller
 		{
 			ItemMeta im = is.getItemMeta();
 
-			if(im.getDisplayName().equals(C.YELLOW + "SCM Wand"))
+			if(im.getDisplayName().equals(WAND_NAME))
 			{
 				String a = im.getLore().get(0).split(":")[1].trim();
 				String b = im.getLore().get(1).split(":")[1].trim();
