@@ -21,7 +21,7 @@ public class EffectCauldronRejectRecipe implements Effect
 	public EffectCauldronRejectRecipe()
 	{
 		audio = new Audio().c(SoundCategory.AMBIENT).vp(1f, 1.9f).setSound(SoundEnum.BLOCK_BREWING_STAND_BREW.bukkitSound());
-		audio.addChild(((Audio) audio).clone().p(0.3f).s(Sound.ENTITY_ZOMBIE_INFECT));
+		audio.addChild(((Audio) audio).clone().p(0.3f).s(SoundEnum.ZOMBIE_INFECT.bukkitSound()));
 		effect = new ParticleSpellMob().setColor(Color.GREEN);
 	}
 
