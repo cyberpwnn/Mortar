@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -417,7 +418,7 @@ public class FulcrumInstance implements Listener
 
 	public boolean canOverwrite(Material m)
 	{
-		if(m.equals(Material.LONG_GRASS) || m.equals(Material.AIR) || m.equals(Material.WATER) || m.equals(Material.STATIONARY_WATER) || m.equals(Material.LAVA) || m.equals(Material.STATIONARY_LAVA) || m.equals(Material.DEAD_BUSH))
+		if(m.equals(Material.LONG_GRASS) || m.equals(MaterialEnum.AIR.bukkitMaterial()) || m.equals(Material.WATER) || m.equals(Material.STATIONARY_WATER) || m.equals(Material.LAVA) || m.equals(Material.STATIONARY_LAVA) || m.equals(Material.DEAD_BUSH))
 		{
 			return true;
 		}
@@ -469,7 +470,7 @@ public class FulcrumInstance implements Listener
 
 						if(is.getAmount() <= 1)
 						{
-							result = new ItemStack(Material.AIR);
+							result = new ItemStack(MaterialEnum.AIR.bukkitMaterial());
 						}
 
 						else
@@ -672,7 +673,7 @@ public class FulcrumInstance implements Listener
 				int place = Math.min(f, count);
 				ItemStack ix = e.getView().getItem(i);
 
-				if(ix == null || ix.getType().equals(Material.AIR))
+				if(ix == null || ix.getType().equals(MaterialEnum.AIR.bukkitMaterial()))
 				{
 					ItemStack iv = is.clone();
 					iv.setAmount(place);
@@ -767,7 +768,7 @@ public class FulcrumInstance implements Listener
 							if(cursor.getAmount() + isv.getAmount() <= stack)
 							{
 								cursor.setAmount(cursor.getAmount() + isv.getAmount());
-								e.getClickedInventory().setItem(i, new ItemStack(Material.AIR));
+								e.getClickedInventory().setItem(i, new ItemStack(MaterialEnum.AIR.bukkitMaterial()));
 								e.setCursor(cursor.clone());
 							}
 						}
@@ -796,7 +797,7 @@ public class FulcrumInstance implements Listener
 								if(cursor.getAmount() + isv.getAmount() <= stack)
 								{
 									cursor.setAmount(cursor.getAmount() + isv.getAmount());
-									other.setItem(i, new ItemStack(Material.AIR));
+									other.setItem(i, new ItemStack(MaterialEnum.AIR.bukkitMaterial()));
 									e.setCursor(cursor.clone());
 								}
 							}
@@ -832,7 +833,7 @@ public class FulcrumInstance implements Listener
 								{
 									is.setAmount(is.getAmount() + 1);
 									clickedInventory.setItem(clickedSlot, is.clone());
-									e.setCursor(new ItemStack(Material.AIR));
+									e.setCursor(new ItemStack(MaterialEnum.AIR.bukkitMaterial()));
 								}
 
 								else if(maxPull > 0 && cursor.getAmount() > 1)
@@ -876,7 +877,7 @@ public class FulcrumInstance implements Listener
 								{
 									is.setAmount(is.getAmount() + 1);
 									clickedInventory.setItem(clickedSlot, is.clone());
-									e.setCursor(new ItemStack(Material.AIR));
+									e.setCursor(new ItemStack(MaterialEnum.AIR.bukkitMaterial()));
 								}
 							}
 						}
@@ -1010,7 +1011,7 @@ public class FulcrumInstance implements Listener
 			if(is != null && is.getType().equals(ist.getType()) && is.getDurability() == ist.getDurability() && ist.getItemMeta().isUnbreakable() && is.getItemMeta().isUnbreakable())
 			{
 				count += is.getAmount();
-				inv.setItem(i, new ItemStack(Material.AIR));
+				inv.setItem(i, new ItemStack(MaterialEnum.AIR.bukkitMaterial()));
 			}
 		}
 

@@ -1,5 +1,6 @@
 package mortar.api.fx;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,7 +19,7 @@ public class ParticleTexture extends ParticleBase implements MotionEffect, Direc
 	public ParticleTexture()
 	{
 		direction = new Vector();
-		type = new BlockType(Material.STONE);
+		type = new BlockType(MaterialEnum.STONE.bukkitMaterial());
 		speed = 0f;
 		blockDust = false;
 	}

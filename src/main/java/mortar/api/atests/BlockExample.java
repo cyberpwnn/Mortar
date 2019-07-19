@@ -1,5 +1,6 @@
 package mortar.api.atests;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 
 import mortar.api.fulcrum.object.CustomBlock;
@@ -12,7 +13,7 @@ public class BlockExample extends CustomBlock
 	{
 		super(id);
 		setCollisionMode(BlockCollision.FULL);
-		setHardnessLike(Material.DIRT);
+		setHardnessLike(MaterialEnum.DIRT.bukkitMaterial());
 		setMaxStackSize(64);
 		setSound(BlockSoundCategory.BREAK, new SoundSteelBreak());
 		setSound(BlockSoundCategory.PLACE, new SoundSteelPlace());

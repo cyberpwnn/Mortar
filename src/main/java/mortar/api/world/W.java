@@ -2,6 +2,7 @@ package mortar.api.world;
 
 import java.util.Collection;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
@@ -632,7 +633,11 @@ public class W
 
 			Material type = new Location(from.getWorld(), from.getBlockX(), check, from.getBlockZ()).getBlock().getType();
 
-			if(!(type.equals(Material.AIR) || type.equals(Material.WATER) || type.equals(Material.STATIONARY_WATER) || type.equals(Material.LAVA) || type.equals(Material.STATIONARY_LAVA)))
+			if(!(type.equals(MaterialEnum.AIR.bukkitMaterial()) ||
+						type.equals(MaterialEnum.WATER.bukkitMaterial()) ||
+						type.equals(MaterialEnum.STATIONARY_WATER.bukkitMaterial()) ||
+						type.equals(MaterialEnum.LAVA.bukkitMaterial()) ||
+						type.equals(MaterialEnum.STATIONARY_LAVA.bukkitMaterial())))
 			{
 				return new Location(from.getWorld(), from.getBlockX(), check + 1, from.getBlockZ());
 			}

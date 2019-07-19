@@ -2,6 +2,7 @@ package mortar.api.scm;
 
 import java.util.Iterator;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.util.Vector;
@@ -39,7 +40,7 @@ public class VariableSchematic
 			{
 				for(int k = 0; k < dimension.getDepth(); k++)
 				{
-					set(i, j, k, Material.AIR, (byte) 0);
+					set(i, j, k, MaterialEnum.AIR.bukkitMaterial(), (byte) 0);
 				}
 			}
 		}
@@ -446,7 +447,7 @@ public class VariableSchematic
 
 	public void remove(Vector add)
 	{
-		set(add.getBlockX(), add.getBlockY(), add.getBlockZ(), Material.AIR, (byte) 0);
+		set(add.getBlockX(), add.getBlockY(), add.getBlockZ(), MaterialEnum.AIR.bukkitMaterial(), (byte) 0);
 	}
 
 	@SuppressWarnings("deprecation")

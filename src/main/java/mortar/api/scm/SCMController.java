@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import mortar.bukkit.compatibility.SoundEnum;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -212,7 +213,7 @@ public class SCMController extends Controller
 			return;
 		}
 
-		if(i.getType().equals(Material.IRON_AXE) && i.hasItemMeta() && i.getItemMeta().getDisplayName().equalsIgnoreCase(WAND_NAME))
+		if(i.getType().equals(MaterialEnum.IRON_AXE.bukkitMaterial()) && i.hasItemMeta() && i.getItemMeta().getDisplayName().equalsIgnoreCase(WAND_NAME))
 		{
 			e.setCancelled(true);
 
@@ -263,7 +264,7 @@ public class SCMController extends Controller
 			return null;
 		}
 
-		if(is.getType().equals(Material.IRON_AXE))
+		if(is.getType().equals(MaterialEnum.IRON_AXE.bukkitMaterial()))
 		{
 			ItemMeta im = is.getItemMeta();
 
@@ -288,7 +289,7 @@ public class SCMController extends Controller
 		{
 			for(Player i : P.onlinePlayers())
 			{
-				if(i.getInventory().getItemInHand().getType().equals(Material.IRON_AXE))
+				if(i.getInventory().getItemInHand().getType().equals(MaterialEnum.IRON_AXE.bukkitMaterial()))
 				{
 					Location[] d = getSelection(i);
 

@@ -2,6 +2,7 @@ package mortar.api.world;
 
 import java.util.List;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -25,7 +26,7 @@ public class Items
 	 */
 	public static boolean is(ItemStack is)
 	{
-		return is != null && !is.getType().equals(Material.AIR);
+		return is != null && !is.getType().equals(MaterialEnum.AIR.bukkitMaterial());
 	}
 
 	/**

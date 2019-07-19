@@ -1,5 +1,6 @@
 package mortar.api.atests;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 
 import mortar.api.fulcrum.util.DefaultBlockModel;
@@ -15,7 +16,7 @@ public class BlockExampleCube extends BlockExample
 		setModel(DefaultBlockModel.CUBE_ALL);
 		getModel().rewrite("$id", getID());
 		setTexture(getID(), "/assets/textures/blocks/steel.png");
-		setHardnessLike(Material.IRON_BLOCK);
+		setHardnessLike(MaterialEnum.IRON_BLOCK.bukkitMaterial());
 		setMinimumToolLevel(ToolLevel.STONE);
 		setEffectiveToolType(ToolType.PICKAXE);
 	}

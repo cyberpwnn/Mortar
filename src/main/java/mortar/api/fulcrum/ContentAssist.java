@@ -1,5 +1,6 @@
 package mortar.api.fulcrum;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
@@ -55,7 +56,7 @@ public class ContentAssist
 			return is;
 		}
 
-		if(is.getType().equals(Material.AIR))
+		if(is.getType().equals(MaterialEnum.AIR.bukkitMaterial()))
 		{
 			return is;
 		}

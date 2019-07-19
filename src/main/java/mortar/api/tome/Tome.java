@@ -14,6 +14,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftMetaBook;
@@ -64,7 +65,7 @@ public class Tome
 
 	public ItemStack toItemStack()
 	{
-		ItemStack isc = new ItemStack(Material.WRITTEN_BOOK);
+		ItemStack isc = new ItemStack(MaterialEnum.WRITTEN_BOOK.bukkitMaterial());
 		BookMeta bm = (BookMeta) isc.getItemMeta();
 		isc.setItemMeta(export(bm));
 

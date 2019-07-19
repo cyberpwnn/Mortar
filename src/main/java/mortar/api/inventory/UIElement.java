@@ -1,5 +1,6 @@
 package mortar.api.inventory;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -36,7 +37,7 @@ public class UIElement implements Element
 		lore = new GList<>();
 		enchanted = false;
 		count = 1;
-		material = new MaterialBlock(Material.AIR);
+		material = new MaterialBlock(MaterialEnum.AIR.bukkitMaterial());
 	}
 
 	@Override

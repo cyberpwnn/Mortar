@@ -1,5 +1,6 @@
 package mortar.api.inventory;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 
 import mortar.api.world.MaterialBlock;
@@ -10,7 +11,7 @@ public class UIStaticDecorator implements WindowDecorator
 
 	public UIStaticDecorator(Element element)
 	{
-		this.element = element == null ? new UIElement("bg").setMaterial(new MaterialBlock(Material.AIR)) : element;
+		this.element = element == null ? new UIElement("bg").setMaterial(new MaterialBlock(MaterialEnum.AIR.bukkitMaterial())) : element;
 	}
 
 	@Override

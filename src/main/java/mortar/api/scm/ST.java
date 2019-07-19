@@ -1,5 +1,6 @@
 package mortar.api.scm;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 import org.bukkit.util.Vector;
 
@@ -113,7 +114,7 @@ public class ST
 
 	public static VariableBlock wildcard(Material material, int size)
 	{
-		VariableBlock vb = new VariableBlock(Material.AIR);
+		VariableBlock vb = new VariableBlock(MaterialEnum.AIR.bukkitMaterial());
 		vb.getBlocks().clear();
 
 		for(int i = 0; i < size; i++)

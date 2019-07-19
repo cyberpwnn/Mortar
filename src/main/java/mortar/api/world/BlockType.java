@@ -1,5 +1,6 @@
 package mortar.api.world;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -99,7 +100,7 @@ public class BlockType
 
 	public BlockType(Material material, short s, boolean spawner)
 	{
-		this.material = Material.MOB_SPAWNER;
+		this.material = MaterialEnum.MOB_SPAWNER.bukkitMaterial();
 		data = 0;
 		cmat = material;
 		cdur = s;
@@ -131,7 +132,7 @@ public class BlockType
 
 	public BlockType()
 	{
-		material = Material.AIR;
+		material = MaterialEnum.AIR.bukkitMaterial();
 		data = 0;
 	}
 

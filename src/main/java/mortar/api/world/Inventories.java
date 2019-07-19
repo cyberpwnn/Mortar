@@ -1,5 +1,6 @@
 package mortar.api.world;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -107,7 +108,7 @@ public class Inventories
 
 		for(ItemStack i : ix.getContents())
 		{
-			if(i == null || i.getType().equals(Material.AIR))
+			if(i == null || i.getType().equals(MaterialEnum.AIR.bukkitMaterial()))
 			{
 				x++;
 			}

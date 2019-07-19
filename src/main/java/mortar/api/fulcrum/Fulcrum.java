@@ -1,5 +1,6 @@
 package mortar.api.fulcrum;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 
 import mortar.api.fulcrum.util.AllocationStrategy;
@@ -40,7 +41,7 @@ public class Fulcrum
 	@FulcrumParameter
 	public static AllocationStrategy allocationStrategy = AllocationStrategy.CYCLIC;
 
-	public static final Material SOLID_IDLE = Material.BARRIER;
+	public static final Material SOLID_IDLE = MaterialEnum.BARRIER.bukkitMaterial();
 
 	public FulcrumController getFulcrum()
 	{

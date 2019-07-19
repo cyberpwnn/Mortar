@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -966,7 +967,7 @@ public class Catalyst12 extends CatalystPacketListener implements CatalystHost
 
 		if(s == null)
 		{
-			return new MaterialBlock(Material.AIR);
+			return new MaterialBlock(MaterialEnum.AIR.bukkitMaterial());
 		}
 
 		IBlockData data = s.getType(xx & 15, yy & 15, zz & 15);

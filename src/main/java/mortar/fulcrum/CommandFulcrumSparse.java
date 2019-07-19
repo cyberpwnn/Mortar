@@ -28,7 +28,7 @@ public class CommandFulcrumSparse extends MortarCommand
 		ItemStack is = sender.player().getInventory().getItemInMainHand();
 		SparseProperties p = null;
 
-		if(is == null || is.getType().equals(Material.AIR))
+		if(is == null || is.getType().equals(MaterialEnum.AIR.bukkitMaterial()))
 		{
 			Block b = P.targetBlock(sender.player(), 16).getBlock();
 			ArmorStand i = ContentAssist.getArmorStand(b);

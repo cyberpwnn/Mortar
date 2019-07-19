@@ -1,5 +1,6 @@
 package mortar.api.inventory;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 
 import mortar.api.world.MaterialBlock;
@@ -16,7 +17,7 @@ public class UIRainbowDecorator implements WindowDecorator
 				.setName(" ")
 				.setMaterial(
 						new MaterialBlock(
-								Material.STAINED_GLASS_PANE,
+								MaterialEnum.STAINED_GLASS_PANE.bukkitMaterial(),
 								(byte) (apos % 15)));
 	}
 }

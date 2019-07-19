@@ -3,6 +3,7 @@ package mortar.api.scm;
 import java.io.File;
 import java.io.IOException;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import mortar.bukkit.compatibility.SoundEnum;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -52,7 +53,7 @@ public class CommandSCM extends MortarCommand
 			GSound g = new GSound(SoundEnum.BLOCK_END_PORTAL_FRAME_FILL.bukkitSound());
 			g.setPitch(0.5f);
 			g.play(sender.player());
-			ItemStack is = new ItemStack(Material.IRON_AXE);
+			ItemStack is = new ItemStack(MaterialEnum.IRON_AXE.bukkitMaterial());
 			ItemMeta im = is.getItemMeta();
 			im.setDisplayName(C.YELLOW + "SCM Wand");
 			Location ll = (sender.player()).getLocation();

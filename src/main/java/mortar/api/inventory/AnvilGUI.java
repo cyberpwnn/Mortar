@@ -1,6 +1,7 @@
 package mortar.api.inventory;
 import java.util.function.BiFunction;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -102,7 +103,7 @@ public class AnvilGUI
 		this.holder = holder;
 		this.biFunction = biFunction;
 
-		final ItemStack paper = new ItemStack(Material.PAPER);
+		final ItemStack paper = new ItemStack(MaterialEnum.PAPER.bukkitMaterial());
 		final ItemMeta paperMeta = paper.getItemMeta();
 		paperMeta.setDisplayName(insert);
 		paper.setItemMeta(paperMeta);
@@ -165,7 +166,7 @@ public class AnvilGUI
 				if(e.getRawSlot() == Slot.OUTPUT)
 				{
 					final ItemStack clicked = inventory.getItem(e.getRawSlot());
-					if(clicked == null || clicked.getType() == Material.AIR)
+					if(clicked == null || clicked.getType() == MaterialEnum.AIR.bukkitMaterial())
 					{
 						return;
 					}

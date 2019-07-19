@@ -1,5 +1,6 @@
 package mortar.api.world;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -66,7 +67,7 @@ public class MaterialBlock
 
 	public MaterialBlock()
 	{
-		material = Material.AIR;
+		material = MaterialEnum.AIR.bukkitMaterial();
 		data = 0;
 	}
 

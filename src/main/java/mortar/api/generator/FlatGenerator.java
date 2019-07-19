@@ -2,6 +2,7 @@ package mortar.api.generator;
 
 import java.util.Random;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.generator.ChunkGenerator;
@@ -19,16 +20,16 @@ public class FlatGenerator extends ChunkGenerator
 		{
 			for(int j = 0; j < 16; j++)
 			{
-				setBlock(result, i, 0, j, (short) Material.BEDROCK.getId());
+				setBlock(result, i, 0, j, (short) MaterialEnum.BEDROCK.bukkitMaterial().getId());
 
 				if(x % 2 == 0 ^ z % 2 == 0)
 				{
-					setBlock(result, i, 1, j, (short) Material.PURPUR_BLOCK.getId());
+					setBlock(result, i, 1, j, (short) MaterialEnum.PURPUR_BLOCK.bukkitMaterial().getId());
 				}
 
 				else
 				{
-					setBlock(result, i, 1, j, (short) Material.END_BRICKS.getId());
+					setBlock(result, i, 1, j, (short) MaterialEnum.END_BRICKS.bukkitMaterial().getId());
 				}
 			}
 		}

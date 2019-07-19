@@ -1,5 +1,6 @@
 package mortar.api.fulcrum.object;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -39,8 +40,8 @@ public class CustomBlock extends CustomItem implements IBlock
 		textures = new GMap<>();
 		setTexture(getID(), "assets/textures/blocks/unknown.png");
 		setCollisionMode(BlockCollision.FULL);
-		setHardnessLike(Material.STONE);
-		setEffectiveToolLike(Material.STONE);
+		setHardnessLike(MaterialEnum.STONE.bukkitMaterial());
+		setEffectiveToolLike(MaterialEnum.STONE.bukkitMaterial());
 		setModel(DefaultBlockModel.CUBE_ALL);
 		model.rewrite("$id", getID());
 	}
@@ -150,7 +151,7 @@ public class CustomBlock extends CustomItem implements IBlock
 	@Override
 	public void removeAt(Block at)
 	{
-		at.setType(Material.AIR);
+		at.setType(MaterialEnum.AIR.bukkitMaterial());
 
 		for(Entity i : at.getWorld().getNearbyEntities(at.getLocation().clone().add(0.5, 0.5, 0.5), 0.25, 0.25, 0.25))
 		{
@@ -207,7 +208,7 @@ public class CustomBlock extends CustomItem implements IBlock
 		{
 			if(getCollisionMode().equals(BlockCollision.FULL))
 			{
-				at.setType(Material.BARRIER);
+				at.setType(MaterialEnum.BARRIER.bukkitMaterial());
 			}
 		}
 
