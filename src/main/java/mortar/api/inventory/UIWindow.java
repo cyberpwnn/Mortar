@@ -63,7 +63,7 @@ public class UIWindow implements Window, Listener
 			return;
 		}
 
-		if(!viewer.getOpenInventory().getTopInventory().getName().equals(title))
+		if(!viewer.getOpenInventory().getTitle().equals(title))
 		{
 			return;
 		}
@@ -222,7 +222,7 @@ public class UIWindow implements Window, Listener
 			return;
 		}
 
-		if(!e.getPlayer().getOpenInventory().getTopInventory().getName().equals(title))
+		if(!e.getPlayer().getOpenInventory().getTitle().equals(title))
 		{
 			return;
 		}
