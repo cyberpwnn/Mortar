@@ -35,6 +35,7 @@ public enum MaterialEnum
 	FIREWORKK("FIREWORK", "FIREWORK_ROCKET"),
 	BOAT("BOAT", "OAK_BOAT"),
 	EGG("EGG"),
+	BOOK_AND_QUILL("BOOK_AND_QUILL", "WRITABLE_BOOK", "LEGACY_BOOK_AND_QUILL"),
 	MOB_SPAWNER("MOB_SPAWNER", "SPAWNER");
 
 	private String[] versionDependentNames;
