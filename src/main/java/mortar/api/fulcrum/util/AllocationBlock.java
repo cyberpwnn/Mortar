@@ -1,5 +1,6 @@
 package mortar.api.fulcrum.util;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 
 import mortar.api.fulcrum.Fulcrum;
@@ -24,11 +25,11 @@ public class AllocationBlock
 
 	public void addDefaultUnits()
 	{
-		add(Material.DIAMOND_HOE, "diamond_hoe", "items/diamond_hoe", "item/handheld");
-		add(Material.IRON_HOE, "iron_hoe", "items/iron_hoe", "item/handheld");
-		add(Material.STONE_HOE, "stone_hoe", "items/stone_hoe", "item/handheld");
-		add(Material.GOLD_HOE, "golden_hoe", "items/gold_hoe", "item/handheld");
-		add(Material.WOOD_HOE, "wooden_hoe", "items/wood_hoe", "item/handheld");
+		add(MaterialEnum.DIAMOND_HOE.bukkitMaterial(), "diamond_hoe", "items/diamond_hoe", "item/handheld");
+		add(MaterialEnum.IRON_HOE.bukkitMaterial(), "iron_hoe", "items/iron_hoe", "item/handheld");
+		add(MaterialEnum.STONE_HOE.bukkitMaterial(), "stone_hoe", "items/stone_hoe", "item/handheld");
+		add(MaterialEnum.GOLD_HOE.bukkitMaterial(), "golden_hoe", "items/gold_hoe", "item/handheld");
+		add(MaterialEnum.WOOD_HOE.bukkitMaterial(), "wooden_hoe", "items/wood_hoe", "item/handheld");
 	}
 
 	public void registerAll(FulcrumRegistry registry)

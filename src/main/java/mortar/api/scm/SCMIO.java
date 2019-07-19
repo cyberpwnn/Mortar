@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -131,7 +132,7 @@ public class SCMIO
 									Location sign = min.clone().add(din.readInt(), din.readInt(), din.readInt());
 									Block b = sign.getBlock();
 
-									if(b.getType().equals(Material.SIGN_POST) || b.getType().equals(Material.WALL_SIGN))
+									if(b.getType().equals(MaterialEnum.SIGN_POST.bukkitMaterial()) || b.getType().equals(MaterialEnum.WALL_SIGN.bukkitMaterial()))
 									{
 										Sign s = (Sign) b.getState();
 
@@ -246,7 +247,7 @@ public class SCMIO
 							dos.writeInt(m.getId());
 							dos.writeByte(mb.getData());
 
-							if(m.equals(Material.SIGN_POST) || m.equals(Material.WALL_SIGN))
+							if(m.equals(MaterialEnum.SIGN_POST.bukkitMaterial()) || m.equals(MaterialEnum.WALL_SIGN.bukkitMaterial()))
 							{
 								signs.add(new Location(c.getWorld(), i, j, k));
 							}

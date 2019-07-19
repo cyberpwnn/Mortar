@@ -418,7 +418,7 @@ public class FulcrumInstance implements Listener
 
 	public boolean canOverwrite(Material m)
 	{
-		if(m.equals(Material.LONG_GRASS) || m.equals(MaterialEnum.AIR.bukkitMaterial()) || m.equals(Material.WATER) || m.equals(Material.STATIONARY_WATER) || m.equals(Material.LAVA) || m.equals(Material.STATIONARY_LAVA) || m.equals(Material.DEAD_BUSH))
+		if(m.equals(MaterialEnum.LONG_GRASS.bukkitMaterial()) || m.equals(MaterialEnum.AIR.bukkitMaterial()) || m.equals(MaterialEnum.WATER.bukkitMaterial()) || m.equals(MaterialEnum.STATIONARY_WATER.bukkitMaterial()) || m.equals(MaterialEnum.LAVA.bukkitMaterial()) || m.equals(MaterialEnum.STATIONARY_LAVA.bukkitMaterial()) || m.equals(MaterialEnum.DEAD_BUSH.bukkitMaterial()))
 		{
 			return true;
 		}
