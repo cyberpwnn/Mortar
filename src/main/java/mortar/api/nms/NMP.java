@@ -1,5 +1,6 @@
 package mortar.api.nms;
 
+import com.google.gson.stream.MalformedJsonException;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -32,7 +33,10 @@ public class NMP
 
 		public static void sendTablist(Player p, String h, String f)
 		{
-			new PacketBuffer().q(host.packetTabHeaderFooter(h, f)).flush(p);
+			try {
+				new PacketBuffer().q(host.packetTabHeaderFooter(h, f)).flush(p);
+			} catch (Exception ex) {
+			}
 		}
 
 		/**
