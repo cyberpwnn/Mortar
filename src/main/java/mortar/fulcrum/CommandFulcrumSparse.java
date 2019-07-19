@@ -1,5 +1,6 @@
 package mortar.fulcrum;
 
+import mortar.bukkit.compatibility.MaterialEnum;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
