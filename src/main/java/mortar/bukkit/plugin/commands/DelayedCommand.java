@@ -35,7 +35,7 @@ public class DelayedCommand
 
 	@Setter
 	@Getter
-	private Long ttl = 5 * 1000L; // 5 second delay
+	private Long ttl = 10 * 1000L; // 5 second delay
 
 	public DelayedCommand(String id, MortarSender sender, Runnable success)
 	{
@@ -67,7 +67,7 @@ public class DelayedCommand
 
 	public boolean canRun()
 	{
-		return this.expire <= this.time;
+		return this.expire <= System.currentTimeMillis();
 	}
 
 }
