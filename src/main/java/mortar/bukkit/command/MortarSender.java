@@ -2,6 +2,9 @@ package mortar.bukkit.command;
 
 import java.util.Set;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.bukkit.GameMode;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -22,6 +25,10 @@ public class MortarSender implements CommandSender
 {
 	private CommandSender s;
 	private String tag;
+
+	@Getter
+	@Setter
+	private String command;
 
 	/**
 	 * Wrap a command sender

@@ -466,7 +466,7 @@ public abstract class MortarPlugin extends JavaPlugin implements Logged, Listene
 				{
 					VirtualCommand cmd = commands.get(i);
 
-					if(cmd.hit(sender, chain.copy()))
+					if(cmd.hit(sender, chain.copy(), label))
 					{
 						return true;
 					}

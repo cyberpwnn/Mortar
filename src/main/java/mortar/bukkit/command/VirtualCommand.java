@@ -72,8 +72,16 @@ public class VirtualCommand
 
 	public boolean hit(CommandSender sender, GList<String> chain)
 	{
+		return hit(sender, chain, null);
+	}
+
+	public boolean hit(CommandSender sender, GList<String> chain, String label)
+	{
 		MortarSender vs = new MortarSender(sender);
 		vs.setTag(tag);
+
+		if (label != null)
+			vs.setCommand(label);
 
 		if(chain.isEmpty())
 		{
@@ -93,10 +101,11 @@ public class VirtualCommand
 			{
 				if(j.equalsIgnoreCase(nl))
 				{
+					vs.setCommand(chain.get(0));
 					VirtualCommand cmd = children.get(i);
 					GList<String> c = chain.copy();
 					c.remove(0);
-					if(cmd.hit(sender, c))
+					if(cmd.hit(sender, c, vs.getCommand()))
 					{
 						return true;
 					}
