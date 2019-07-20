@@ -35,16 +35,31 @@ public class DelayedController extends Controller
 		}
 	}
 
-	public void register(DelayedCommand cmd)
+	public DelayedCommand register(DelayedCommand cmd)
 	{
 		this.cmds.add(cmd);
+		return cmd;
 	}
 
 	public boolean confirm(MortarSender sender)
 	{
 		for (DelayedCommand cmd : cmds) {
-			if (!cmd.getSender().equals(sender) || cmd.isCancelled()) continue;
+			if (!cmd.getSender().player().equals(sender.player())) continue;
 			cmd.setCancelled(false);
+			cmd.run();
+			cmds.remove(cmd);
+			return true;
+		}
+		return false;
+	}
+
+	public boolean cancel(MortarSender sender)
+	{
+		for (DelayedCommand cmd : cmds) {
+			if (!cmd.getSender().player().equals(sender.player())) continue;
+			cmd.setCancelled(true);
+			cmd.run();
+			cmds.remove(cmd);
 			return true;
 		}
 		return false;

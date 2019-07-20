@@ -39,6 +39,7 @@ public class DelayedCommand
 
 	public DelayedCommand(String id, MortarSender sender, Runnable success)
 	{
+		this.id = id;
 		this.time = System.currentTimeMillis();
 		this.expire = this.time + this.ttl;
 
@@ -62,8 +63,6 @@ public class DelayedCommand
 	{
 		if (!this.isCancelled() && this.success != null) this.success.run();
 		else if (this.isCancelled() && this.failed != null) this.failed.run();
-		setSuccess(null);
-		setFailed(null);
 	}
 
 	public boolean canRun()
