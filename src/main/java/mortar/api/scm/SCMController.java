@@ -185,6 +185,7 @@ public class SCMController extends Controller
 
 	public GBiset<String, IMappedVolume> doMatch(Location at)
 	{
+		if (volumes == null || volumes.size() == 0) return null;
 		GBiset<String, IMappedVolume> s = null;
 
 		for(String i : volumes.k())
