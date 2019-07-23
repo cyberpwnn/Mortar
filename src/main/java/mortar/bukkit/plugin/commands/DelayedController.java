@@ -46,7 +46,9 @@ public class DelayedController extends Controller
 		for (DelayedCommand cmd : cmds) {
 			if (!cmd.getSender().player().equals(sender.player())) continue;
 			cmd.setCancelled(false);
-			cmd.run();
+			try {
+				cmd.run();
+			} catch (Exception ex) {}
 			cmds.remove(cmd);
 			return true;
 		}
