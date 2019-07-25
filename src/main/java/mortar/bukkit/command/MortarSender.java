@@ -186,7 +186,8 @@ public class MortarSender implements CommandSender
 	@Override
 	public void sendMessage(String[] messages)
 	{
-		s.sendMessage(C.translateAlternateColorCodes('&', getTag()) + messages);
+		for (String str : messages)
+			s.sendMessage(C.translateAlternateColorCodes('&', getTag() + str));
 	}
 
 	@Override
