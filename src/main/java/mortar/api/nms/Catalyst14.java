@@ -893,7 +893,7 @@ public class Catalyst14 extends CatalystPacketListener implements CatalystHost
 		bits += noBasePlate ? 8 : 0;
 		bits += marker ? 10 : 0;
 
-		return new Item<Byte>(new DataWatcherObject<>(11, DataWatcherRegistry.a), bits);
+		return new Item<Byte>(new DataWatcherObject<>(13, DataWatcherRegistry.a), bits);
 	}
 
 	@Override
