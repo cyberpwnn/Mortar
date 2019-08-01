@@ -4,7 +4,7 @@
   <groupId>com.volmit</groupId>
   <artifactId>Mortar</artifactId>
   <name>Mortar</name>
-  <version>1.0.66</version>
+  <version>1.0.71-dev</version>
   <description>That crap between the bricks</description>
   <developers>
     <developer>
@@ -89,7 +89,6 @@
         <plugins>
           <plugin>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -101,28 +100,20 @@
           </plugin>
           <plugin>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>
                 <goals>
                   <goal>jar</goal>
                 </goals>
-                <configuration>
-                  <additionalJOptions>
-                    <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-Mortar</additionalJOption>
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                  </additionalJOptions>
-                  <stylesheetfile>C:\Users\cyberpwn\Documents\development\workspace\Mortar\stylesheet.css</stylesheetfile>
-                </configuration>
               </execution>
             </executions>
             <configuration>
               <additionalJOptions>
-                <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-Mortar</additionalJOption>
-                <additionalparam>-Xdoclint:none</additionalparam>
+                <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-${project.name}</additionalJOption>
+                <additionalparam>${javadoc.opts}</additionalparam>
               </additionalJOptions>
-              <stylesheetfile>C:\Users\cyberpwn\Documents\development\workspace\Mortar\stylesheet.css</stylesheetfile>
+              <stylesheetfile>${project.basedir}\stylesheet.css</stylesheetfile>
             </configuration>
           </plugin>
           <plugin>
@@ -136,26 +127,16 @@
                 <goals>
                   <goal>exec</goal>
                 </goals>
-                <configuration>
-                  <skip>false</skip>
-                  <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/doublecopy.bat</executable>
-                  <arguments>
-                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.66.jar</argument>
-                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\1.0.66\Mortar-1.0.66.jar</argument>
-                    <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\Mortar.jar</argument>
-                    <argument>1.0.66</argument>
-                  </arguments>
-                </configuration>
               </execution>
             </executions>
             <configuration>
-              <skip>false</skip>
-              <executable>C:\Users\cyberpwn\Documents\development\workspace\Mortar/scripts/doublecopy.bat</executable>
+              <skip>${skip.copy}</skip>
+              <executable>${project.basedir}/scripts/doublecopy.bat</executable>
               <arguments>
-                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\target\Mortar-1.0.66.jar</argument>
-                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\1.0.66\Mortar-1.0.66.jar</argument>
-                <argument>C:\Users\cyberpwn\Documents\development\workspace\Mortar\release\Mortar.jar</argument>
-                <argument>1.0.66</argument>
+                <argument>${project.basedir}\target\${project.name}-${project.version}.jar</argument>
+                <argument>${project.basedir}\release\${project.version}\Mortar-${project.version}.jar</argument>
+                <argument>${project.basedir}\release\Mortar.jar</argument>
+                <argument>${project.version}</argument>
               </arguments>
             </configuration>
           </plugin>
@@ -327,14 +308,14 @@
     </repository>
   </distributionManagement>
   <properties>
-    <skip.copy>false</skip.copy>
     <api.version>3</api.version>
-    <libs>${project.basedir}/lib</libs>
-    <development.location>${user.home}\Documents\development\servers\dynamic\plugins\${project.name}.jar</development.location>
-    <javadoc.opts>-Xdoclint:none</javadoc.opts>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <development.location>${user.home}\Documents\development\servers\dynamic\plugins\${project.name}.jar</development.location>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <javadoc.opts>-Xdoclint:none</javadoc.opts>
+    <skip.copy>false</skip.copy>
+    <libs>${project.basedir}/lib</libs>
   </properties>
 </project>
 

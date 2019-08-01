@@ -329,17 +329,17 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
-			<version>9.4.8.v20171121</version>
+			<version>9.4.19.v20190610</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlet</artifactId>
-			<version>9.4.8.v20171121</version>
+			<version>9.4.19.v20190610</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-util</artifactId>
-			<version>9.4.8.v20171121</version>
+			<version>9.4.19.v20190610</version>
 		</dependency>
 		<dependency>
 			<groupId>d4j</groupId>
