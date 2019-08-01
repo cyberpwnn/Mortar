@@ -649,12 +649,8 @@ public class GList<T> extends ArrayList<T>
 	public GList<T> copy()
 	{
 		GList<T> c = new GList<T>();
-
-		for(T i : this)
-		{
-			c.add(i);
-		}
-
+		if (this.size() < 1) return c;
+		c.addAll(this);
 		return c;
 	}
 
