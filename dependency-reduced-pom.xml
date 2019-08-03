@@ -4,7 +4,7 @@
   <groupId>com.volmit</groupId>
   <artifactId>Mortar</artifactId>
   <name>Mortar</name>
-  <version>1.0.71-dev</version>
+  <version>1.0.71</version>
   <description>That crap between the bricks</description>
   <developers>
     <developer>
