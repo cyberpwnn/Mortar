@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 
 import mortar.bukkit.plugin.MortarAPIPlugin;
@@ -39,7 +40,7 @@ public abstract class CatalystPacketListener implements PacketListener
 		protocol = new TinyProtocol(MortarAPIPlugin.p)
 		{
 			@Override
-			public Object onPacketOutAsync(Player reciever, Object packet)
+			public Object onPacketOutAsync(Player reciever, Channel channel, Object packet)
 			{
 				Object p = packet;
 
@@ -86,7 +87,7 @@ public abstract class CatalystPacketListener implements PacketListener
 			}
 
 			@Override
-			public Object onPacketInAsync(Player sender, Object packet)
+			public Object onPacketInAsync(Player sender, Channel channel, Object packet)
 			{
 				Object p = packet;
 
