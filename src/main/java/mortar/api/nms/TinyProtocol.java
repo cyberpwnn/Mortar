@@ -1,169 +1,250 @@
 package mortar.api.nms;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelPromise;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
+import com.mojang.authlib.GameProfile;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
+/**
+ * Represents a very tiny alternative to ProtocolLib.
+ * <p>
+ * It now supports intercepting packets during login and status ping (such as OUT_SERVER_PING)!
+ *
+ * @author Kristian
+ */
+public abstract class TinyProtocol {
+	private static final AtomicInteger ID = new AtomicInteger(0);
 
-public abstract class TinyProtocol implements Listener
-{
-	private static String OBC_PREFIX = Bukkit.getServer().getClass().getPackage().getName();
-	private static String NMS_PREFIX = OBC_PREFIX.replace("org.bukkit.craftbukkit", "net.minecraft.server");
-	private MethodInvoker getPlayerHandle = getMethod(getCraftBukkitClass("entity.CraftPlayer"), "getHandle");
-	private FieldAccessor<Object> getConnection = getField(getMinecraftClass("EntityPlayer"), "playerConnection", Object.class);
-	private FieldAccessor<Object> getManager = getField(getMinecraftClass("PlayerConnection"), "networkManager", Object.class);
-	private FieldAccessor<Channel> getChannel = getField(getMinecraftClass("NetworkManager"), Channel.class, 0);
-	private Map<Player, Channel> channelLookup = new MapMaker().weakKeys().makeMap();
+	// Used in order to lookup a channel
+	private static final Reflection.MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
+	private static final Reflection.FieldAccessor<Object> getConnection = Reflection.getField("{nms}.EntityPlayer", "playerConnection", Object.class);
+	private static final Reflection.FieldAccessor<Object> getManager = Reflection.getField("{nms}.PlayerConnection", "networkManager", Object.class);
+	private static final Reflection.FieldAccessor<Channel> getChannel = Reflection.getField("{nms}.NetworkManager", Channel.class, 0);
 
-	private boolean closed;
-	private Plugin plugin;
+	// Looking up ServerConnection
+	private static final Class<Object> minecraftServerClass = Reflection.getUntypedClass("{nms}.MinecraftServer");
+	private static final Class<Object> serverConnectionClass = Reflection.getUntypedClass("{nms}.ServerConnection");
+	private static final Reflection.FieldAccessor<Object> getMinecraftServer = Reflection.getField("{obc}.CraftServer", minecraftServerClass, 0);
+	private static final Reflection.FieldAccessor<Object> getServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0);
+	private static final Reflection.MethodInvoker getNetworkMarkers = Reflection.getTypedMethod(serverConnectionClass, null, List.class, serverConnectionClass);
 
-	public TinyProtocol(Plugin plugin)
-	{
+	// Packets we have to intercept
+	private static final Class<?> PACKET_LOGIN_IN_START = Reflection.getMinecraftClass("PacketLoginInStart");
+	private static final Reflection.FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
+
+	// Speedup channel lookup
+	private Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
+	private Listener listener;
+
+	// Channels that have already been removed
+	private Set<Channel> uninjectedChannels = Collections.newSetFromMap(new MapMaker().weakKeys().<Channel, Boolean>makeMap());
+
+	// List of network markers
+	private List<Object> networkManagers;
+
+	// Injected channel handlers
+	private List<Channel> serverChannels = Lists.newArrayList();
+	private ChannelInboundHandlerAdapter serverChannelHandler;
+	private ChannelInitializer<Channel> beginInitProtocol;
+	private ChannelInitializer<Channel> endInitProtocol;
+
+	// Current handler name
+	private String handlerName;
+
+	protected volatile boolean closed;
+	protected Plugin plugin;
+
+	/**
+	 * Construct a new instance of TinyProtocol, and start intercepting packets for all connected clients and future clients.
+	 * <p>
+	 * You can construct multiple instances per plugin.
+	 *
+	 * @param plugin - the plugin.
+	 */
+	public TinyProtocol(final Plugin plugin) {
 		this.plugin = plugin;
-		this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
 
-		for(Player player : plugin.getServer().getOnlinePlayers())
-		{
+		// Compute handler name
+		this.handlerName = getHandlerName();
+
+		// Prepare existing players
+		registerBukkitEvents();
+
+		try {
+			registerChannelHandler();
+			registerPlayers(plugin);
+		} catch (IllegalArgumentException ex) {
+			// Damn you, late bind
+			plugin.getLogger().info("[TinyProtocol] Delaying server channel injection due to late bind.");
+
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					registerChannelHandler();
+					registerPlayers(plugin);
+					plugin.getLogger().info("[TinyProtocol] Late bind injection successful.");
+				}
+			}.runTask(plugin);
+		}
+	}
+
+	private void createServerChannelHandler() {
+		// Handle connected channels
+		endInitProtocol = new ChannelInitializer<Channel>() {
+
+			@Override
+			protected void initChannel(Channel channel) throws Exception {
+				try {
+					// This can take a while, so we need to stop the main thread from interfering
+					synchronized (networkManagers) {
+						// Stop injecting channels
+						if (!closed) {
+							channel.eventLoop().submit(() -> injectChannelInternal(channel));
+						}
+					}
+				} catch (Exception e) {
+					plugin.getLogger().log(Level.SEVERE, "Cannot inject incomming channel " + channel, e);
+				}
+			}
+
+		};
+
+		// This is executed before Minecraft's channel handler
+		beginInitProtocol = new ChannelInitializer<Channel>() {
+
+			@Override
+			protected void initChannel(Channel channel) throws Exception {
+				channel.pipeline().addLast(endInitProtocol);
+			}
+
+		};
+
+		serverChannelHandler = new ChannelInboundHandlerAdapter() {
+
+			@Override
+			public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+				Channel channel = (Channel) msg;
+
+				// Prepare to initialize ths channel
+				channel.pipeline().addFirst(beginInitProtocol);
+				ctx.fireChannelRead(msg);
+			}
+
+		};
+	}
+
+	/**
+	 * Register bukkit events.
+	 */
+	private void registerBukkitEvents() {
+		listener = new Listener() {
+
+			@EventHandler(priority = EventPriority.LOWEST)
+			public final void onPlayerLogin(PlayerLoginEvent e) {
+				if (closed)
+					return;
+
+				Channel channel = getChannel(e.getPlayer());
+
+				// Don't inject players that have been explicitly uninjected
+				if (!uninjectedChannels.contains(channel)) {
+					injectPlayer(e.getPlayer());
+				}
+			}
+
+			@EventHandler
+			public final void onPluginDisable(PluginDisableEvent e) {
+				if (e.getPlugin().equals(plugin)) {
+					close();
+				}
+			}
+
+		};
+
+		plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void registerChannelHandler() {
+		Object mcServer = getMinecraftServer.get(Bukkit.getServer());
+		Object serverConnection = getServerConnection.get(mcServer);
+		boolean looking = true;
+
+		// We need to synchronize against this list
+		networkManagers = (List<Object>) getNetworkMarkers.invoke(null, serverConnection);
+		createServerChannelHandler();
+
+		// Find the correct list, or implicitly throw an exception
+		for (int i = 0; looking; i++) {
+			List<Object> list = Reflection.getField(serverConnection.getClass(), List.class, i).get(serverConnection);
+
+			for (Object item : list) {
+				if (!ChannelFuture.class.isInstance(item))
+					break;
+
+				// Channel future that contains the server connection
+				Channel serverChannel = ((ChannelFuture) item).channel();
+
+				serverChannels.add(serverChannel);
+				serverChannel.pipeline().addFirst(serverChannelHandler);
+				looking = false;
+			}
+		}
+	}
+
+	private void unregisterChannelHandler() {
+		if (serverChannelHandler == null)
+			return;
+
+		for (Channel serverChannel : serverChannels) {
+			final ChannelPipeline pipeline = serverChannel.pipeline();
+
+			// Remove channel handler
+			serverChannel.eventLoop().execute(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						pipeline.remove(serverChannelHandler);
+					} catch (NoSuchElementException e) {
+						// That's fine
+					}
+				}
+
+			});
+		}
+	}
+
+	private void registerPlayers(Plugin plugin) {
+		for (Player player : plugin.getServer().getOnlinePlayers()) {
 			injectPlayer(player);
 		}
-	}
-
-	private void injectPlayer(final Player player)
-	{
-		getChannel(player).pipeline().addBefore("packet_handler", getHandlerName(), new ChannelDuplexHandler()
-		{
-			@Override
-			public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
-			{
-				try
-				{
-					msg = onPacketInAsync(player, msg);
-				}
-				catch(Exception e)
-				{
-					plugin.getLogger().log(Level.SEVERE, "Error in onPacketInAsync().", e);
-				}
-
-				if(msg != null)
-				{
-					super.channelRead(ctx, msg);
-				}
-			}
-
-			@Override
-			public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception
-			{
-				try
-				{
-					msg = onPacketOutAsync(player, msg);
-				}
-				catch(Exception e)
-				{
-					plugin.getLogger().log(Level.SEVERE, "Error in onPacketOutAsync().", e);
-				}
-
-				if(msg != null)
-				{
-					super.write(ctx, msg, promise);
-				}
-			}
-		});
-	}
-
-	private String getHandlerName()
-	{
-		return "tiny-" + plugin.getName();
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST)
-	public final void onPlayerJoin(PlayerJoinEvent e)
-	{
-		if(closed)
-			return;
-		injectPlayer(e.getPlayer());
-	}
-
-	@EventHandler
-	public final void onPluginDisable(PluginDisableEvent e)
-	{
-		if(e.getPlugin().equals(plugin))
-		{
-			try
-			{
-				close();
-			}
-
-			catch(Throwable ex)
-			{
-
-			}
-		}
-	}
-
-	/**
-	 * Send a packet to a particular player.
-	 *
-	 * @param player
-	 *            - the destination player.
-	 * @param packet
-	 *            - the packet to send.
-	 */
-	public void sendPacket(Player player, Object packet)
-	{
-		getChannel(player).pipeline().writeAndFlush(packet);
-	}
-
-	/**
-	 * Pretend that a given packet has been received from a player.
-	 *
-	 * @param player
-	 *            - the player that sent the packet.
-	 * @param packet
-	 *            - the packet that will be received by the server.
-	 */
-	public void receivePacket(Player player, Object packet)
-	{
-		getChannel(player).pipeline().context("encoder").fireChannelRead(packet);
-	}
-
-	/**
-	 * Retrieve the Netty channel associated with a player. This is cached.
-	 *
-	 * @param player
-	 *            - the player.
-	 * @return The Netty channel.
-	 */
-	private Channel getChannel(Player player)
-	{
-		Channel channel = channelLookup.get(player);
-
-		// Lookup channel again
-		if(channel == null)
-		{
-			Object connection = getConnection.get(getPlayerHandle.invoke(player));
-			Object manager = getManager.get(connection);
-
-			channelLookup.put(player, channel = getChannel.get(manager));
-		}
-		return channel;
 	}
 
 	/**
@@ -171,291 +252,268 @@ public abstract class TinyProtocol implements Listener
 	 * <p>
 	 * Note that this is not executed on the main thread.
 	 *
-	 * @param reciever
-	 *            - the receiving player.
-	 * @param packet
-	 *            - the packet being sent.
+	 * @param receiver - the receiving player, NULL for early login/status packets.
+	 * @param channel - the channel that received the packet. Never NULL.
+	 * @param packet - the packet being sent.
 	 * @return The packet to send instead, or NULL to cancel the transmission.
 	 */
-	public Object onPacketOutAsync(Player reciever, Object packet)
-	{
+	public Object onPacketOutAsync(Player receiver, Channel channel, Object packet) {
 		return packet;
 	}
 
 	/**
 	 * Invoked when the server has received a packet from a given player.
+	 * <p>
+	 * Use {@link Channel#remoteAddress()} to get the remote address of the client.
 	 *
-	 * @param sender
-	 *            - the player that sent the packet.
-	 * @param packet
-	 *            - the packet being sent.
+	 * @param sender - the player that sent the packet, NULL for early login/status packets.
+	 * @param channel - channel that received the packet. Never NULL.
+	 * @param packet - the packet being received.
 	 * @return The packet to recieve instead, or NULL to cancel.
 	 */
-	public Object onPacketInAsync(Player sender, Object packet)
-	{
+	public Object onPacketInAsync(Player sender, Channel channel, Object packet) {
 		return packet;
 	}
 
 	/**
-	 * Cease listening for packets. This is called automatically when your plugin is
-	 * disabled.
+	 * Send a packet to a particular player.
+	 * <p>
+	 * Note that {@link #onPacketOutAsync(Player, Channel, Object)} will be invoked with this packet.
+	 *
+	 * @param player - the destination player.
+	 * @param packet - the packet to send.
 	 */
-	public final void close()
-	{
-		if(!closed)
-		{
+	public void sendPacket(Player player, Object packet) {
+		sendPacket(getChannel(player), packet);
+	}
+
+	/**
+	 * Send a packet to a particular client.
+	 * <p>
+	 * Note that {@link #onPacketOutAsync(Player, Channel, Object)} will be invoked with this packet.
+	 *
+	 * @param channel - client identified by a channel.
+	 * @param packet - the packet to send.
+	 */
+	public void sendPacket(Channel channel, Object packet) {
+		channel.pipeline().writeAndFlush(packet);
+	}
+
+	/**
+	 * Pretend that a given packet has been received from a player.
+	 * <p>
+	 * Note that {@link #onPacketInAsync(Player, Channel, Object)} will be invoked with this packet.
+	 *
+	 * @param player - the player that sent the packet.
+	 * @param packet - the packet that will be received by the server.
+	 */
+	public void receivePacket(Player player, Object packet) {
+		receivePacket(getChannel(player), packet);
+	}
+
+	/**
+	 * Pretend that a given packet has been received from a given client.
+	 * <p>
+	 * Note that {@link #onPacketInAsync(Player, Channel, Object)} will be invoked with this packet.
+	 *
+	 * @param channel - client identified by a channel.
+	 * @param packet - the packet that will be received by the server.
+	 */
+	public void receivePacket(Channel channel, Object packet) {
+		channel.pipeline().context("encoder").fireChannelRead(packet);
+	}
+
+	/**
+	 * Retrieve the name of the channel injector, default implementation is "tiny-" + plugin name + "-" + a unique ID.
+	 * <p>
+	 * Note that this method will only be invoked once. It is no longer necessary to override this to support multiple instances.
+	 *
+	 * @return A unique channel handler name.
+	 */
+	protected String getHandlerName() {
+		return "tiny-" + plugin.getName() + "-" + ID.incrementAndGet();
+	}
+
+	/**
+	 * Add a custom channel handler to the given player's channel pipeline, allowing us to intercept sent and received packets.
+	 * <p>
+	 * This will automatically be called when a player has logged in.
+	 *
+	 * @param player - the player to inject.
+	 */
+	public void injectPlayer(Player player) {
+		injectChannelInternal(getChannel(player)).player = player;
+	}
+
+	/**
+	 * Add a custom channel handler to the given channel.
+	 *
+	 * @param channel - the channel to inject.
+	 * @return The intercepted channel, or NULL if it has already been injected.
+	 */
+	public void injectChannel(Channel channel) {
+		injectChannelInternal(channel);
+	}
+
+	/**
+	 * Add a custom channel handler to the given channel.
+	 *
+	 * @param channel - the channel to inject.
+	 * @return The packet interceptor.
+	 */
+	private PacketInterceptor injectChannelInternal(Channel channel) {
+		try {
+			PacketInterceptor interceptor = (PacketInterceptor) channel.pipeline().get(handlerName);
+
+			// Inject our packet interceptor
+			if (interceptor == null) {
+				interceptor = new PacketInterceptor();
+				channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
+				uninjectedChannels.remove(channel);
+			}
+
+			return interceptor;
+		} catch (IllegalArgumentException e) {
+			// Try again
+			return (PacketInterceptor) channel.pipeline().get(handlerName);
+		}
+	}
+
+	/**
+	 * Retrieve the Netty channel associated with a player. This is cached.
+	 *
+	 * @param player - the player.
+	 * @return The Netty channel.
+	 */
+	public Channel getChannel(Player player) {
+		Channel channel = channelLookup.get(player.getName());
+
+		// Lookup channel again
+		if (channel == null) {
+			Object connection = getConnection.get(getPlayerHandle.invoke(player));
+			Object manager = getManager.get(connection);
+
+			channelLookup.put(player.getName(), channel = getChannel.get(manager));
+		}
+
+		return channel;
+	}
+
+	/**
+	 * Uninject a specific player.
+	 *
+	 * @param player - the injected player.
+	 */
+	public void uninjectPlayer(Player player) {
+		uninjectChannel(getChannel(player));
+	}
+
+	/**
+	 * Uninject a specific channel.
+	 * <p>
+	 * This will also disable the automatic channel injection that occurs when a player has properly logged in.
+	 *
+	 * @param channel - the injected channel.
+	 */
+	public void uninjectChannel(final Channel channel) {
+		// No need to guard against this if we're closing
+		if (!closed) {
+			uninjectedChannels.add(channel);
+		}
+
+		// See ChannelInjector in ProtocolLib, line 590
+		channel.eventLoop().execute(new Runnable() {
+
+			@Override
+			public void run() {
+				channel.pipeline().remove(handlerName);
+			}
+
+		});
+	}
+
+	/**
+	 * Determine if the given player has been injected by TinyProtocol.
+	 *
+	 * @param player - the player.
+	 * @return TRUE if it is, FALSE otherwise.
+	 */
+	public boolean hasInjected(Player player) {
+		return hasInjected(getChannel(player));
+	}
+
+	/**
+	 * Determine if the given channel has been injected by TinyProtocol.
+	 *
+	 * @param channel - the channel.
+	 * @return TRUE if it is, FALSE otherwise.
+	 */
+	public boolean hasInjected(Channel channel) {
+		return channel.pipeline().get(handlerName) != null;
+	}
+
+	/**
+	 * Cease listening for packets. This is called automatically when your plugin is disabled.
+	 */
+	public final void close() {
+		if (!closed) {
 			closed = true;
 
 			// Remove our handlers
-			for(Player player : plugin.getServer().getOnlinePlayers())
-			{
-				getChannel(player).pipeline().remove(getHandlerName());
+			for (Player player : plugin.getServer().getOnlinePlayers()) {
+				uninjectPlayer(player);
 			}
+
+			// Clean up Bukkit
+			HandlerList.unregisterAll(listener);
+			unregisterChannelHandler();
 		}
 	}
 
 	/**
-	 * Retrieve a field accessor for a specific field type and name.
+	 * Channel handler that is inserted into the player's channel pipeline, allowing us to intercept sent and received packets.
 	 *
-	 * @param target
-	 *            - the target type.
-	 * @param name
-	 *            - the name of the field, or NULL to ignore.
-	 * @param fieldType
-	 *            - a compatible field type.
-	 * @return The field accessor.
+	 * @author Kristian
 	 */
-	public static <T> FieldAccessor<T> getField(Class<?> target, String name, Class<T> fieldType)
-	{
-		return getField(target, name, fieldType, 0);
-	}
+	private final class PacketInterceptor extends ChannelDuplexHandler {
+		// Updated by the login event
+		public volatile Player player;
 
-	/**
-	 * Retrieve a field accessor for a specific field type and name.
-	 *
-	 * @param target
-	 *            - the target type.
-	 * @param fieldType
-	 *            - a compatible field type.
-	 * @param index
-	 *            - the number of compatible fields to skip.
-	 * @return The field accessor.
-	 */
-	public static <T> FieldAccessor<T> getField(Class<?> target, Class<T> fieldType, int index)
-	{
-		return getField(target, null, fieldType, index);
-	}
+		@Override
+		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+			// Intercept channel
+			final Channel channel = ctx.channel();
+			handleLoginStart(channel, msg);
 
-	/**
-	 * Retrieve a field accessor for a specific field type and name.
-	 *
-	 * @param nmsTargetClass
-	 *            - the net.minecraft.server class name.
-	 * @param fieldType
-	 *            - a compatible field type.
-	 * @param index
-	 *            - the number of compatible fields to skip.
-	 * @return The field accessor.
-	 */
-	public static <T> FieldAccessor<T> getField(String nmsTargetClass, Class<T> fieldType, int index)
-	{
-		return getField(getMinecraftClass(nmsTargetClass), fieldType, index);
-	}
+			try {
+				msg = onPacketInAsync(player, channel, msg);
+			} catch (Exception e) {
+				plugin.getLogger().log(Level.SEVERE, "Error in onPacketInAsync().", e);
+			}
 
-	private static <T> FieldAccessor<T> getField(Class<?> target, String name, Class<T> fieldType, int index)
-	{
-		for(final Field field : target.getDeclaredFields())
-		{
-			if((name == null || field.getName().equals(name)) && fieldType.isAssignableFrom(field.getType()) && index-- <= 0)
-			{
-				field.setAccessible(true);
-				return new FieldAccessor<T>()
-				{
-					@SuppressWarnings("unchecked")
-					@Override
-					public T get(Object target)
-					{
-						try
-						{
-							return (T) field.get(target);
-						}
-						catch(IllegalAccessException e)
-						{
-							throw new RuntimeException("Cannot access reflection.", e);
-						}
-					}
-
-					@Override
-					public void set(Object target, Object value)
-					{
-						try
-						{
-							field.set(target, value);
-						}
-						catch(IllegalAccessException e)
-						{
-							throw new RuntimeException("Cannot access reflection.", e);
-						}
-					}
-
-					@Override
-					public boolean hasField(Object target)
-					{
-						return field.getDeclaringClass().isAssignableFrom(target.getClass());
-					}
-				};
+			if (msg != null) {
+				super.channelRead(ctx, msg);
 			}
 		}
 
-		if(target.getSuperclass() != null)
-		{
-			return getField(target.getSuperclass(), name, fieldType, index);
-		}
+		@Override
+		public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+			try {
+				msg = onPacketOutAsync(player, ctx.channel(), msg);
+			} catch (Exception e) {
+				plugin.getLogger().log(Level.SEVERE, "Error in onPacketOutAsync().", e);
+			}
 
-		throw new IllegalArgumentException("Cannot find field with type " + fieldType);
-	}
-
-	/**
-	 * Search for the first publically and privately defined method of the given
-	 * name and parameter count.
-	 *
-	 * @param clazz
-	 *            - a class to start with.
-	 * @param methodName
-	 *            - the method name, or NULL to skip.
-	 * @param params
-	 *            - the expected parameters.
-	 * @return An object that invokes this specific method.
-	 * @throws IllegalStateException
-	 *             If we cannot find this method.
-	 */
-	public static MethodInvoker getMethod(Class<?> clazz, String methodName, Class<?>... params)
-	{
-		for(final Method method : clazz.getDeclaredMethods())
-		{
-			if((methodName == null || method.getName().equals(methodName)) && Arrays.equals(method.getParameterTypes(), params))
-			{
-				method.setAccessible(true);
-				return new MethodInvoker()
-				{
-					@Override
-					public Object invoke(Object target, Object... arguments)
-					{
-						try
-						{
-							return method.invoke(target, arguments);
-						}
-
-						catch(Exception e)
-						{
-							throw new RuntimeException("Cannot invoke method " + method, e);
-						}
-					}
-				};
+			if (msg != null) {
+				super.write(ctx, msg, promise);
 			}
 		}
 
-		if(clazz.getSuperclass() != null)
-		{
-			return getMethod(clazz.getSuperclass(), methodName, params);
+		private void handleLoginStart(Channel channel, Object packet) {
+			if (PACKET_LOGIN_IN_START.isInstance(packet)) {
+				GameProfile profile = getGameProfile.get(packet);
+				channelLookup.put(profile.getName(), channel);
+			}
 		}
-
-		throw new IllegalStateException(String.format("Unable to find method %s (%s).", methodName, Arrays.asList(params)));
-	}
-
-	/**
-	 * Retrieve a class in the net.minecraft.server.VERSION.* package.
-	 *
-	 * @param name
-	 *            - the name of the class, excluding the package.
-	 * @throws IllegalArgumentException
-	 *             If the class doesn't exist.
-	 */
-	public static Class<?> getMinecraftClass(String name)
-	{
-		try
-		{
-			return Class.forName(NMS_PREFIX + "." + name);
-		}
-
-		catch(ClassNotFoundException e)
-		{
-			throw new IllegalArgumentException("Cannot find nms." + name, e);
-		}
-	}
-
-	/**
-	 * Retrieve a class in the org.bukkit.craftbukkit.VERSION.* package.
-	 *
-	 * @param name
-	 *            - the name of the class, excluding the package.
-	 * @throws IllegalArgumentException
-	 *             If the class doesn't exist.
-	 */
-	public static Class<?> getCraftBukkitClass(String name)
-	{
-		try
-		{
-			return Class.forName(OBC_PREFIX + "." + name);
-		}
-
-		catch(ClassNotFoundException e)
-		{
-			throw new IllegalArgumentException("Cannot find obc." + name, e);
-		}
-	}
-
-	/**
-	 * An interface for invoking a specific method.
-	 */
-	public interface MethodInvoker
-	{
-		/**
-		 * Invoke a method on a specific target object.
-		 *
-		 * @param target
-		 *            - the target object, or NULL for a static method.
-		 * @param arguments
-		 *            - the arguments to pass to the method.
-		 * @return The return value, or NULL if is void.
-		 */
-		public Object invoke(Object target, Object... arguments);
-	}
-
-	/**
-	 * An interface for retrieving the field content.
-	 *
-	 * @param <T>
-	 *            - field type.
-	 */
-	public interface FieldAccessor<T>
-	{
-		/**
-		 * Retrieve the content of a field.
-		 *
-		 * @param target
-		 *            - the target object, or NULL for a static field.
-		 * @return The value of the field.
-		 */
-		public T get(Object target);
-
-		/**
-		 * Set the content of a field.
-		 *
-		 * @param target
-		 *            - the target object, or NULL for a static field.
-		 * @param value
-		 *            - the new value of the field.
-		 */
-		public void set(Object target, Object value);
-
-		/**
-		 * Determine if the given object has this field.
-		 *
-		 * @param target
-		 *            - the object to test.
-		 * @return TRUE if it does, FALSE otherwise.
-		 */
-		public boolean hasField(Object target);
 	}
 }
