@@ -17,6 +17,8 @@ public class GMap<K, V> extends HashMap<K, V>
 	{
 		super();
 
+		if (map == null) return;
+
 		for(K i : map.keySet())
 		{
 			put(i, map.get(i));
@@ -104,9 +106,10 @@ public class GMap<K, V> extends HashMap<K, V>
 	 */
 	public GMap<K, V> append(GMap<K, V> umap)
 	{
-		for(K i : umap.keySet())
-		{
-			put(i, umap.get(i));
+		if (umap != null) {
+			for (K i : umap.keySet()) {
+				put(i, umap.get(i));
+			}
 		}
 
 		return this;

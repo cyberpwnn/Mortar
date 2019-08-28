@@ -103,6 +103,8 @@ public class GList<T> extends ArrayList<T>
 	{
 		super();
 
+		if (null == set) return;
+
 		for(T i : set)
 		{
 			add(i);
