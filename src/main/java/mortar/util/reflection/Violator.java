@@ -5,12 +5,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import mortar.lang.collection.GList;
 
 public class Violator
 {
-	protected static TreeMap<String, Object> nodes = new TreeMap<String, Object>();
+	protected static ConcurrentSkipListMap<String, Object> nodes = new ConcurrentSkipListMap<String, Object>();
 
 	private static String id(Object o, Object h)
 	{
