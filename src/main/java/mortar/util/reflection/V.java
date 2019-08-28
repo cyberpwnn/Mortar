@@ -137,7 +137,17 @@ public class V
 	{
 		try
 		{
-			(local ? Violator.getDeclaredField(o.getClass(), field) : Violator.getField(o.getClass(), field)).set(o, value);
+			// https://github.com/VolmitSoftware/Mortar/issues/5
+			(local
+				? Violator.getDeclaredField(
+					o.getClass(),
+					field
+				) :
+				Violator.getField(
+					o.getClass(),
+					field
+				)
+			).set(o, value);
 		}
 
 		catch(Throwable e)
